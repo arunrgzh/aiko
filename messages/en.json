@@ -1,0 +1,149 @@
+{
+<<<<<<< HEAD
+    "landing": {
+        "nav": {
+            "main": "Home",
+            "audience": "Who It's For",
+            "features": "Convenience",
+            "opport": "Opportunities"
+        },
+
+        "title": "Create a Personal AI-Assistant in 3 Minutes",
+        "title_part_highlight": "AI-Assistant",
+
+        "subtitle": "Build smart chatbots for WhatsApp, Telegram, Instagram, and other messengers — with CRM integration and full business automation.",
+
+        "button": {
+            "create": "Create",
+            "try": "Try Demo",
+            "start": "Get Started",
+            "login": "Log In"
+        },
+
+        "main": {
+            "title": "One System — All Messengers.",
+            "sub": "Manage customer communication across all messengers from one convenient platform. Replace dozens of tools with a single smart system for messaging, sales, and support.",
+            "mode": "Customizable Themes",
+            "mode-sub": "Easily switch between light and dark modes or create your own theme.",
+            "auto": "Automate Customer Communication",
+            "auto-sub": "Our chatbots help answer customer questions 24/7, collect leads, and boost satisfaction.",
+            "panel": "All your chats, bots, operators, and analytics — in one simple dashboard.",
+            "panel-sub": "Control communication and performance in one window: from incoming messages to analytics for every bot and channel.",
+            "messengers": "Connect in Just a Few Steps",
+            "messengers-sub": "Easily integrate your AI assistant with popular messengers"
+        },
+
+        "audience": {
+            "title": "Who It's For...",
+            "sub": "“Suitable for any business”",
+            "users": {
+                "e-commerce": "Online Stores",
+                "e-commerce-sub": "Auto-replies, recommendations, and 24/7 support",
+                "edu": "Online Courses and Schools",
+                "edu-sub": "A bot consultant for programs and schedules",
+                "tourism": "Hotels and Tourism",
+                "tourism-sub": "Booking, reminders, and FAQ support",
+                "freelancers": "Freelancers",
+                "freelancers-sub": "Client onboarding via messengers",
+                "techsupport": "Technical Support",
+                "tech-sub": "24/7 auto-replies, fast query routing, FAQs",
+                "services": "Business Services (lawyers, accountants, etc.)",
+                "services-sub": "Initial consultations, lead collection, and client filtering",
+                "assitant": "AI Sales Assistant",
+                "assitant-sub": "Automatically identifies interest, handles objections, and guides to payment",
+                "clinics": "Medical Clinics",
+                "clinics-sub": "Online booking and consultation via messengers"
+            }
+        },
+
+        "features": {
+            "titile": "All in One Place",
+            "sub": "We create chatbots and assistants precisely tailored to your business — from online stores to service industries and sales automation.",
+            "lang": {
+                "lang": "Multilingual by Default",
+                "sub": "Your bot speaks the client's language — automatically. Add support for Russian, English, Kazakh, and more right out of the box. The virtual assistant detects the language and adjusts responses accordingly."
+            },
+            "dashboard": {
+                "dashboard": "Analytics and Management in One Place",
+                "sub": "Monitor, improve, manage. The dashboard shows how many clients are chatting, where drop-offs happen, how many leads are closed — all in real time.",
+                "one": "Track key metrics without delays",
+                "two": "React quickly to bottlenecks in the sales funnel",
+                "three": "Optimize processes using up-to-date data"
+            },
+            "responsive": {
+                "title": "Works on Any Device",
+                "sub": "Manage bots from your phone, tablet, or laptop. Setup, replies, and script editing — all available online through the browser. No app installations or special access required.",
+                "one": "Manage bots from any browser without installing software.",
+                "two": "Edit scripts in real-time from any device.",
+                "three": "Access settings in one click, wherever you are."
+            }
+        },
+
+        "opport": {
+            "nav": {
+                "create-bot": "Bot Builder",
+                "payment": "Payment",
+                "analytic": "Analytics",
+                "marketing": "Marketing",
+                "ai": "AI",
+                "tech-supp": "Tech Support",
+                "project": "Project"
+            }
+        },
+
+        "footer": {
+            "titile": "Try It Now.",
+            "sub": "Chat with our bot right here..."
+=======
+    "nav": {
+        "main": {
+            "dashboard": "Dashboard",
+            "pricing": "Pricing",
+            "blog": "Blog"
+        },
+        "assistants": {
+            "assistants": "Assistants",
+            "assistantDetails": "Assistant Details",
+            "main": {
+                "main": "Main",
+                "assistant": "Assistant",
+                "testing": "Testing",
+                "docs": "Docs",
+                "correction": "Correction"
+            },
+            "analytic": {
+                "analytic": "Analytic",
+                "statistic": "Statistic",
+                "messages": "Messages"
+            },
+            "integration": {
+                "integration": "Integration",
+                "messengers": "Messengers",
+                "newsletters": "Newsletters"
+            }
+>>>>>>> d950f28c931be89f3fee03853c040e2c28d78559
+        }
+    },
+
+    "signIn": {
+        "welcome": "Welcome!",
+        "text": "Please enter your credentials to log in!",
+        "username": "Username",
+        "password": "Password",
+        "forgot-password": "Forgot password",
+        "button": "Sign In",
+        "continue": "or continue with",
+        "fotter-text": "Don't have an account yet? Sign up"
+    },
+
+    "signUp": {
+        "signUp": "Sign Up",
+        "subheading": "Start your free trial",
+        "username": "Username",
+        "email": "Email",
+        "password": "Password",
+        "confirm-password": "Confirm password",
+        "button": "Register",
+        "footer-text": "Already have an account? Log in"
+    }
+}

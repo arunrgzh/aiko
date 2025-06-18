@@ -1,0 +1,11 @@
+services:
+  xrox_frontend:
+    container_name: xrox_frontend
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    command: sh -c "npm run start -- -p $NEXT_PORT -H $NEXT_HOST"
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${NEXT_PORT}:${NEXT_PORT}"
