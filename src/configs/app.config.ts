@@ -14,7 +14,7 @@ const appConfig: AppConfig = {
     authenticatedEntryPath: '/main/dashboard/',
     unAuthenticatedEntryPath: '/landing',
     signInEntryPath: '/sign-in',
-    locale: 'en',
+    locale: 'ru',
     activeNavTranslation: true,
 }
 

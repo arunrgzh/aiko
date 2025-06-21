@@ -32,7 +32,7 @@ const Prose = () => {
                 base styles is what you really want. You dont want to have to
                 remove annoying margins every time you use a <code>p</code>{' '}
                 element in a piece of your dashboard UI. And I doubt you really
-                want your blog posts to use the user-agent styles either — you
+                want your blog posts to use the user-agent styles either - you
                 want them to look <em>awesome</em>, not awful.
             </p>
             <p>
@@ -98,7 +98,7 @@ const Prose = () => {
             <p>Now we're going to try out another header style.</p>
             <h3>Typography should be easy</h3>
             <p>
-                So that's a header for you — with any luck if we've done our job
+                So that's a header for you - with any luck if we've done our job
                 correctly that will look pretty reasonable.
             </p>
             <p>Something a wise person once told me about typography is:</p>

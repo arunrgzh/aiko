@@ -19,56 +19,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import type { Mode } from '@/@types/theme'
+import { useTranslations } from 'next-intl'
 
 type DemoProps = {
     mode: Mode
 }
-
-const demoList: Record<
-    string,
-    {
-        id: string
-        name: string
-        path: string
-    }[]
-> = {
-    all: allDemos,
-    project: projectDemos,
-    ecommerce: ecommerceDemos,
-    ai: aiDemos,
-    apps: appsDemos,
-    marketing: marketingDemos,
-    helpCenter: helpCenterDemos,
-    accounts: accountDemos,
-    auth: authDemos,
-}
-
-const tabList = [
-    {
-        id: 'all',
-        name: 'Конструктор бота',
-    },
-    {
-        id: 'ecommerce',
-        name: 'Оплата',
-    },
-    {
-        id: 'project',
-        name: 'Аналитика',
-    },
-    {
-        id: 'marketing',
-        name: 'Marketing',
-    },
-    {
-        id: 'ai',
-        name: 'AI',
-    },
-    {
-        id: 'helpCenter',
-        name: 'Тех.поддержка',
-    },
-]
 
 const DemoCard = ({
     id,
@@ -113,9 +68,11 @@ const DemoCard = ({
 const Tabs = ({
     selectedTab,
     setSelectedTab,
+    tabList,
 }: {
     selectedTab: string
     setSelectedTab: (id: string) => void
+    tabList: Array<{ id: string; name: string }>
 }) => {
     return (
         <div className="flex flex-col gap-2">
@@ -142,8 +99,61 @@ const Tabs = ({
 
 const Demos = ({ mode }: DemoProps) => {
     const [selectedTab, setSelectedTab] = useState('all')
-
+    const t = useTranslations('content')
     const router = useRouter()
+
+    const demoList: Record<
+        string,
+        {
+            id: string
+            name: string
+            path: string
+        }[]
+    > = {
+        all: allDemos,
+        onboarding: accountDemos,
+        vacancies: projectDemos,
+        chat: aiDemos,
+        profile: ecommerceDemos,
+        'my-responses': marketingDemos,
+        interview: helpCenterDemos,
+        settings: authDemos,
+    }
+
+    const tabList = [
+        {
+            id: 'all',
+            name: 'All',
+        },
+        {
+            id: 'onboarding',
+            name: t('pages.onboarding'),
+        },
+        {
+            id: 'vacancies',
+            name: t('pages.vacancies'),
+        },
+        {
+            id: 'chat',
+            name: t('pages.chat'),
+        },
+        {
+            id: 'profile',
+            name: t('pages.profile'),
+        },
+        {
+            id: 'my-responses',
+            name: t('pages.my-responses'),
+        },
+        {
+            id: 'interview',
+            name: t('pages.interview'),
+        },
+        {
+            id: 'settings',
+            name: t('pages.settings'),
+        },
+    ]
 
     const handleSignIn = () => {
         router.push('/sign-in')
@@ -158,9 +168,9 @@ const Demos = ({ mode }: DemoProps) => {
                 transition={{ duration: 0.3, type: 'spring', bounce: 0.1 }}
                 viewport={{ once: true }}
             >
-                <motion.h2 className="my-6 text-5xl">Возможности </motion.h2>
+                <motion.h2 className="my-6 text-5xl">{t('title')} </motion.h2>
                 <motion.p className="mx-auto max-w-[600px]">
-                    «Функции, которые делают нас лучшими»{' '}
+                    {t('sub')}{' '}
                 </motion.p>
             </motion.div>
             <Container>
@@ -169,6 +179,7 @@ const Demos = ({ mode }: DemoProps) => {
                         <Tabs
                             selectedTab={selectedTab}
                             setSelectedTab={setSelectedTab}
+                            tabList={tabList}
                         />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -190,7 +201,7 @@ const Demos = ({ mode }: DemoProps) => {
                         className="inline-flex items-center"
                         onClick={handleSignIn}
                     >
-                        Попробовать Демо
+                        {t('button.try-demo')}
                     </Button>
                 </div>
             </Container>

@@ -49,7 +49,7 @@ const PointList = ({ children }: { children: ReactNode }) => {
 }
 
 const OtherFeatures = () => {
-    const t = useTranslations('landing.features')
+    const t = useTranslations('features')
 
     return (
         <div id="otherFeatures" className="relative z-20 py-10 md:py-40">
@@ -126,7 +126,7 @@ const OtherFeatures = () => {
                                 </div>
                             </div>
                             <div>
-                                <h3 className="text-4xl">{t('lang.title')} </h3>
+                                <h3 className="text-4xl">{t('lang.lang')} </h3>
                                 <p className="mt-6 max-w-[550px] text-lg">
                                     {t('lang.sub')}
                                 </p>
@@ -145,9 +145,6 @@ const OtherFeatures = () => {
                                 <div className="mt-12 flex flex-col gap-4">
                                     <PointList>{t('dashboard.one')}</PointList>
                                     <PointList>{t('dashboard.two')}</PointList>
-                                    <PointList>
-                                        {t('dashboard.three')}
-                                    </PointList>
                                 </div>
                             </div>
                             <div className="relative flex justify-center">
@@ -190,9 +187,6 @@ const OtherFeatures = () => {
                                 <div className="mt-12 flex flex-col gap-4">
                                     <PointList>{t('responsive.one')}</PointList>
                                     <PointList>{t('responsive.two')}</PointList>
-                                    <PointList>
-                                        {t('responsive.three')}
-                                    </PointList>
                                 </div>
                             </div>
                             <div className="relative flex justify-center">

@@ -1,10 +1,17 @@
 // services/ApiService.ts
 import AxiosBase from './axios/AxiosBase'
-import type { AxiosRequestConfig, AxiosResponse, AxiosError, Method } from 'axios'
+import type {
+    AxiosRequestConfig,
+    AxiosResponse,
+    AxiosError,
+    Method,
+} from 'axios'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export interface FetchDataOptions<Response = unknown, Request = Record<string, unknown>>
-    extends AxiosRequestConfig<Request> {
+export interface FetchDataOptions<
+    Response = unknown,
+    Request = Record<string, unknown>,
+> extends AxiosRequestConfig<Request> {
     url: string
     method?: Method
     data?: Request
@@ -20,14 +27,16 @@ const ApiService = {
     ): Promise<Response> {
         return new Promise<Response>((resolve, reject) => {
             AxiosBase(options)
-                .then((response: AxiosResponse<Response>) => resolve(response.data))
+                .then((response: AxiosResponse<Response>) =>
+                    resolve(response.data),
+                )
                 .catch((error: AxiosError) => reject(error))
         })
     },
 
     /**
      * multipart/form-data запрос
-     * @template T — тип данных, который придёт в ответе
+     * @template T - тип данных, который придёт в ответе
      */
     fetchFormDataWithAxios<T = unknown>(
         options: Omit<AxiosRequestConfig<FormData>, 'data'> & {
@@ -40,14 +49,14 @@ const ApiService = {
         const { url, method = 'post', data, headers = {}, ...rest } = options
 
         return new Promise<T>((resolve, reject) => {
-            // тут мы явно передаём T — чтобы ESLint «увидел» использование дженерика
+            // тут мы явно передаём T - чтобы ESLint «увидел» использование дженерика
             AxiosBase<T>({
                 url,
                 method,
                 data,
                 headers: {
                     ...headers,
-                    // не нужно руками прописывать Content-Type — Axios это сделает
+                    // не нужно руками прописывать Content-Type - Axios это сделает
                 },
                 ...rest,
             })
