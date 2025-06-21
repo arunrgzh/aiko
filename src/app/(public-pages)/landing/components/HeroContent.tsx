@@ -21,7 +21,7 @@ const HeroContent = ({ mode }: { mode: Mode }) => {
             <div className="flex flex-col min-h-screen pt-20 md:pt-40 relative overflow-hidden">
                 <div>
                     <TextGenerateEffect
-                        wordClassName="text-2xl md:text-4xl lg:text-8xl font-bold max-w-7xl mx-auto text-center mt-6 relative z-10"
+                        wordClassName="text-2xl md:text-4xl lg:text-6xl  max-w-7xl mx-auto text-center mt-6 relative z-10"
                         words={t('title')}
                         wordsCallbackClass={({ word }) => {
                             if (word === t('title_part_highlight')) {
@@ -56,7 +56,7 @@ const HeroContent = ({ mode }: { mode: Mode }) => {
                         {mode === MODE_LIGHT && (
                             <Image
                                 className="rounded-2xl lg:rounded-[24px]"
-                                src="/img/landing/hero/hero.webp"
+                                src="/img/landing/hero/img-1.jpg"
                                 width={1920}
                                 height={1040}
                                 alt="Ecme homepage"

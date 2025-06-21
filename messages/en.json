@@ -1,5 +1,4 @@
 {
-<<<<<<< HEAD
     "landing": {
         "nav": {
             "main": "Home",
@@ -8,10 +7,10 @@
             "opport": "Opportunities"
         },
 
-        "title": "Create a Personal AI-Assistant in 3 Minutes",
-        "title_part_highlight": "AI-Assistant",
+        "title": "Welcome to AI-Komekshi - your personal job search assistant.",
+        "title_part_highlight": "AI-Komekshi",
 
-        "subtitle": "Build smart chatbots for WhatsApp, Telegram, Instagram, and other messengers — with CRM integration and full business automation.",
+        "subtitle": "Build smart chatbots for WhatsApp, Telegram, Instagram, and other messengers - with CRM integration and full business automation.",
 
         "button": {
             "create": "Create",
@@ -21,13 +20,13 @@
         },
 
         "main": {
-            "title": "One System — All Messengers.",
+            "title": "One System - All Messengers.",
             "sub": "Manage customer communication across all messengers from one convenient platform. Replace dozens of tools with a single smart system for messaging, sales, and support.",
             "mode": "Customizable Themes",
             "mode-sub": "Easily switch between light and dark modes or create your own theme.",
             "auto": "Automate Customer Communication",
             "auto-sub": "Our chatbots help answer customer questions 24/7, collect leads, and boost satisfaction.",
-            "panel": "All your chats, bots, operators, and analytics — in one simple dashboard.",
+            "panel": "All your chats, bots, operators, and analytics - in one simple dashboard.",
             "panel-sub": "Control communication and performance in one window: from incoming messages to analytics for every bot and channel.",
             "messengers": "Connect in Just a Few Steps",
             "messengers-sub": "Easily integrate your AI assistant with popular messengers"
@@ -35,7 +34,7 @@
 
         "audience": {
             "title": "Who It's For...",
-            "sub": "“Suitable for any business”",
+            "sub": "Suitable for any business",
             "users": {
                 "e-commerce": "Online Stores",
                 "e-commerce-sub": "Auto-replies, recommendations, and 24/7 support",
@@ -57,22 +56,23 @@
         },
 
         "features": {
-            "titile": "All in One Place",
-            "sub": "We create chatbots and assistants precisely tailored to your business — from online stores to service industries and sales automation.",
+            "title": "All in One Place",
+            "sub": "We create chatbots and assistants precisely tailored to your business - from online stores to service industries and sales automation.",
             "lang": {
+                "title": "Multilingual by Default",
                 "lang": "Multilingual by Default",
-                "sub": "Your bot speaks the client's language — automatically. Add support for Russian, English, Kazakh, and more right out of the box. The virtual assistant detects the language and adjusts responses accordingly."
+                "sub": "Your bot speaks the client's language - automatically. Add support for Russian, English, Kazakh, and more right out of the box. The virtual assistant detects the language and adjusts responses accordingly."
             },
             "dashboard": {
                 "dashboard": "Analytics and Management in One Place",
-                "sub": "Monitor, improve, manage. The dashboard shows how many clients are chatting, where drop-offs happen, how many leads are closed — all in real time.",
+                "sub": "Monitor, improve, manage. The dashboard shows how many clients are chatting, where drop-offs happen, how many leads are closed - all in real time.",
                 "one": "Track key metrics without delays",
                 "two": "React quickly to bottlenecks in the sales funnel",
                 "three": "Optimize processes using up-to-date data"
             },
             "responsive": {
                 "title": "Works on Any Device",
-                "sub": "Manage bots from your phone, tablet, or laptop. Setup, replies, and script editing — all available online through the browser. No app installations or special access required.",
+                "sub": "Manage bots from your phone, tablet, or laptop. Setup, replies, and script editing - all available online through the browser. No app installations or special access required.",
                 "one": "Manage bots from any browser without installing software.",
                 "two": "Edit scripts in real-time from any device.",
                 "three": "Access settings in one click, wherever you are."
@@ -94,7 +94,26 @@
         "footer": {
             "titile": "Try It Now.",
             "sub": "Chat with our bot right here..."
-=======
+        }
+    },
+
+    "content": {
+        "title": "Opportunities",
+        "sub": "\"Features that make us the best\"",
+        "pages": {
+            "onboarding": "Onboarding",
+            "vacancies": "Vacancies",
+            "chat": "AI Chat",
+            "profile": "Profile",
+            "my-responses": "My Responses",
+            "interview": "Practice Interviews",
+            "settings": "Profile Settings"
+        },
+        "button": {
+            "try-demo": "Try Demo"
+        }
+    },
+
     "nav": {
         "main": {
             "dashboard": "Dashboard",
@@ -121,7 +140,6 @@
                 "messengers": "Messengers",
                 "newsletters": "Newsletters"
             }
->>>>>>> d950f28c931be89f3fee03853c040e2c28d78559
         }
     },
 
