@@ -23,7 +23,7 @@ app.add_middleware(
 )
 
 # Include routers
-app.include_router(auth.router, prefix="/api")
+app.include_router(auth.router)
 
 @app.on_event("startup")
 async def init_db():

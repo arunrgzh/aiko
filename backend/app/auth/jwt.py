@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from ..config import settings
 from ..schemas.user import TokenData, UserResponse
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
 async def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
     to_encode = data.copy()
