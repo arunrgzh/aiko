@@ -21,9 +21,24 @@ import type {
 
 export async function apiSignUp(data: SignUpCredential) {
     return ApiService.fetchDataWithAxios<SignUpResponse>({
-        url: '/auth/sign-up/',
+        url: '/auth/sign-up',
         method: 'post',
         data,
+    }).catch((error) => {
+        console.log('Auth service error:', error.response?.data)
+        const errorData = error.response?.data
+        if (errorData) {
+            // Handle different error formats
+            const errorMessage =
+                typeof errorData === 'string'
+                    ? errorData
+                    : errorData.error ||
+                      errorData.detail ||
+                      errorData.message ||
+                      JSON.stringify(errorData)
+            throw new Error(errorMessage)
+        }
+        throw new Error('Failed to sign up')
     })
 }
 

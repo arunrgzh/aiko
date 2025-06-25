@@ -10,7 +10,7 @@ export type AppConfig = {
 }
 
 const appConfig: AppConfig = {
-    apiUrl: 'http://localhost:8000',
+    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
     apiPrefix: '/api',
     authenticatedEntryPath: '/main/dashboard/',
     unAuthenticatedEntryPath: '/landing',

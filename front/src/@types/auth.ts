@@ -16,8 +16,10 @@ export type SignInResponse = {
 }
 
 export type SignUpResponse = {
-    status: string
-    message: string
+    status?: string
+    message?: string
+    error?: string
+    detail?: string
 }
 
 export type SignUpCredential = {
