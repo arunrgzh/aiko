@@ -13,6 +13,7 @@ import { z } from 'zod'
 import type { ZodType } from 'zod'
 import type { CommonProps } from '@/@types/common'
 import type { ReactNode } from 'react'
+import { signIn } from 'next-auth/react'
 
 export type OnSignInPayload = {
     values: SignInFormSchema
@@ -52,16 +53,40 @@ const SignInForm = (props: SignInFormProps) => {
         formState: { errors },
         control,
     } = useForm<SignInFormSchema>({
-        defaultValues: {
-            username: 'admin-01@aikomekshi.com',
-            password: '123Qwe',
-        },
         resolver: zodResolver(validationSchema),
     })
 
     const handleSignIn = async (values: SignInFormSchema) => {
-        if (onSignIn) {
-            onSignIn({ values, setSubmitting, setMessage })
+        try {
+            setSubmitting(true)
+            const result = await signIn('credentials', {
+                username: values.username,
+                password: values.password,
+                redirect: false,
+            })
+
+            if (result?.error) {
+                // Map error codes to user-friendly messages
+                const errorMessages: { [key: string]: string } = {
+                    CredentialsSignin: 'Invalid username or password',
+                    default: 'An error occurred during sign in',
+                }
+
+                setMessage(errorMessages[result.error] || errorMessages.default)
+                return
+            }
+
+            if (onSignIn) {
+                onSignIn({ values, setSubmitting, setMessage })
+            }
+        } catch (error) {
+            setMessage(
+                error instanceof Error
+                    ? error.message
+                    : 'An error occurred during sign in',
+            )
+        } finally {
+            setSubmitting(false)
         }
     }
 

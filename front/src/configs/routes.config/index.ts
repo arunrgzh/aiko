@@ -13,4 +13,16 @@ const routes: Routes = {
     },
 }
 
+export const protectedRoutes: Routes = {
+    ...botRoute,
+    ...mainRoute,
+}
+
+export const publicRoutes = {
+    '/': true,
+    '/landing': true,
+}
+
+export const authRoutes = authRoute
+
 export default routes
