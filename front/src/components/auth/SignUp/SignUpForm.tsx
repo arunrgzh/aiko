@@ -32,15 +32,30 @@ interface SignUpFormProps extends CommonProps {
 
 const validationSchema: ZodType<SignUpFormSchema> = z
     .object({
-        email: z.string({ required_error: 'Please enter your email' }),
-        username: z.string({ required_error: 'Please enter your name' }),
-        password: z.string({ required_error: 'Password Required' }),
+        email: z
+            .string({ required_error: 'Please enter your email' })
+            .email('Please enter a valid email address'),
+        username: z
+            .string({ required_error: 'Please enter your name' })
+            .min(3, 'Username must be at least 3 characters'),
+        password: z
+            .string({ required_error: 'Password Required' })
+            .min(8, 'Password must be at least 8 characters')
+            .regex(
+                /[A-Z]/,
+                'Password must contain at least one uppercase letter',
+            )
+            .regex(
+                /[a-z]/,
+                'Password must contain at least one lowercase letter',
+            )
+            .regex(/[0-9]/, 'Password must contain at least one number'),
         confirmPassword: z.string({
             required_error: 'Confirm Password Required',
         }),
     })
     .refine((data) => data.password === data.confirmPassword, {
-        message: 'Password not match',
+        message: 'Passwords do not match',
         path: ['confirmPassword'],
     })
 
@@ -114,7 +129,7 @@ const SignUpForm = (props: SignUpFormProps) => {
                             <Input
                                 type="password"
                                 autoComplete="off"
-                                placeholder="Password"
+                                placeholder="Password (min. 8 characters)"
                                 {...field}
                             />
                         )}

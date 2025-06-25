@@ -1,25 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server'
 import type { SignUpCredential } from '@/@types/auth'
+import appConfig from '@/configs/app.config'
 
 export async function POST(req: NextRequest) {
     try {
-        const body = await req.json() as SignUpCredential
+        const body = (await req.json()) as SignUpCredential
+        console.log('API route received:', body)
 
-        const res = await fetch('http://46.226.123.179:8081/api/signup/', {
+        if (!body.username || !body.email || !body.password) {
+            return NextResponse.json(
+                { error: 'Missing required fields' },
+                { status: 400 },
+            )
+        }
+
+        const apiUrl = appConfig.apiUrl
+        console.log('Calling backend URL:', `${apiUrl}/api/auth/register`)
+
+        const res = await fetch(`${apiUrl}/api/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(body),
-
         })
 
         const data = await res.json()
+        console.log('FastAPI response:', data)
 
-        return NextResponse.json(data, { status: res.status })
+        if (!res.ok) {
+            const errorMessage =
+                data.detail || data.message || 'Failed to sign up'
+            return NextResponse.json(
+                { error: errorMessage },
+                { status: res.status },
+            )
+        }
+
+        return NextResponse.json(data)
     } catch (error) {
         console.error('Signup error:', error)
-        return NextResponse.json({ error: 'Server error' }, { status: 500 })
+        return NextResponse.json(
+            { error: 'An error occurred during sign up' },
+            { status: 500 },
+        )
     }
 }
-

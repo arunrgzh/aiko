@@ -24,8 +24,8 @@ export const SignUp = ({ onSignUp, signInUrl = '/sign-in' }: SignUpProps) => {
                 <Logo
                     type="streamline"
                     mode={mode}
-                    logoWidth={60}
-                    logoHeight={60}
+                    logoWidth={140}
+                    logoHeight={80}
                 />
             </div>
             <div className="mb-8">
