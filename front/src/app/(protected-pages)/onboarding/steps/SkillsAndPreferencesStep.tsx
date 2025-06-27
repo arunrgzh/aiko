@@ -1,10 +1,37 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, ReactNode } from 'react'
 import { Form, FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
 import { OnboardingData } from '../page'
+
+const Chip = ({
+    selected,
+    children,
+    ...props
+}: {
+    selected: boolean
+    children: ReactNode
+    [key: string]: any
+}) => (
+    <button
+        type="button"
+        className={`px-4 py-2 rounded-full border text-sm font-medium transition-all duration-150 
+            focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1
+            active:scale-95 active:shadow-sm transform
+            ${
+                selected
+                    ? 'bg-blue-500 text-white border-blue-500 shadow-md hover:bg-blue-600 hover:border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600'
+            }
+        `}
+        aria-pressed={selected}
+        {...props}
+    >
+        {children}
+    </button>
+)
 
 interface SkillsAndPreferencesStepProps {
     data: OnboardingData
@@ -297,18 +324,13 @@ const SkillsAndPreferencesStep = ({
                         <FormItem label="Популярные навыки">
                             <div className="flex flex-wrap gap-2">
                                 {popularSkills.map((skill) => (
-                                    <Button
+                                    <Chip
                                         key={skill}
-                                        size="sm"
-                                        variant={
-                                            skills.includes(skill)
-                                                ? 'solid'
-                                                : 'default'
-                                        }
+                                        selected={skills.includes(skill)}
                                         onClick={() => handleSkillToggle(skill)}
                                     >
                                         {skill}
-                                    </Button>
+                                    </Chip>
                                 ))}
                             </div>
                         </FormItem>
@@ -364,20 +386,17 @@ const SkillsAndPreferencesStep = ({
                             {/* Popular Job Types */}
                             <div className="flex flex-wrap gap-2">
                                 {popularJobTypes.map((jobType) => (
-                                    <Button
+                                    <Chip
                                         key={jobType}
-                                        size="sm"
-                                        variant={
-                                            preferredJobTypes.includes(jobType)
-                                                ? 'solid'
-                                                : 'default'
-                                        }
+                                        selected={preferredJobTypes.includes(
+                                            jobType,
+                                        )}
                                         onClick={() =>
                                             handleJobTypeToggle(jobType)
                                         }
                                     >
                                         {jobType}
-                                    </Button>
+                                    </Chip>
                                 ))}
                             </div>
                         </FormItem>
@@ -430,22 +449,17 @@ const SkillsAndPreferencesStep = ({
                             {/* Popular Locations */}
                             <div className="flex flex-wrap gap-2">
                                 {popularLocations.map((location) => (
-                                    <Button
+                                    <Chip
                                         key={location}
-                                        size="sm"
-                                        variant={
-                                            preferredLocations.includes(
-                                                location,
-                                            )
-                                                ? 'solid'
-                                                : 'default'
-                                        }
+                                        selected={preferredLocations.includes(
+                                            location,
+                                        )}
                                         onClick={() =>
                                             handleLocationToggle(location)
                                         }
                                     >
                                         {location}
-                                    </Button>
+                                    </Chip>
                                 ))}
                             </div>
                         </FormItem>

@@ -1,11 +1,38 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, ReactNode } from 'react'
 import { Form, FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Button from '@/components/ui/Button'
 import { OnboardingData } from '../page'
+
+const Chip = ({
+    selected,
+    children,
+    ...props
+}: {
+    selected: boolean
+    children: ReactNode
+    [key: string]: any
+}) => (
+    <button
+        type="button"
+        className={`px-4 py-2 rounded-full border text-sm font-medium transition-all duration-150 
+            focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1
+            active:scale-95 active:shadow-sm transform
+            ${
+                selected
+                    ? 'bg-blue-500 text-white border-blue-500 shadow-md hover:bg-blue-600 hover:border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600'
+            }
+        `}
+        aria-pressed={selected}
+        {...props}
+    >
+        {children}
+    </button>
+)
 
 interface ProfessionalInfoStepProps {
     data: OnboardingData
@@ -241,16 +268,11 @@ const ProfessionalInfoStep = ({
                             <FormItem label="Интересующие темы для обучения">
                                 <div className="flex flex-wrap gap-2 mb-4">
                                     {learningTopicOptions.map((topic) => (
-                                        <Button
+                                        <Chip
                                             key={topic}
-                                            size="sm"
-                                            variant={
-                                                formData.learning_topics.includes(
-                                                    topic,
-                                                )
-                                                    ? 'solid'
-                                                    : 'default'
-                                            }
+                                            selected={formData.learning_topics.includes(
+                                                topic,
+                                            )}
                                             onClick={() =>
                                                 handleToggleArray(
                                                     'learning_topics',
@@ -259,7 +281,7 @@ const ProfessionalInfoStep = ({
                                             }
                                         >
                                             {topic}
-                                        </Button>
+                                        </Chip>
                                     ))}
                                 </div>
 
