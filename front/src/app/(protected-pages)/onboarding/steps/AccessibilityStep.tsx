@@ -1,11 +1,38 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, ReactNode } from 'react'
 import { Form, FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
 import Button from '@/components/ui/Button'
 import { OnboardingData } from '../page'
+
+const Chip = ({
+    selected,
+    children,
+    ...props
+}: {
+    selected: boolean
+    children: ReactNode
+    [key: string]: any
+}) => (
+    <button
+        type="button"
+        className={`px-4 py-2 rounded-full border text-sm font-medium transition-all duration-150 
+            focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1
+            active:scale-95 active:shadow-sm transform
+            ${
+                selected
+                    ? 'bg-blue-500 text-white border-blue-500 shadow-md hover:bg-blue-600 hover:border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600'
+            }
+        `}
+        aria-pressed={selected}
+        {...props}
+    >
+        {children}
+    </button>
+)
 
 interface Option {
     value: string
@@ -146,16 +173,11 @@ const AccessibilityStep = ({
                         <FormItem label="Важные адаптации на рабочем месте">
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {adaptationOptions.map((adaptation) => (
-                                    <Button
+                                    <Chip
                                         key={adaptation}
-                                        size="sm"
-                                        variant={
-                                            formData.important_adaptations.includes(
-                                                adaptation,
-                                            )
-                                                ? 'solid'
-                                                : 'default'
-                                        }
+                                        selected={formData.important_adaptations.includes(
+                                            adaptation,
+                                        )}
                                         onClick={() =>
                                             handleToggleArray(
                                                 'important_adaptations',
@@ -164,7 +186,7 @@ const AccessibilityStep = ({
                                         }
                                     >
                                         {adaptation}
-                                    </Button>
+                                    </Chip>
                                 ))}
                             </div>
 
@@ -194,16 +216,11 @@ const AccessibilityStep = ({
                         <FormItem label="Желаемые функции платформы">
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {platformFeatureOptions.map((feature) => (
-                                    <Button
+                                    <Chip
                                         key={feature}
-                                        size="sm"
-                                        variant={
-                                            formData.platform_features.includes(
-                                                feature,
-                                            )
-                                                ? 'solid'
-                                                : 'default'
-                                        }
+                                        selected={formData.platform_features.includes(
+                                            feature,
+                                        )}
                                         onClick={() =>
                                             handleToggleArray(
                                                 'platform_features',
@@ -212,7 +229,7 @@ const AccessibilityStep = ({
                                         }
                                     >
                                         {feature}
-                                    </Button>
+                                    </Chip>
                                 ))}
                             </div>
 
@@ -240,16 +257,11 @@ const AccessibilityStep = ({
                         <FormItem label="Какие проблемы с доступностью у вас есть?">
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {accessibilityIssueOptions.map((issue) => (
-                                    <Button
+                                    <Chip
                                         key={issue}
-                                        size="sm"
-                                        variant={
-                                            formData.accessibility_issues.includes(
-                                                issue,
-                                            )
-                                                ? 'solid'
-                                                : 'default'
-                                        }
+                                        selected={formData.accessibility_issues.includes(
+                                            issue,
+                                        )}
                                         onClick={() =>
                                             handleToggleArray(
                                                 'accessibility_issues',
@@ -258,7 +270,7 @@ const AccessibilityStep = ({
                                         }
                                     >
                                         {issue}
-                                    </Button>
+                                    </Chip>
                                 ))}
                             </div>
 
