@@ -46,10 +46,10 @@ const CompletionStep = ({
         <div className="max-w-2xl mx-auto">
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                    Almost Done!
+                    Почти готово!
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                    Add some final details to complete your profile
+                    Добавьте финальные детали для завершения вашего профиля
                 </p>
             </div>
 
@@ -62,7 +62,7 @@ const CompletionStep = ({
                             onChange={(e) =>
                                 handleInputChange('bio', e.target.value)
                             }
-                            placeholder="Tell us a bit about yourself, your interests, and what you're looking for..."
+                            placeholder="Расскажите немного о себе, ваших интересах и том, что вы ищете..."
                             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                         />
                     </FormItem>
@@ -76,7 +76,7 @@ const CompletionStep = ({
                                     e.target.value,
                                 )
                             }
-                            placeholder="https://linkedin.com/in/your-profile"
+                            placeholder="https://linkedin.com/in/ваш-профиль"
                         />
                     </FormItem>
 
@@ -89,7 +89,7 @@ const CompletionStep = ({
                                     e.target.value,
                                 )
                             }
-                            placeholder="https://your-portfolio.com"
+                            placeholder="https://ваш-портфолио.com"
                         />
                     </FormItem>
                 </Form>
@@ -97,32 +97,32 @@ const CompletionStep = ({
                 {/* Summary */}
                 <div className="mt-8 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <h3 className="font-semibold text-gray-900 dark:text-white mb-3">
-                        Profile Summary
+                        Краткое резюме профиля
                     </h3>
                     <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
                         <div>
-                            <span className="font-medium">Name:</span>{' '}
+                            <span className="font-medium">Имя:</span>{' '}
                             {data.first_name} {data.last_name}
                         </div>
                         {data.current_position && (
                             <div>
-                                <span className="font-medium">Position:</span>{' '}
+                                <span className="font-medium">Должность:</span>{' '}
                                 {data.current_position}
                             </div>
                         )}
                         {data.skills && data.skills.length > 0 && (
                             <div>
-                                <span className="font-medium">Skills:</span>{' '}
+                                <span className="font-medium">Навыки:</span>{' '}
                                 {data.skills.slice(0, 5).join(', ')}
                                 {data.skills.length > 5 &&
-                                    ` +${data.skills.length - 5} more`}
+                                    ` +${data.skills.length - 5} еще`}
                             </div>
                         )}
                         {data.preferred_job_types &&
                             data.preferred_job_types.length > 0 && (
                                 <div>
                                     <span className="font-medium">
-                                        Job Types:
+                                        Типы работ:
                                     </span>{' '}
                                     {data.preferred_job_types.join(', ')}
                                 </div>
@@ -130,9 +130,7 @@ const CompletionStep = ({
                         {data.preferred_locations &&
                             data.preferred_locations.length > 0 && (
                                 <div>
-                                    <span className="font-medium">
-                                        Locations:
-                                    </span>{' '}
+                                    <span className="font-medium">Места:</span>{' '}
                                     {data.preferred_locations.join(', ')}
                                 </div>
                             )}
@@ -146,7 +144,7 @@ const CompletionStep = ({
                         disabled={saving}
                         className="min-w-[120px]"
                     >
-                        Previous
+                        Назад
                     </Button>
                     <Button
                         variant="solid"
@@ -157,10 +155,10 @@ const CompletionStep = ({
                         {saving ? (
                             <>
                                 <Spinner size={16} className="mr-2" />
-                                Saving...
+                                Сохранение...
                             </>
                         ) : (
-                            'Complete Setup'
+                            'Завершить настройку'
                         )}
                     </Button>
                 </div>

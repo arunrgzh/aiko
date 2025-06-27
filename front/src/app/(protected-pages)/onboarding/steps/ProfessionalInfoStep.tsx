@@ -14,6 +14,45 @@ interface ProfessionalInfoStepProps {
     onPrevious: () => void
 }
 
+const industryOptions = [
+    'Технологии',
+    'Здравоохранение',
+    'Финансы',
+    'Образование',
+    'Производство',
+    'Розничная торговля',
+    'Консалтинг',
+    'Маркетинг',
+    'Продажи',
+    'Другое',
+]
+
+const educationStatusOptions = [
+    'Среднее образование',
+    'Среднее специальное',
+    'Неоконченное высшее',
+    'Высшее образование',
+    'Магистратура',
+    'Докторантура',
+    'Курсы и сертификаты',
+    'Самообразование',
+    'Другое',
+]
+
+const learningTopicOptions = [
+    'Программирование',
+    'Дизайн',
+    'Маркетинг',
+    'Управление проектами',
+    'Иностранные языки',
+    'Бухгалтерия',
+    'Менеджмент',
+    'Продажи',
+    'Кулинария',
+    'Ремесла',
+    'Другое',
+]
+
 const ProfessionalInfoStep = ({
     data,
     onUpdate,
@@ -24,29 +63,11 @@ const ProfessionalInfoStep = ({
         current_position: data.current_position || '',
         years_of_experience: data.years_of_experience || 0,
         industry: data.industry || '',
-        company_size: data.company_size || '',
+        education_status: data.education_status || '',
+        wants_courses: data.wants_courses || '',
+        learning_topics: data.learning_topics || [],
+        learning_topics_other: data.learning_topics_other || '',
     })
-
-    const industryOptions = [
-        'Technology',
-        'Healthcare',
-        'Finance',
-        'Education',
-        'Manufacturing',
-        'Retail',
-        'Consulting',
-        'Marketing',
-        'Sales',
-        'Other',
-    ]
-
-    const companySizeOptions = [
-        '1-10 employees',
-        '11-50 employees',
-        '51-200 employees',
-        '201-1000 employees',
-        '1000+ employees',
-    ]
 
     const experienceOptions = [
         0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
@@ -55,6 +76,16 @@ const ProfessionalInfoStep = ({
 
     const handleInputChange = (field: string, value: string | number) => {
         setFormData((prev) => ({ ...prev, [field]: value }))
+    }
+
+    const handleToggleArray = (field: string, value: string) => {
+        setFormData((prev) => {
+            const currentArray = prev[field as keyof typeof prev] as string[]
+            const updatedArray = currentArray.includes(value)
+                ? currentArray.filter((item) => item !== value)
+                : [...currentArray, value]
+            return { ...prev, [field]: updatedArray }
+        })
     }
 
     const handleNext = () => {
@@ -71,65 +102,184 @@ const ProfessionalInfoStep = ({
         <div className="max-w-2xl mx-auto">
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                    Professional Information
+                    Профессиональный опыт
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                    Tell us about your work experience
+                    Расскажите о вашем опыте работы и образовании
                 </p>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                 <Form layout="vertical">
-                    <FormItem label="Current Position">
-                        <Input
-                            value={formData.current_position}
-                            onChange={(e) =>
-                                handleInputChange(
-                                    'current_position',
-                                    e.target.value,
-                                )
-                            }
-                            placeholder="e.g., Software Engineer, Marketing Manager"
-                        />
-                    </FormItem>
+                    {/* Work Experience Section */}
+                    <div className="mb-8">
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                            Опыт работы
+                        </h3>
 
-                    <FormItem label="Years of Experience">
-                        <Select
-                            value={formData.years_of_experience.toString()}
-                            onChange={(value) =>
-                                handleInputChange(
-                                    'years_of_experience',
-                                    parseInt(value || '0'),
-                                )
-                            }
-                            placeholder="Select years of experience"
-                            options={experienceOptions.map((exp) =>
-                                exp.toString(),
-                            )}
-                        />
-                    </FormItem>
+                        <FormItem label="Текущая должность или статус">
+                            <Input
+                                value={formData.current_position}
+                                onChange={(e) =>
+                                    handleInputChange(
+                                        'current_position',
+                                        e.target.value,
+                                    )
+                                }
+                                placeholder="Например: студент, безработный, кассир, волонтёр"
+                            />
+                        </FormItem>
 
-                    <FormItem label="Industry">
-                        <Select
-                            value={formData.industry}
-                            onChange={(value) =>
-                                handleInputChange('industry', value || '')
-                            }
-                            placeholder="Select your industry"
-                            options={industryOptions}
-                        />
-                    </FormItem>
+                        <FormItem label="Годы опыта работы">
+                            <Select
+                                value={formData.years_of_experience.toString()}
+                                onChange={(value) =>
+                                    handleInputChange(
+                                        'years_of_experience',
+                                        parseInt(value || '0'),
+                                    )
+                                }
+                                placeholder="Выберите количество лет опыта"
+                                options={experienceOptions.map((exp) =>
+                                    exp.toString(),
+                                )}
+                            />
+                        </FormItem>
 
-                    <FormItem label="Company Size">
-                        <Select
-                            value={formData.company_size}
-                            onChange={(value) =>
-                                handleInputChange('company_size', value || '')
-                            }
-                            placeholder="Select company size"
-                            options={companySizeOptions}
-                        />
-                    </FormItem>
+                        <FormItem label="Отрасль (если есть)">
+                            <Select
+                                value={formData.industry}
+                                onChange={(value) =>
+                                    handleInputChange('industry', value || '')
+                                }
+                                placeholder="Выберите отрасль"
+                                options={industryOptions}
+                            />
+                        </FormItem>
+                    </div>
+
+                    {/* Education Section */}
+                    <div className="mb-8">
+                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
+                            Образование и обучение
+                        </h3>
+
+                        <FormItem label="Уровень образования">
+                            <Select
+                                value={formData.education_status}
+                                onChange={(value) =>
+                                    handleInputChange(
+                                        'education_status',
+                                        value || '',
+                                    )
+                                }
+                                placeholder="Выберите уровень образования"
+                                options={educationStatusOptions}
+                            />
+                        </FormItem>
+
+                        <FormItem label="Хотите ли вы проходить курсы?">
+                            <div className="flex gap-4">
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="wants_courses"
+                                        value="yes"
+                                        checked={
+                                            formData.wants_courses === 'yes'
+                                        }
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                'wants_courses',
+                                                e.target.value,
+                                            )
+                                        }
+                                        className="mr-2"
+                                    />
+                                    Да
+                                </label>
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="wants_courses"
+                                        value="no"
+                                        checked={
+                                            formData.wants_courses === 'no'
+                                        }
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                'wants_courses',
+                                                e.target.value,
+                                            )
+                                        }
+                                        className="mr-2"
+                                    />
+                                    Нет
+                                </label>
+                                <label className="flex items-center">
+                                    <input
+                                        type="radio"
+                                        name="wants_courses"
+                                        value="maybe"
+                                        checked={
+                                            formData.wants_courses === 'maybe'
+                                        }
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                'wants_courses',
+                                                e.target.value,
+                                            )
+                                        }
+                                        className="mr-2"
+                                    />
+                                    Возможно
+                                </label>
+                            </div>
+                        </FormItem>
+
+                        {formData.wants_courses !== 'no' && (
+                            <FormItem label="Интересующие темы для обучения">
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {learningTopicOptions.map((topic) => (
+                                        <Button
+                                            key={topic}
+                                            size="sm"
+                                            variant={
+                                                formData.learning_topics.includes(
+                                                    topic,
+                                                )
+                                                    ? 'solid'
+                                                    : 'default'
+                                            }
+                                            onClick={() =>
+                                                handleToggleArray(
+                                                    'learning_topics',
+                                                    topic,
+                                                )
+                                            }
+                                        >
+                                            {topic}
+                                        </Button>
+                                    ))}
+                                </div>
+
+                                {formData.learning_topics.includes(
+                                    'Другое',
+                                ) && (
+                                    <Input
+                                        value={formData.learning_topics_other}
+                                        onChange={(e) =>
+                                            handleInputChange(
+                                                'learning_topics_other',
+                                                e.target.value,
+                                            )
+                                        }
+                                        placeholder="Укажите другие темы для обучения"
+                                    />
+                                )}
+                            </FormItem>
+                        )}
+                    </div>
                 </Form>
 
                 <div className="flex justify-between mt-8">
@@ -138,14 +288,14 @@ const ProfessionalInfoStep = ({
                         onClick={handlePrevious}
                         className="min-w-[120px]"
                     >
-                        Previous
+                        Назад
                     </Button>
                     <Button
                         variant="solid"
                         onClick={handleNext}
                         className="min-w-[120px]"
                     >
-                        Next
+                        Далее
                     </Button>
                 </div>
             </div>

@@ -21,61 +21,47 @@ const PreferencesStep = ({
     onPrevious,
 }: PreferencesStepProps) => {
     const [formData, setFormData] = useState({
-        preferred_job_types: data.preferred_job_types || [],
-        preferred_locations: data.preferred_locations || [],
-        salary_expectation: data.salary_expectation || '',
+        job_features: data.job_features || [],
+        suitable_job_categories: data.suitable_job_categories || [],
     })
+
     const [newJobType, setNewJobType] = useState('')
     const [newLocation, setNewLocation] = useState('')
 
     const popularJobTypes = [
-        'Full-time',
-        'Part-time',
-        'Contract',
-        'Freelance',
-        'Internship',
-        'Remote',
-        'Hybrid',
-        'On-site',
+        'Полная занятость',
+        'Частичная занятость',
+        'Контракт',
+        'Фриланс',
+        'Стажировка',
+        'Удаленная работа',
+        'Гибридная работа',
+        'В офисе',
     ]
 
     const popularLocations = [
-        'New York, NY',
-        'San Francisco, CA',
-        'Los Angeles, CA',
-        'Chicago, IL',
-        'Austin, TX',
-        'Seattle, WA',
-        'Boston, MA',
-        'Denver, CO',
-        'Atlanta, GA',
-        'Miami, FL',
-        'Remote',
-        'Anywhere',
-    ]
-
-    const salaryRanges = [
-        'Under $30,000',
-        '$30,000 - $50,000',
-        '$50,000 - $75,000',
-        '$75,000 - $100,000',
-        '$100,000 - $150,000',
-        '$150,000 - $200,000',
-        '$200,000+',
-        'Negotiable',
+        'Алматы',
+        'Астана',
+        'Шымкент',
+        'Актобе',
+        'Караганда',
+        'Тараз',
+        'Павлодар',
+        'Усть-Каменогорск',
+        'Семей',
+        'Уральск',
+        'Удаленная работа',
+        'Любое место',
     ]
 
     const handleAddJobType = () => {
         if (
             newJobType.trim() &&
-            !formData.preferred_job_types.includes(newJobType.trim())
+            !formData.job_features.includes(newJobType.trim())
         ) {
             setFormData((prev) => ({
                 ...prev,
-                preferred_job_types: [
-                    ...prev.preferred_job_types,
-                    newJobType.trim(),
-                ],
+                job_features: [...prev.job_features, newJobType.trim()],
             }))
             setNewJobType('')
         }
@@ -84,21 +70,19 @@ const PreferencesStep = ({
     const handleRemoveJobType = (jobType: string) => {
         setFormData((prev) => ({
             ...prev,
-            preferred_job_types: prev.preferred_job_types.filter(
-                (type) => type !== jobType,
-            ),
+            job_features: prev.job_features.filter((type) => type !== jobType),
         }))
     }
 
     const handleAddLocation = () => {
         if (
             newLocation.trim() &&
-            !formData.preferred_locations.includes(newLocation.trim())
+            !formData.suitable_job_categories.includes(newLocation.trim())
         ) {
             setFormData((prev) => ({
                 ...prev,
-                preferred_locations: [
-                    ...prev.preferred_locations,
+                suitable_job_categories: [
+                    ...prev.suitable_job_categories,
                     newLocation.trim(),
                 ],
             }))
@@ -109,37 +93,46 @@ const PreferencesStep = ({
     const handleRemoveLocation = (location: string) => {
         setFormData((prev) => ({
             ...prev,
-            preferred_locations: prev.preferred_locations.filter(
+            suitable_job_categories: prev.suitable_job_categories.filter(
                 (loc) => loc !== location,
             ),
         }))
     }
 
     const handleAddPopularJobType = (jobType: string) => {
-        if (!formData.preferred_job_types.includes(jobType)) {
+        if (!formData.job_features.includes(jobType)) {
             setFormData((prev) => ({
                 ...prev,
-                preferred_job_types: [...prev.preferred_job_types, jobType],
+                job_features: [...prev.job_features, jobType],
             }))
         }
     }
 
     const handleAddPopularLocation = (location: string) => {
-        if (!formData.preferred_locations.includes(location)) {
+        if (!formData.suitable_job_categories.includes(location)) {
             setFormData((prev) => ({
                 ...prev,
-                preferred_locations: [...prev.preferred_locations, location],
+                suitable_job_categories: [
+                    ...prev.suitable_job_categories,
+                    location,
+                ],
             }))
         }
     }
 
     const handleNext = () => {
-        onUpdate(formData)
+        onUpdate({
+            job_features: formData.job_features,
+            suitable_job_categories: formData.suitable_job_categories,
+        })
         onNext()
     }
 
     const handlePrevious = () => {
-        onUpdate(formData)
+        onUpdate({
+            job_features: formData.job_features,
+            suitable_job_categories: formData.suitable_job_categories,
+        })
         onPrevious()
     }
 
@@ -147,10 +140,10 @@ const PreferencesStep = ({
         <div className="max-w-2xl mx-auto">
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                    Job Preferences
+                    Предпочтения по работе
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                    Tell us about your job preferences and desired locations
+                    Расскажите о ваших предпочтениях по работе и желаемых местах
                 </p>
             </div>
 
@@ -162,7 +155,7 @@ const PreferencesStep = ({
                             <Input
                                 value={newJobType}
                                 onChange={(e) => setNewJobType(e.target.value)}
-                                placeholder="Add a job type"
+                                placeholder="Добавить тип работы"
                                 className="flex-1"
                             />
                             <Button
@@ -170,30 +163,28 @@ const PreferencesStep = ({
                                 onClick={handleAddJobType}
                                 disabled={!newJobType.trim()}
                             >
-                                Add
+                                Добавить
                             </Button>
                         </div>
 
-                        {formData.preferred_job_types.length > 0 && (
+                        {formData.job_features.length > 0 && (
                             <div className="flex flex-wrap gap-2 mb-4">
-                                {formData.preferred_job_types.map(
-                                    (jobType, index) => (
-                                        <div
-                                            key={index}
-                                            className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                                {formData.job_features.map((jobType, index) => (
+                                    <div
+                                        key={index}
+                                        className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                                    >
+                                        <span>{jobType}</span>
+                                        <button
+                                            onClick={() =>
+                                                handleRemoveJobType(jobType)
+                                            }
+                                            className="ml-1 text-green-600 hover:text-green-800"
                                         >
-                                            <span>{jobType}</span>
-                                            <button
-                                                onClick={() =>
-                                                    handleRemoveJobType(jobType)
-                                                }
-                                                className="ml-1 text-green-600 hover:text-green-800"
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                    ),
-                                )}
+                                            ×
+                                        </button>
+                                    </div>
+                                ))}
                             </div>
                         )}
 
@@ -203,16 +194,14 @@ const PreferencesStep = ({
                                     key={jobType}
                                     size="sm"
                                     variant={
-                                        formData.preferred_job_types.includes(
-                                            jobType,
-                                        )
+                                        formData.job_features.includes(jobType)
                                             ? 'solid'
                                             : 'default'
                                     }
                                     onClick={() =>
                                         handleAddPopularJobType(jobType)
                                     }
-                                    disabled={formData.preferred_job_types.includes(
+                                    disabled={formData.job_features.includes(
                                         jobType,
                                     )}
                                 >
@@ -228,7 +217,7 @@ const PreferencesStep = ({
                             <Input
                                 value={newLocation}
                                 onChange={(e) => setNewLocation(e.target.value)}
-                                placeholder="Add a location"
+                                placeholder="Добавить место"
                                 className="flex-1"
                             />
                             <Button
@@ -236,13 +225,13 @@ const PreferencesStep = ({
                                 onClick={handleAddLocation}
                                 disabled={!newLocation.trim()}
                             >
-                                Add
+                                Добавить
                             </Button>
                         </div>
 
-                        {formData.preferred_locations.length > 0 && (
+                        {formData.suitable_job_categories.length > 0 && (
                             <div className="flex flex-wrap gap-2 mb-4">
-                                {formData.preferred_locations.map(
+                                {formData.suitable_job_categories.map(
                                     (location, index) => (
                                         <div
                                             key={index}
@@ -271,7 +260,7 @@ const PreferencesStep = ({
                                     key={location}
                                     size="sm"
                                     variant={
-                                        formData.preferred_locations.includes(
+                                        formData.suitable_job_categories.includes(
                                             location,
                                         )
                                             ? 'solid'
@@ -280,7 +269,7 @@ const PreferencesStep = ({
                                     onClick={() =>
                                         handleAddPopularLocation(location)
                                     }
-                                    disabled={formData.preferred_locations.includes(
+                                    disabled={formData.suitable_job_categories.includes(
                                         location,
                                     )}
                                 >
@@ -288,21 +277,6 @@ const PreferencesStep = ({
                                 </Button>
                             ))}
                         </div>
-                    </FormItem>
-
-                    {/* Salary Expectation */}
-                    <FormItem label="Salary Expectation">
-                        <Select
-                            value={formData.salary_expectation}
-                            onChange={(value) =>
-                                setFormData((prev) => ({
-                                    ...prev,
-                                    salary_expectation: value || '',
-                                }))
-                            }
-                            placeholder="Select salary range"
-                            options={salaryRanges}
-                        />
                     </FormItem>
                 </Form>
 
@@ -312,14 +286,14 @@ const PreferencesStep = ({
                         onClick={handlePrevious}
                         className="min-w-[120px]"
                     >
-                        Previous
+                        Назад
                     </Button>
                     <Button
                         variant="solid"
                         onClick={handleNext}
                         className="min-w-[120px]"
                     >
-                        Next
+                        Далее
                     </Button>
                 </div>
             </div>

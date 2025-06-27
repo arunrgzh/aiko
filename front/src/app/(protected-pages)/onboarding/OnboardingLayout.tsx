@@ -19,11 +19,11 @@ const OnboardingLayout = ({
     const progressPercentage = (currentStep / totalSteps) * 100
 
     const steps = [
-        { number: 1, title: 'Personal Info' },
-        { number: 2, title: 'Professional Info' },
-        { number: 3, title: 'Skills' },
-        { number: 4, title: 'Preferences' },
-        { number: 5, title: 'Complete' },
+        { number: 1, title: 'Личная информация' },
+        { number: 2, title: 'Профессиональный опыт' },
+        { number: 3, title: 'Навыки и предпочтения' },
+        { number: 4, title: 'Доступность и комфорт' },
+        { number: 5, title: 'Завершение' },
     ]
 
     return (
@@ -35,15 +35,15 @@ const OnboardingLayout = ({
                         <div className="flex items-center justify-between">
                             <div>
                                 <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                                    Welcome to AI-Komekshi
+                                    Добро пожаловать в AI-Көмекші
                                 </h1>
                                 <p className="text-gray-600 dark:text-gray-400">
-                                    Let's set up your profile
+                                    Давайте настроим ваш профиль
                                 </p>
                             </div>
                             <div className="text-right">
                                 <div className="text-sm text-gray-500 dark:text-gray-400">
-                                    Step {currentStep} of {totalSteps}
+                                    Шаг {currentStep} из {totalSteps}
                                 </div>
                                 <div className="text-lg font-semibold text-gray-900 dark:text-white">
                                     {steps[currentStep - 1]?.title}
