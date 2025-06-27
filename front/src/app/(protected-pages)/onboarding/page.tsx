@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import useCurrentSession from '@/utils/hooks/useCurrentSession'
 import OnboardingLayout from './OnboardingLayout'
@@ -135,21 +135,24 @@ const OnboardingPage = () => {
         return () => clearTimeout(timeout)
     }, [loading])
 
-    const updateOnboardingData = (data: Partial<OnboardingData>) => {
-        setOnboardingData((prev) => ({ ...prev, ...data }))
-    }
+    const updateOnboardingData = useCallback(
+        (data: Partial<OnboardingData>) => {
+            setOnboardingData((prev) => ({ ...prev, ...data }))
+        },
+        [],
+    )
 
-    const handleNext = async () => {
+    const handleNext = useCallback(async () => {
         if (currentStep < totalSteps) {
             setCurrentStep((prev) => prev + 1)
         }
-    }
+    }, [currentStep, totalSteps])
 
-    const handlePrevious = () => {
+    const handlePrevious = useCallback(() => {
         if (currentStep > 1) {
             setCurrentStep((prev) => prev - 1)
         }
-    }
+    }, [currentStep])
 
     const handleComplete = async () => {
         setSaving(true)
@@ -186,6 +189,15 @@ const OnboardingPage = () => {
             setSaving(false)
         }
     }
+
+    const handleStepChange = useCallback(
+        (step: number) => {
+            if (step >= 1 && step <= totalSteps) {
+                setCurrentStep(step)
+            }
+        },
+        [totalSteps],
+    )
 
     const renderStep = () => {
         switch (currentStep) {
@@ -248,7 +260,11 @@ const OnboardingPage = () => {
     }
 
     return (
-        <OnboardingLayout currentStep={currentStep} totalSteps={totalSteps}>
+        <OnboardingLayout
+            currentStep={currentStep}
+            totalSteps={totalSteps}
+            onStepChange={handleStepChange}
+        >
             {renderStep()}
         </OnboardingLayout>
     )

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { Form, FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
@@ -17,6 +17,33 @@ interface PersonalInfoStepProps {
     onUpdate: (data: Partial<OnboardingData>) => void
     onNext: () => void
 }
+
+const Chip = ({
+    selected,
+    children,
+    ...props
+}: {
+    selected: boolean
+    children: React.ReactNode
+    [key: string]: any
+}) => (
+    <button
+        type="button"
+        className={`px-4 py-2 rounded-full border text-sm font-medium transition-all duration-150 
+            focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1
+            active:scale-95 active:shadow-sm transform
+            ${
+                selected
+                    ? 'bg-blue-500 text-white border-blue-500 shadow-md hover:bg-blue-600 hover:border-blue-600'
+                    : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600'
+            }
+        `}
+        aria-pressed={selected}
+        {...props}
+    >
+        {children}
+    </button>
+)
 
 const PersonalInfoStep = ({
     data,
@@ -36,49 +63,64 @@ const PersonalInfoStep = ({
         workplace_other: data.workplace_other || '',
     })
 
-    const genderOptions: Option[] = [
-        { value: 'male', label: 'Мужской' },
-        { value: 'female', label: 'Женский' },
-        { value: 'other', label: 'Другое' },
-        { value: 'prefer_not_to_say', label: 'Предпочитаю не указывать' },
-    ]
+    const genderOptions: Option[] = useMemo(
+        () => [
+            { value: 'male', label: 'Мужской' },
+            { value: 'female', label: 'Женский' },
+            { value: 'other', label: 'Другое' },
+            { value: 'prefer_not_to_say', label: 'Предпочитаю не указывать' },
+        ],
+        [],
+    )
 
-    const disabilityTypeOptions = [
-        'Нарушение зрения',
-        'Нарушение слуха',
-        'Нарушение опорно-двигательного аппарата',
-        'Нарушение речи',
-        'Когнитивные нарушения',
-        'Психические расстройства',
-        'Хронические заболевания',
-        'Другое',
-        'Нет инвалидности',
-    ]
+    const disabilityTypeOptions = useMemo(
+        () => [
+            'Нарушение зрения',
+            'Нарушение слуха',
+            'Нарушение опорно-двигательного аппарата',
+            'Нарушение речи',
+            'Когнитивные нарушения',
+            'Психические расстройства',
+            'Хронические заболевания',
+            'Другое',
+            'Нет инвалидности',
+        ],
+        [],
+    )
 
-    const workConditionOptions = [
-        'Могу работать полный день',
-        'Могу работать неполный день',
-        'Нужен гибкий график',
-        'Могу работать удаленно',
-        'Нужна помощь на рабочем месте',
-        'Нужны специальные условия',
-        'Другое',
-    ]
+    const workConditionOptions = useMemo(
+        () => [
+            'Могу работать полный день',
+            'Могу работать неполный день',
+            'Нужен гибкий график',
+            'Могу работать удаленно',
+            'Нужна помощь на рабочем месте',
+            'Нужны специальные условия',
+            'Другое',
+        ],
+        [],
+    )
 
-    const workplacePreferenceOptions = [
-        'Офис',
-        'Удаленная работа',
-        'Гибридная работа',
-        'Домашняя работа',
-        'Специально оборудованное место',
-        'Другое',
-    ]
+    const workplacePreferenceOptions = useMemo(
+        () => [
+            'Офис',
+            'Удаленная работа',
+            'Гибридная работа',
+            'Домашняя работа',
+            'Специально оборудованное место',
+            'Другое',
+        ],
+        [],
+    )
 
-    const handleInputChange = (field: string, value: string | string[]) => {
-        setFormData((prev) => ({ ...prev, [field]: value }))
-    }
+    const handleInputChange = useCallback(
+        (field: string, value: string | string[]) => {
+            setFormData((prev) => ({ ...prev, [field]: value }))
+        },
+        [],
+    )
 
-    const handleToggleArray = (field: string, value: string) => {
+    const handleToggleArray = useCallback((field: string, value: string) => {
         setFormData((prev) => {
             const currentArray = prev[field as keyof typeof prev] as string[]
             const updatedArray = currentArray.includes(value)
@@ -86,12 +128,12 @@ const PersonalInfoStep = ({
                 : [...currentArray, value]
             return { ...prev, [field]: updatedArray }
         })
-    }
+    }, [])
 
-    const handleNext = () => {
+    const handleNext = useCallback(() => {
         onUpdate(formData)
         onNext()
-    }
+    }, [formData, onUpdate, onNext])
 
     const isFormValid = formData.first_name && formData.last_name
 
@@ -192,16 +234,11 @@ const PersonalInfoStep = ({
                         <FormItem label="Тип инвалидности (если есть)">
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {disabilityTypeOptions.map((type) => (
-                                    <Button
+                                    <Chip
                                         key={type}
-                                        size="sm"
-                                        variant={
-                                            formData.disability_type.includes(
-                                                type,
-                                            )
-                                                ? 'solid'
-                                                : 'default'
-                                        }
+                                        selected={formData.disability_type.includes(
+                                            type,
+                                        )}
                                         onClick={() =>
                                             handleToggleArray(
                                                 'disability_type',
@@ -210,7 +247,7 @@ const PersonalInfoStep = ({
                                         }
                                     >
                                         {type}
-                                    </Button>
+                                    </Chip>
                                 ))}
                             </div>
 
@@ -238,16 +275,11 @@ const PersonalInfoStep = ({
                         <FormItem label="Ваши возможности по работе">
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {workConditionOptions.map((condition) => (
-                                    <Button
+                                    <Chip
                                         key={condition}
-                                        size="sm"
-                                        variant={
-                                            formData.work_conditions.includes(
-                                                condition,
-                                            )
-                                                ? 'solid'
-                                                : 'default'
-                                        }
+                                        selected={formData.work_conditions.includes(
+                                            condition,
+                                        )}
                                         onClick={() =>
                                             handleToggleArray(
                                                 'work_conditions',
@@ -256,7 +288,7 @@ const PersonalInfoStep = ({
                                         }
                                     >
                                         {condition}
-                                    </Button>
+                                    </Chip>
                                 ))}
                             </div>
                         </FormItem>
@@ -265,16 +297,11 @@ const PersonalInfoStep = ({
                             <div className="flex flex-wrap gap-2 mb-4">
                                 {workplacePreferenceOptions.map(
                                     (preference) => (
-                                        <Button
+                                        <Chip
                                             key={preference}
-                                            size="sm"
-                                            variant={
-                                                formData.workplace_preferences.includes(
-                                                    preference,
-                                                )
-                                                    ? 'solid'
-                                                    : 'default'
-                                            }
+                                            selected={formData.workplace_preferences.includes(
+                                                preference,
+                                            )}
                                             onClick={() =>
                                                 handleToggleArray(
                                                     'workplace_preferences',
@@ -283,7 +310,7 @@ const PersonalInfoStep = ({
                                             }
                                         >
                                             {preference}
-                                        </Button>
+                                        </Chip>
                                     ),
                                 )}
                             </div>
@@ -310,7 +337,7 @@ const PersonalInfoStep = ({
                     <Button
                         variant="solid"
                         onClick={handleNext}
-                        disabled={!isFormValid}
+                        disabled={false}
                         className="min-w-[120px]"
                     >
                         Далее

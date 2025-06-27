@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, ReactNode } from 'react'
 import { Form, FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
@@ -12,6 +12,33 @@ interface SkillsStepProps {
     onNext: () => void
     onPrevious: () => void
 }
+
+const Chip = ({
+    selected,
+    children,
+    ...props
+}: {
+    selected: boolean
+    children: ReactNode
+    [key: string]: any
+}) => (
+    <button
+        type="button"
+        className={`px-4 py-2 rounded-full border text-sm font-medium transition-all duration-150 
+        focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-1
+        active:scale-95 active:shadow-sm transform
+        ${
+            selected
+                ? 'bg-blue-500 text-white border-blue-500 shadow-md hover:bg-blue-600 hover:border-blue-600'
+                : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600'
+        }
+    `}
+        aria-pressed={selected}
+        {...props}
+    >
+        {children}
+    </button>
+)
 
 const SkillsStep = ({
     data,
@@ -196,19 +223,13 @@ const SkillsStep = ({
                     <FormItem label="Популярные навыки">
                         <div className="flex flex-wrap gap-2">
                             {popularSkills.map((skill) => (
-                                <Button
+                                <Chip
                                     key={skill}
-                                    size="sm"
-                                    variant={
-                                        skills.includes(skill)
-                                            ? 'solid'
-                                            : 'default'
-                                    }
+                                    selected={skills.includes(skill)}
                                     onClick={() => handleAddPopularSkill(skill)}
-                                    disabled={skills.includes(skill)}
                                 >
                                     {skill}
-                                </Button>
+                                </Chip>
                             ))}
                         </div>
                     </FormItem>
