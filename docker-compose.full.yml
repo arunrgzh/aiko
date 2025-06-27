@@ -4,11 +4,11 @@ services:
     # PostgreSQL Database
     postgres:
         image: postgres:15
-        container_name: xrox_postgres
+        container_name: ai_komekshi_postgres
         environment:
-            POSTGRES_DB: xrox_db
-            POSTGRES_USER: xrox_user
-            POSTGRES_PASSWORD: xrox_password
+            POSTGRES_DB: ai_komek
+            POSTGRES_USER: komek_user
+            POSTGRES_PASSWORD: REDACTED
         ports:
             - '5432:5432'
         volumes:
@@ -18,7 +18,7 @@ services:
     # Redis (for caching and sessions)
     redis:
         image: redis:7-alpine
-        container_name: xrox_redis
+        container_name: ai_komekshi_redis
         ports:
             - '6379:6379'
         restart: unless-stopped
@@ -28,9 +28,9 @@ services:
         build:
             context: ./backend
             dockerfile: Dockerfile
-        container_name: xrox_backend
+        container_name: ai_komekshi_backend
         environment:
-            - DATABASE_URL=postgresql://xrox_user:xrox_password@postgres:5432/xrox_db
+            - DATABASE_URL=postgresql+asyncpg://komek_user:REDACTED@postgres:5432/ai_komek
             - REDIS_URL=redis://redis:6379
             - SECRET_KEY=your-super-secret-key-change-this-in-production
             - FRONTEND_URL=http://localhost:3000
@@ -50,7 +50,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        container_name: xrox_frontend
+        container_name: ai_komekshi_frontend
         environment:
             - API_URL=http://localhost:8000
             - NEXTAUTH_SECRET=your-nextauth-secret-change-this-in-production

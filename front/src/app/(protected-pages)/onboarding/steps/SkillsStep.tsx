@@ -23,41 +23,82 @@ const SkillsStep = ({
     const [newSkill, setNewSkill] = useState('')
 
     const popularSkills = [
-        'JavaScript',
-        'Python',
-        'React',
-        'Node.js',
-        'TypeScript',
-        'Java',
-        'C++',
-        'C#',
-        'PHP',
-        'Ruby',
-        'Go',
-        'Rust',
-        'HTML',
-        'CSS',
-        'SQL',
-        'MongoDB',
-        'PostgreSQL',
-        'AWS',
-        'Docker',
-        'Kubernetes',
-        'Git',
-        'Linux',
-        'Machine Learning',
-        'Data Analysis',
-        'Project Management',
-        'Agile',
-        'Scrum',
-        'UI/UX Design',
-        'Graphic Design',
-        'Content Writing',
-        'Digital Marketing',
-        'Sales',
-        'Customer Service',
-        'Leadership',
-        'Communication',
+        // Технологии и IT
+        'Программирование',
+        'Веб-разработка',
+        'Тестирование ПО',
+        'Администрирование систем',
+        'Работа с базами данных',
+        'Аналитика данных',
+        'Кибербезопасность',
+        'Техническая поддержка',
+        // Искусство и дизайн
+        'Живопись',
+        'Графический дизайн',
+        'Фотография',
+        'Музыка',
+        'Вокал',
+        'Танцы',
+        'Видеомонтаж',
+        'Актерское мастерство',
+        // Образование
+        'Преподавание',
+        'Репетиторство',
+        'Разработка учебных программ',
+        'Работа с детьми',
+        // Медицина и уход
+        'Медицинский уход',
+        'Массаж',
+        'Физиотерапия',
+        'Первая помощь',
+        'Уход за пожилыми',
+        // Сервис и обслуживание
+        'Кулинария',
+        'Выпечка',
+        'Уборка',
+        'Гостиничный сервис',
+        'Официант',
+        'Бариста',
+        'Парикмахер',
+        'Маникюр/Педикюр',
+        // Производство и ремесла
+        'Столярное дело',
+        'Слесарные работы',
+        'Электромонтаж',
+        'Сварка',
+        'Шитье',
+        'Вязание',
+        'Ремонт техники',
+        // Офис и администрирование
+        'Работа с документами',
+        'Ввод данных',
+        'Бухгалтерия',
+        'Планирование',
+        'Работа с клиентами',
+        // Продажи и маркетинг
+        'Продажи',
+        'Телемаркетинг',
+        'Интернет-маркетинг',
+        'SMM',
+        'Копирайтинг',
+        // Soft skills
+        'Коммуникация',
+        'Работа в команде',
+        'Лидерство',
+        'Организаторские способности',
+        'Креативность',
+        'Стрессоустойчивость',
+        'Публичные выступления',
+        'Решение конфликтов',
+        'Эмпатия',
+        'Тайм-менеджмент',
+        // Другое
+        'Вождение',
+        'Знание иностранных языков',
+        'Работа с животными',
+        'Садоводство',
+        'Ремонт автомобилей',
+        'Другое',
     ]
 
     const handleAddSkill = () => {
@@ -98,11 +139,11 @@ const SkillsStep = ({
         <div className="max-w-2xl mx-auto">
             <div className="text-center mb-8">
                 <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                    Your Skills
+                    Ваши навыки
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
-                    Add your skills to help us match you with relevant
-                    opportunities
+                    Добавьте ваши навыки, чтобы мы могли подобрать вам
+                    подходящие возможности
                 </p>
             </div>
 
@@ -114,7 +155,7 @@ const SkillsStep = ({
                                 value={newSkill}
                                 onChange={(e) => setNewSkill(e.target.value)}
                                 onKeyPress={handleKeyPress}
-                                placeholder="Type a skill and press Enter"
+                                placeholder="Введите навык и нажмите Enter"
                                 className="flex-1"
                             />
                             <Button
@@ -122,14 +163,14 @@ const SkillsStep = ({
                                 onClick={handleAddSkill}
                                 disabled={!newSkill.trim()}
                             >
-                                Add
+                                Добавить
                             </Button>
                         </div>
                     </FormItem>
 
                     {/* Selected Skills */}
                     {skills.length > 0 && (
-                        <FormItem label="Your Skills">
+                        <FormItem label="Ваши навыки">
                             <div className="flex flex-wrap gap-2">
                                 {skills.map((skill, index) => (
                                     <div
@@ -152,7 +193,7 @@ const SkillsStep = ({
                     )}
 
                     {/* Popular Skills */}
-                    <FormItem label="Popular Skills">
+                    <FormItem label="Популярные навыки">
                         <div className="flex flex-wrap gap-2">
                             {popularSkills.map((skill) => (
                                 <Button
@@ -179,14 +220,14 @@ const SkillsStep = ({
                         onClick={handlePrevious}
                         className="min-w-[120px]"
                     >
-                        Previous
+                        Назад
                     </Button>
                     <Button
                         variant="solid"
                         onClick={handleNext}
                         className="min-w-[120px]"
                     >
-                        Next
+                        Далее
                     </Button>
                 </div>
             </div>
