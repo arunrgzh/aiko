@@ -3,10 +3,13 @@ from typing import Optional
 from jose import JWTError, jwt
 from fastapi import HTTPException, status, Depends
 from fastapi.security import OAuth2PasswordBearer
-from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..config import settings
-from ..schemas.user import TokenData, UserResponse
+from ..schemas.user import TokenData
+from ..models.user import User
+from ..database import get_db
+from .security import get_user_by_username
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
 
@@ -42,14 +45,17 @@ async def verify_token(token: str, credentials_exception: HTTPException) -> Toke
     except JWTError:
         raise credentials_exception
 
-async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserResponse:
+async def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: AsyncSession = Depends(get_db)
+) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
     token_data = await verify_token(token, credentials_exception)
-    user = await get_user_by_username(token_data.username)
+    user = await get_user_by_username(token_data.username, db)
     if not user:
         raise credentials_exception
     if not user.is_active:
@@ -59,7 +65,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> UserResponse:
         )
     return user
 
-async def get_current_active_user(current_user: UserResponse = Depends(get_current_user)) -> UserResponse:
+async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user 
