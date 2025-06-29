@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, ReactNode } from 'react'
+import { useState, ReactNode, useMemo, useCallback, useEffect } from 'react'
 import { Form, FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
@@ -93,35 +93,166 @@ const ProfessionalInfoStep = ({
         education_status: data.education_status || '',
         wants_courses: data.wants_courses || '',
         learning_topics: data.learning_topics || [],
-        learning_topics_other: data.learning_topics_other || '',
     })
 
-    const experienceOptions = [
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-        20,
-    ]
+    // Синхронизируем с родительским компонентом через useEffect
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            onUpdate(formData)
+        }, 0)
+        return () => clearTimeout(timeout)
+    }, [formData])
 
-    const handleInputChange = (field: string, value: string | number) => {
-        setFormData((prev) => ({ ...prev, [field]: value }))
-    }
+    const experienceOptions = useMemo(
+        () => [
+            { value: 0, label: 'Нет опыта' },
+            { value: 1, label: 'Менее 1 года' },
+            { value: 2, label: '1-2 года' },
+            { value: 3, label: '3-5 лет' },
+            { value: 5, label: '5-10 лет' },
+            { value: 10, label: 'Более 10 лет' },
+        ],
+        [],
+    )
 
-    const handleToggleArray = (field: string, value: string) => {
+    const educationOptions = useMemo(
+        () => [
+            { value: 'none', label: 'Нет образования' },
+            { value: 'primary', label: 'Начальное образование' },
+            { value: 'secondary', label: 'Среднее образование' },
+            { value: 'vocational', label: 'Профессиональное образование' },
+            { value: 'bachelor', label: 'Бакалавриат' },
+            { value: 'master', label: 'Магистратура' },
+            { value: 'phd', label: 'Докторантура' },
+        ],
+        [],
+    )
+
+    const industryOptions = useMemo(
+        () => [
+            { value: 'it', label: 'IT и технологии' },
+            { value: 'education', label: 'Образование' },
+            { value: 'healthcare', label: 'Здравоохранение' },
+            { value: 'retail', label: 'Торговля' },
+            { value: 'manufacturing', label: 'Производство' },
+            { value: 'construction', label: 'Строительство' },
+            { value: 'transport', label: 'Транспорт' },
+            { value: 'finance', label: 'Финансы' },
+            { value: 'tourism', label: 'Туризм' },
+            { value: 'government', label: 'Государственная служба' },
+            { value: 'ngo', label: 'НКО и благотворительность' },
+            { value: 'media', label: 'Медиа и реклама' },
+            { value: 'arts', label: 'Искусство и развлечения' },
+            { value: 'agriculture', label: 'Сельское хозяйство' },
+            { value: 'energy', label: 'Энергетика' },
+            { value: 'other', label: 'Другое' },
+        ],
+        [],
+    )
+
+    const learningTopicOptions = useMemo(
+        () => [
+            // IT и технологии
+            'Программирование',
+            'Веб-разработка',
+            'Мобильная разработка',
+            'Тестирование ПО',
+            'Базы данных',
+            'Кибербезопасность',
+            'Машинное обучение',
+            'Искусственный интеллект',
+            'DevOps',
+            'UI/UX дизайн',
+            'Системное администрирование',
+
+            // Бизнес и менеджмент
+            'Управление проектами',
+            'Менеджмент',
+            'Маркетинг',
+            'Продажи',
+            'Финансы и бухгалтерия',
+            'HR и управление персоналом',
+            'Предпринимательство',
+            'Логистика',
+
+            // Творчество и дизайн
+            'Графический дизайн',
+            'Фотография',
+            'Видеомонтаж',
+            'Анимация',
+            'Иллюстрация',
+            'Музыка',
+            'Письмо и копирайтинг',
+
+            // Образование и наука
+            'Педагогика',
+            'Психология',
+            'Медицина',
+            'Юриспруденция',
+            'Экология',
+            'Химия',
+            'Физика',
+            'Математика',
+
+            // Ремесла и услуги
+            'Кулинария',
+            'Парикмахерское дело',
+            'Косметология',
+            'Строительство',
+            'Электрика',
+            'Сантехника',
+            'Автомеханика',
+            'Садоводство',
+
+            // Мягкие навыки
+            'Коммуникация',
+            'Публичные выступления',
+            'Тайм-менеджмент',
+            'Лидерство',
+            'Эмоциональный интеллект',
+            'Стрессоустойчивость',
+            'Критическое мышление',
+
+            // Языки
+            'Английский язык',
+            'Русский язык',
+            'Казахский язык',
+            'Китайский язык',
+            'Немецкий язык',
+            'Французский язык',
+
+            'Другое',
+        ],
+        [],
+    )
+
+    const handleInputChange = useCallback(
+        (field: string, value: string | number) => {
+            setFormData((prev) => ({ ...prev, [field]: value }))
+        },
+        [],
+    )
+
+    const handleToggleArray = useCallback((field: string, value: string) => {
         setFormData((prev) => {
-            const currentArray = prev[field as keyof typeof prev] as string[]
+            const fieldKey = field as keyof typeof prev
+            const currentArray = Array.isArray(prev[fieldKey])
+                ? (prev[fieldKey] as string[])
+                : []
+
             const updatedArray = currentArray.includes(value)
                 ? currentArray.filter((item) => item !== value)
                 : [...currentArray, value]
+
             return { ...prev, [field]: updatedArray }
         })
-    }
+    }, [])
 
     const handleNext = () => {
-        onUpdate(formData)
         onNext()
     }
 
     const handlePrevious = () => {
-        onUpdate(formData)
         onPrevious()
     }
 
@@ -158,26 +289,44 @@ const ProfessionalInfoStep = ({
                         </FormItem>
 
                         <FormItem label="Годы опыта работы">
-                            <Select
-                                value={formData.years_of_experience.toString()}
-                                onChange={(value) =>
+                            <Select<{ value: number; label: string }>
+                                value={experienceOptions.find(
+                                    (option) =>
+                                        option.value ===
+                                        formData.years_of_experience,
+                                )}
+                                onChange={(option) =>
                                     handleInputChange(
                                         'years_of_experience',
-                                        parseInt(value || '0'),
+                                        (
+                                            option as {
+                                                value: number
+                                                label: string
+                                            }
+                                        )?.value || 0,
                                     )
                                 }
                                 placeholder="Выберите количество лет опыта"
-                                options={experienceOptions.map((exp) =>
-                                    exp.toString(),
-                                )}
+                                options={experienceOptions}
                             />
                         </FormItem>
 
                         <FormItem label="Отрасль (если есть)">
-                            <Select
-                                value={formData.industry}
-                                onChange={(value) =>
-                                    handleInputChange('industry', value || '')
+                            <Select<{ value: string; label: string }>
+                                value={industryOptions.find(
+                                    (option) =>
+                                        option.value === formData.industry,
+                                )}
+                                onChange={(option) =>
+                                    handleInputChange(
+                                        'industry',
+                                        (
+                                            option as {
+                                                value: string
+                                                label: string
+                                            }
+                                        )?.value || '',
+                                    )
                                 }
                                 placeholder="Выберите отрасль"
                                 options={industryOptions}
@@ -192,115 +341,27 @@ const ProfessionalInfoStep = ({
                         </h3>
 
                         <FormItem label="Уровень образования">
-                            <Select
-                                value={formData.education_status}
-                                onChange={(value) =>
+                            <Select<{ value: string; label: string }>
+                                value={educationOptions.find(
+                                    (option) =>
+                                        option.value ===
+                                        formData.education_status,
+                                )}
+                                onChange={(option) =>
                                     handleInputChange(
                                         'education_status',
-                                        value || '',
+                                        (
+                                            option as {
+                                                value: string
+                                                label: string
+                                            }
+                                        )?.value || '',
                                     )
                                 }
                                 placeholder="Выберите уровень образования"
-                                options={educationStatusOptions}
+                                options={educationOptions}
                             />
                         </FormItem>
-
-                        <FormItem label="Хотите ли вы проходить курсы?">
-                            <div className="flex gap-4">
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="wants_courses"
-                                        value="yes"
-                                        checked={
-                                            formData.wants_courses === 'yes'
-                                        }
-                                        onChange={(e) =>
-                                            handleInputChange(
-                                                'wants_courses',
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="mr-2"
-                                    />
-                                    Да
-                                </label>
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="wants_courses"
-                                        value="no"
-                                        checked={
-                                            formData.wants_courses === 'no'
-                                        }
-                                        onChange={(e) =>
-                                            handleInputChange(
-                                                'wants_courses',
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="mr-2"
-                                    />
-                                    Нет
-                                </label>
-                                <label className="flex items-center">
-                                    <input
-                                        type="radio"
-                                        name="wants_courses"
-                                        value="maybe"
-                                        checked={
-                                            formData.wants_courses === 'maybe'
-                                        }
-                                        onChange={(e) =>
-                                            handleInputChange(
-                                                'wants_courses',
-                                                e.target.value,
-                                            )
-                                        }
-                                        className="mr-2"
-                                    />
-                                    Возможно
-                                </label>
-                            </div>
-                        </FormItem>
-
-                        {formData.wants_courses !== 'no' && (
-                            <FormItem label="Интересующие темы для обучения">
-                                <div className="flex flex-wrap gap-2 mb-4">
-                                    {learningTopicOptions.map((topic) => (
-                                        <Chip
-                                            key={topic}
-                                            selected={formData.learning_topics.includes(
-                                                topic,
-                                            )}
-                                            onClick={() =>
-                                                handleToggleArray(
-                                                    'learning_topics',
-                                                    topic,
-                                                )
-                                            }
-                                        >
-                                            {topic}
-                                        </Chip>
-                                    ))}
-                                </div>
-
-                                {formData.learning_topics.includes(
-                                    'Другое',
-                                ) && (
-                                    <Input
-                                        value={formData.learning_topics_other}
-                                        onChange={(e) =>
-                                            handleInputChange(
-                                                'learning_topics_other',
-                                                e.target.value,
-                                            )
-                                        }
-                                        placeholder="Укажите другие темы для обучения"
-                                    />
-                                )}
-                            </FormItem>
-                        )}
                     </div>
                 </Form>
 

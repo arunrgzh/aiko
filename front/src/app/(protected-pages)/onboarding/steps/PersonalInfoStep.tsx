@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo, useEffect } from 'react'
 import { Form, FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
@@ -63,6 +63,16 @@ const PersonalInfoStep = ({
         workplace_other: data.workplace_other || '',
     })
 
+    const [savedFields, setSavedFields] = useState<Record<string, boolean>>({})
+
+    // Синхронизируем с родительским компонентом через useEffect
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            onUpdate(formData)
+        }, 0)
+        return () => clearTimeout(timeout)
+    }, [formData])
+
     const genderOptions: Option[] = useMemo(
         () => [
             { value: 'male', label: 'Мужской' },
@@ -122,18 +132,29 @@ const PersonalInfoStep = ({
 
     const handleToggleArray = useCallback((field: string, value: string) => {
         setFormData((prev) => {
-            const currentArray = prev[field as keyof typeof prev] as string[]
+            const fieldKey = field as keyof typeof prev
+            const currentArray = Array.isArray(prev[fieldKey])
+                ? (prev[fieldKey] as string[])
+                : []
+
             const updatedArray = currentArray.includes(value)
                 ? currentArray.filter((item) => item !== value)
                 : [...currentArray, value]
+
             return { ...prev, [field]: updatedArray }
         })
     }, [])
 
+    const handleSaveField = useCallback((fieldName: string) => {
+        setSavedFields((prev) => ({ ...prev, [fieldName]: true }))
+        setTimeout(() => {
+            setSavedFields((prev) => ({ ...prev, [fieldName]: false }))
+        }, 2000)
+    }, [])
+
     const handleNext = useCallback(() => {
-        onUpdate(formData)
         onNext()
-    }, [formData, onUpdate, onNext])
+    }, [onNext])
 
     const isFormValid = formData.first_name && formData.last_name
 
@@ -232,36 +253,99 @@ const PersonalInfoStep = ({
                         </h3>
 
                         <FormItem label="Тип инвалидности (если есть)">
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {disabilityTypeOptions.map((type) => (
-                                    <Chip
-                                        key={type}
-                                        selected={formData.disability_type.includes(
-                                            type,
+                            {/* Selected disability types */}
+                            {formData.disability_type.length > 0 && (
+                                <div className="mb-6">
+                                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                        Выбранные типы инвалидности
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {formData.disability_type.map(
+                                            (type) => (
+                                                <div
+                                                    key={type}
+                                                    className="inline-flex items-center gap-1 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                                                >
+                                                    <span>{type}</span>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleToggleArray(
+                                                                'disability_type',
+                                                                type,
+                                                            )
+                                                        }
+                                                        className="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            ),
                                         )}
-                                        onClick={() =>
-                                            handleToggleArray(
-                                                'disability_type',
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Available disability types */}
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Доступные варианты
+                                </h4>
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {disabilityTypeOptions.map((type) => (
+                                        <Chip
+                                            key={type}
+                                            selected={formData.disability_type.includes(
                                                 type,
-                                            )
-                                        }
-                                    >
-                                        {type}
-                                    </Chip>
-                                ))}
+                                            )}
+                                            onClick={() =>
+                                                handleToggleArray(
+                                                    'disability_type',
+                                                    type,
+                                                )
+                                            }
+                                        >
+                                            {type}
+                                        </Chip>
+                                    ))}
+                                </div>
                             </div>
 
                             {formData.disability_type.includes('Другое') && (
-                                <Input
-                                    value={formData.disability_description}
-                                    onChange={(e) =>
-                                        handleInputChange(
-                                            'disability_description',
-                                            e.target.value,
-                                        )
-                                    }
-                                    placeholder="Опишите тип инвалидности"
-                                />
+                                <div className="flex gap-2 items-start">
+                                    <div className="flex-1">
+                                        <Input
+                                            value={
+                                                formData.disability_description
+                                            }
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    'disability_description',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            placeholder="Опишите тип инвалидности"
+                                        />
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        variant={
+                                            savedFields.disability_description
+                                                ? 'solid'
+                                                : 'default'
+                                        }
+                                        onClick={() =>
+                                            handleSaveField(
+                                                'disability_description',
+                                            )
+                                        }
+                                        className="min-w-[80px] mt-0.5"
+                                    >
+                                        {savedFields.disability_description
+                                            ? '✓ Сохранено'
+                                            : 'Сохранить'}
+                                    </Button>
+                                </div>
                             )}
                         </FormItem>
                     </div>
@@ -273,61 +357,158 @@ const PersonalInfoStep = ({
                         </h3>
 
                         <FormItem label="Ваши возможности по работе">
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {workConditionOptions.map((condition) => (
-                                    <Chip
-                                        key={condition}
-                                        selected={formData.work_conditions.includes(
-                                            condition,
+                            {/* Selected work conditions */}
+                            {formData.work_conditions.length > 0 && (
+                                <div className="mb-6">
+                                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                        Выбранные условия работы
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {formData.work_conditions.map(
+                                            (condition) => (
+                                                <div
+                                                    key={condition}
+                                                    className="inline-flex items-center gap-1 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                                                >
+                                                    <span>{condition}</span>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleToggleArray(
+                                                                'work_conditions',
+                                                                condition,
+                                                            )
+                                                        }
+                                                        className="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            ),
                                         )}
-                                        onClick={() =>
-                                            handleToggleArray(
-                                                'work_conditions',
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Available work conditions */}
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Доступные варианты
+                                </h4>
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {workConditionOptions.map((condition) => (
+                                        <Chip
+                                            key={condition}
+                                            selected={formData.work_conditions.includes(
                                                 condition,
-                                            )
-                                        }
-                                    >
-                                        {condition}
-                                    </Chip>
-                                ))}
+                                            )}
+                                            onClick={() =>
+                                                handleToggleArray(
+                                                    'work_conditions',
+                                                    condition,
+                                                )
+                                            }
+                                        >
+                                            {condition}
+                                        </Chip>
+                                    ))}
+                                </div>
                             </div>
                         </FormItem>
 
                         <FormItem label="Предпочтения по месту работы">
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {workplacePreferenceOptions.map(
-                                    (preference) => (
-                                        <Chip
-                                            key={preference}
-                                            selected={formData.workplace_preferences.includes(
-                                                preference,
-                                            )}
-                                            onClick={() =>
-                                                handleToggleArray(
-                                                    'workplace_preferences',
+                            {/* Selected workplace preferences */}
+                            {formData.workplace_preferences.length > 0 && (
+                                <div className="mb-6">
+                                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                        Выбранные предпочтения по месту работы
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {formData.workplace_preferences.map(
+                                            (preference) => (
+                                                <div
+                                                    key={preference}
+                                                    className="inline-flex items-center gap-1 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                                                >
+                                                    <span>{preference}</span>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleToggleArray(
+                                                                'workplace_preferences',
+                                                                preference,
+                                                            )
+                                                        }
+                                                        className="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            ),
+                                        )}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Available workplace preferences */}
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Доступные варианты
+                                </h4>
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {workplacePreferenceOptions.map(
+                                        (preference) => (
+                                            <Chip
+                                                key={preference}
+                                                selected={formData.workplace_preferences.includes(
                                                     preference,
-                                                )
-                                            }
-                                        >
-                                            {preference}
-                                        </Chip>
-                                    ),
-                                )}
+                                                )}
+                                                onClick={() =>
+                                                    handleToggleArray(
+                                                        'workplace_preferences',
+                                                        preference,
+                                                    )
+                                                }
+                                            >
+                                                {preference}
+                                            </Chip>
+                                        ),
+                                    )}
+                                </div>
                             </div>
 
                             {formData.workplace_preferences.includes(
                                 'Другое',
                             ) && (
-                                <Input
-                                    value={formData.workplace_other}
-                                    onChange={(e) =>
-                                        handleInputChange(
-                                            'workplace_other',
-                                            e.target.value,
-                                        )
-                                    }
-                                    placeholder="Укажите другие предпочтения"
-                                />
+                                <div className="flex gap-2 items-start">
+                                    <div className="flex-1">
+                                        <Input
+                                            value={formData.workplace_other}
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    'workplace_other',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            placeholder="Укажите другие предпочтения"
+                                        />
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        variant={
+                                            savedFields.workplace_other
+                                                ? 'solid'
+                                                : 'default'
+                                        }
+                                        onClick={() =>
+                                            handleSaveField('workplace_other')
+                                        }
+                                        className="min-w-[80px] mt-0.5"
+                                    >
+                                        {savedFields.workplace_other
+                                            ? '✓ Сохранено'
+                                            : 'Сохранить'}
+                                    </Button>
+                                </div>
                             )}
                         </FormItem>
                     </div>
