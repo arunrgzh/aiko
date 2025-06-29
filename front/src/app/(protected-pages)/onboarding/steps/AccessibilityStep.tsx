@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, ReactNode } from 'react'
+import { useState, ReactNode, useEffect } from 'react'
 import { Form, FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
@@ -108,28 +108,48 @@ const AccessibilityStep = ({
         feedback: data.feedback || '',
     })
 
+    const [savedFields, setSavedFields] = useState<Record<string, boolean>>({})
+
+    // Синхронизируем с родительским компонентом через useEffect
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            onUpdate(formData)
+        }, 0)
+        return () => clearTimeout(timeout)
+    }, [formData])
+
     const handleInputChange = (field: string, value: string | string[]) => {
         setFormData((prev) => ({ ...prev, [field]: value }))
     }
 
     const handleToggleArray = (field: string, value: string) => {
         setFormData((prev) => {
-            const currentArray = prev[field as keyof typeof prev] as string[]
+            const fieldKey = field as keyof typeof prev
+            const currentArray = Array.isArray(prev[fieldKey])
+                ? (prev[fieldKey] as string[])
+                : []
+
             const updatedArray = currentArray.includes(value)
                 ? currentArray.filter((item) => item !== value)
                 : [...currentArray, value]
+
             return { ...prev, [field]: updatedArray }
         })
     }
 
     const handleNext = () => {
-        onUpdate(formData)
         onNext()
     }
 
     const handlePrevious = () => {
-        onUpdate(formData)
         onPrevious()
+    }
+
+    const handleSaveField = (fieldName: string) => {
+        setSavedFields((prev) => ({ ...prev, [fieldName]: true }))
+        setTimeout(() => {
+            setSavedFields((prev) => ({ ...prev, [fieldName]: false }))
+        }, 2000)
     }
 
     return (
@@ -171,38 +191,97 @@ const AccessibilityStep = ({
                         </FormItem>
 
                         <FormItem label="Важные адаптации на рабочем месте">
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {adaptationOptions.map((adaptation) => (
-                                    <Chip
-                                        key={adaptation}
-                                        selected={formData.important_adaptations.includes(
-                                            adaptation,
+                            {/* Selected adaptations */}
+                            {formData.important_adaptations.length > 0 && (
+                                <div className="mb-6">
+                                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                        Выбранные адаптации
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {formData.important_adaptations.map(
+                                            (adaptation) => (
+                                                <div
+                                                    key={adaptation}
+                                                    className="inline-flex items-center gap-1 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                                                >
+                                                    <span>{adaptation}</span>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleToggleArray(
+                                                                'important_adaptations',
+                                                                adaptation,
+                                                            )
+                                                        }
+                                                        className="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            ),
                                         )}
-                                        onClick={() =>
-                                            handleToggleArray(
-                                                'important_adaptations',
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Available adaptations */}
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Популярные адаптации
+                                </h4>
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {adaptationOptions.map((adaptation) => (
+                                        <Chip
+                                            key={adaptation}
+                                            selected={formData.important_adaptations.includes(
                                                 adaptation,
-                                            )
-                                        }
-                                    >
-                                        {adaptation}
-                                    </Chip>
-                                ))}
+                                            )}
+                                            onClick={() =>
+                                                handleToggleArray(
+                                                    'important_adaptations',
+                                                    adaptation,
+                                                )
+                                            }
+                                        >
+                                            {adaptation}
+                                        </Chip>
+                                    ))}
+                                </div>
                             </div>
 
                             {formData.important_adaptations.includes(
                                 'Другое',
                             ) && (
-                                <Input
-                                    value={formData.adaptations_other}
-                                    onChange={(e) =>
-                                        handleInputChange(
-                                            'adaptations_other',
-                                            e.target.value,
-                                        )
-                                    }
-                                    placeholder="Укажите другие адаптации"
-                                />
+                                <div className="flex gap-2 items-start">
+                                    <div className="flex-1">
+                                        <Input
+                                            value={formData.adaptations_other}
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    'adaptations_other',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            placeholder="Укажите другие адаптации"
+                                        />
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        variant={
+                                            savedFields.adaptations_other
+                                                ? 'solid'
+                                                : 'default'
+                                        }
+                                        onClick={() =>
+                                            handleSaveField('adaptations_other')
+                                        }
+                                        className="min-w-[80px] mt-0.5"
+                                    >
+                                        {savedFields.adaptations_other
+                                            ? '✓ Сохранено'
+                                            : 'Сохранить'}
+                                    </Button>
+                                </div>
                             )}
                         </FormItem>
                     </div>
@@ -214,79 +293,99 @@ const AccessibilityStep = ({
                         </h3>
 
                         <FormItem label="Желаемые функции платформы">
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {platformFeatureOptions.map((feature) => (
-                                    <Chip
-                                        key={feature}
-                                        selected={formData.platform_features.includes(
-                                            feature,
+                            {/* Selected platform features */}
+                            {formData.platform_features.length > 0 && (
+                                <div className="mb-6">
+                                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                        Выбранные функции платформы
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {formData.platform_features.map(
+                                            (feature) => (
+                                                <div
+                                                    key={feature}
+                                                    className="inline-flex items-center gap-1 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
+                                                >
+                                                    <span>{feature}</span>
+                                                    <button
+                                                        onClick={() =>
+                                                            handleToggleArray(
+                                                                'platform_features',
+                                                                feature,
+                                                            )
+                                                        }
+                                                        className="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            ),
                                         )}
-                                        onClick={() =>
-                                            handleToggleArray(
-                                                'platform_features',
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Available platform features */}
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Популярные функции платформы
+                                </h4>
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {platformFeatureOptions.map((feature) => (
+                                        <Chip
+                                            key={feature}
+                                            selected={formData.platform_features.includes(
                                                 feature,
-                                            )
-                                        }
-                                    >
-                                        {feature}
-                                    </Chip>
-                                ))}
+                                            )}
+                                            onClick={() =>
+                                                handleToggleArray(
+                                                    'platform_features',
+                                                    feature,
+                                                )
+                                            }
+                                        >
+                                            {feature}
+                                        </Chip>
+                                    ))}
+                                </div>
                             </div>
 
                             {formData.platform_features.includes('Другое') && (
-                                <Input
-                                    value={formData.platform_features_other}
-                                    onChange={(e) =>
-                                        handleInputChange(
-                                            'platform_features_other',
-                                            e.target.value,
-                                        )
-                                    }
-                                    placeholder="Укажите другие функции"
-                                />
-                            )}
-                        </FormItem>
-                    </div>
-
-                    {/* Accessibility Issues Section */}
-                    <div className="mb-8">
-                        <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-                            Проблемы с доступностью
-                        </h3>
-
-                        <FormItem label="Какие проблемы с доступностью у вас есть?">
-                            <div className="flex flex-wrap gap-2 mb-4">
-                                {accessibilityIssueOptions.map((issue) => (
-                                    <Chip
-                                        key={issue}
-                                        selected={formData.accessibility_issues.includes(
-                                            issue,
-                                        )}
+                                <div className="flex gap-2 items-start">
+                                    <div className="flex-1">
+                                        <Input
+                                            value={
+                                                formData.platform_features_other
+                                            }
+                                            onChange={(e) =>
+                                                handleInputChange(
+                                                    'platform_features_other',
+                                                    e.target.value,
+                                                )
+                                            }
+                                            placeholder="Укажите другие функции"
+                                        />
+                                    </div>
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        variant={
+                                            savedFields.platform_features_other
+                                                ? 'solid'
+                                                : 'default'
+                                        }
                                         onClick={() =>
-                                            handleToggleArray(
-                                                'accessibility_issues',
-                                                issue,
+                                            handleSaveField(
+                                                'platform_features_other',
                                             )
                                         }
+                                        className="min-w-[80px] mt-0.5"
                                     >
-                                        {issue}
-                                    </Chip>
-                                ))}
-                            </div>
-
-                            {formData.accessibility_issues.includes(
-                                'Другое',
-                            ) && (
-                                <Input
-                                    value={formData.accessibility_issues_other}
-                                    onChange={(e) =>
-                                        handleInputChange(
-                                            'accessibility_issues_other',
-                                            e.target.value,
-                                        )
-                                    }
-                                    placeholder="Опишите другие проблемы"
-                                />
+                                        {savedFields.platform_features_other
+                                            ? '✓ Сохранено'
+                                            : 'Сохранить'}
+                                    </Button>
+                                </div>
                             )}
                         </FormItem>
                     </div>
@@ -298,18 +397,39 @@ const AccessibilityStep = ({
                         </h3>
 
                         <FormItem label="Дополнительные комментарии или предложения">
-                            <textarea
-                                rows={4}
-                                value={formData.feedback}
-                                onChange={(e) =>
-                                    handleInputChange(
-                                        'feedback',
-                                        e.target.value,
-                                    )
-                                }
-                                placeholder="Расскажите о любых дополнительных потребностях или предложениях..."
-                                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                            />
+                            <div className="space-y-2">
+                                <textarea
+                                    rows={4}
+                                    value={formData.feedback}
+                                    onChange={(e) =>
+                                        handleInputChange(
+                                            'feedback',
+                                            e.target.value,
+                                        )
+                                    }
+                                    placeholder="Расскажите о любых дополнительных потребностях или предложениях..."
+                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                                />
+                                <div className="flex justify-end">
+                                    <Button
+                                        type="button"
+                                        size="sm"
+                                        variant={
+                                            savedFields.feedback
+                                                ? 'solid'
+                                                : 'default'
+                                        }
+                                        onClick={() =>
+                                            handleSaveField('feedback')
+                                        }
+                                        className="min-w-[80px]"
+                                    >
+                                        {savedFields.feedback
+                                            ? '✓ Сохранено'
+                                            : 'Сохранить'}
+                                    </Button>
+                                </div>
+                            </div>
                         </FormItem>
                     </div>
                 </Form>
