@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from .api import auth
+from .api import auth, onboarding
 from .database import engine, Base
 from .config import settings
 
@@ -24,6 +24,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth.router)
+app.include_router(onboarding.router)
 
 @app.on_event("startup")
 async def init_db():
