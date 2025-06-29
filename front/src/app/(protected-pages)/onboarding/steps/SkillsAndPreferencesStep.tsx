@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, ReactNode } from 'react'
+import { useState, ReactNode, useEffect } from 'react'
 import { Form, FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
@@ -162,19 +162,29 @@ const SkillsAndPreferencesStep = ({
     )
     const [newLocation, setNewLocation] = useState('')
 
+    // Синхронизируем с родительским компонентом через useEffect
+    useEffect(() => {
+        const timeout = setTimeout(() => {
+            onUpdate({
+                skills,
+                preferred_job_types: preferredJobTypes,
+                preferred_locations: preferredLocations,
+            })
+        }, 0)
+        return () => clearTimeout(timeout)
+    }, [skills, preferredJobTypes, preferredLocations])
+
     const handleAddSkill = () => {
         if (newSkill.trim() && !skills.includes(newSkill.trim())) {
             const updatedSkills = [...skills, newSkill.trim()]
             setSkills(updatedSkills)
             setNewSkill('')
-            onUpdate({ skills: updatedSkills })
         }
     }
 
     const handleRemoveSkill = (skillToRemove: string) => {
         const updatedSkills = skills.filter((skill) => skill !== skillToRemove)
         setSkills(updatedSkills)
-        onUpdate({ skills: updatedSkills })
     }
 
     const handleSkillToggle = (skill: string) => {
@@ -182,7 +192,6 @@ const SkillsAndPreferencesStep = ({
             ? skills.filter((s) => s !== skill)
             : [...skills, skill]
         setSkills(updatedSkills)
-        onUpdate({ skills: updatedSkills })
     }
 
     const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -200,7 +209,6 @@ const SkillsAndPreferencesStep = ({
             const updatedJobTypes = [...preferredJobTypes, newJobType.trim()]
             setPreferredJobTypes(updatedJobTypes)
             setNewJobType('')
-            onUpdate({ preferred_job_types: updatedJobTypes })
         }
     }
 
@@ -209,7 +217,6 @@ const SkillsAndPreferencesStep = ({
             (jobType) => jobType !== jobTypeToRemove,
         )
         setPreferredJobTypes(updatedJobTypes)
-        onUpdate({ preferred_job_types: updatedJobTypes })
     }
 
     const handleJobTypeToggle = (jobType: string) => {
@@ -217,7 +224,6 @@ const SkillsAndPreferencesStep = ({
             ? preferredJobTypes.filter((jt) => jt !== jobType)
             : [...preferredJobTypes, jobType]
         setPreferredJobTypes(updatedJobTypes)
-        onUpdate({ preferred_job_types: updatedJobTypes })
     }
 
     const handleAddLocation = () => {
@@ -228,7 +234,6 @@ const SkillsAndPreferencesStep = ({
             const updatedLocations = [...preferredLocations, newLocation.trim()]
             setPreferredLocations(updatedLocations)
             setNewLocation('')
-            onUpdate({ preferred_locations: updatedLocations })
         }
     }
 
@@ -237,7 +242,6 @@ const SkillsAndPreferencesStep = ({
             (location) => location !== locationToRemove,
         )
         setPreferredLocations(updatedLocations)
-        onUpdate({ preferred_locations: updatedLocations })
     }
 
     const handleLocationToggle = (location: string) => {
@@ -245,7 +249,6 @@ const SkillsAndPreferencesStep = ({
             ? preferredLocations.filter((loc) => loc !== location)
             : [...preferredLocations, location]
         setPreferredLocations(updatedLocations)
-        onUpdate({ preferred_locations: updatedLocations })
     }
 
     const handleNext = () => {
@@ -269,165 +272,133 @@ const SkillsAndPreferencesStep = ({
 
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
                 <Form layout="vertical">
-                    {/* Skills Section */}
+                    {/* Skills */}
                     <div className="mb-8">
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                             Ваши навыки
                         </h3>
 
-                        <FormItem label="Добавить навык">
-                            <div className="flex gap-2">
-                                <Input
-                                    value={newSkill}
-                                    onChange={(e) =>
-                                        setNewSkill(e.target.value)
-                                    }
-                                    onKeyPress={handleKeyPress}
-                                    placeholder="Введите навык и нажмите Enter"
-                                    className="flex-1"
-                                />
-                                <Button
-                                    variant="solid"
-                                    onClick={handleAddSkill}
-                                    disabled={!newSkill.trim()}
-                                >
-                                    Добавить
-                                </Button>
-                            </div>
-                        </FormItem>
-
-                        {/* Selected Skills */}
-                        {skills.length > 0 && (
-                            <FormItem label="Выбранные навыки">
-                                <div className="flex flex-wrap gap-2">
-                                    {skills.map((skill, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center gap-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-3 py-1 rounded-full text-sm"
-                                        >
-                                            <span>{skill}</span>
-                                            <button
-                                                onClick={() =>
-                                                    handleRemoveSkill(skill)
-                                                }
-                                                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200"
+                        <FormItem label="Навыки и умения">
+                            {/* Selected skills */}
+                            {skills.length > 0 && (
+                                <div className="mb-6">
+                                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                        Выбранные навыки
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {skills.map((skill) => (
+                                            <div
+                                                key={skill}
+                                                className="inline-flex items-center gap-1 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
                                             >
-                                                ×
-                                            </button>
-                                        </div>
+                                                <span>{skill}</span>
+                                                <button
+                                                    onClick={() =>
+                                                        handleRemoveSkill(skill)
+                                                    }
+                                                    className="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Available skills */}
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Популярные навыки
+                                </h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {popularSkills.map((skill) => (
+                                        <Chip
+                                            key={skill}
+                                            selected={skills.includes(skill)}
+                                            onClick={() =>
+                                                handleSkillToggle(skill)
+                                            }
+                                        >
+                                            {skill}
+                                        </Chip>
                                     ))}
                                 </div>
-                            </FormItem>
-                        )}
-
-                        {/* Popular Skills */}
-                        <FormItem label="Популярные навыки">
-                            <div className="flex flex-wrap gap-2">
-                                {popularSkills.map((skill) => (
-                                    <Chip
-                                        key={skill}
-                                        selected={skills.includes(skill)}
-                                        onClick={() => handleSkillToggle(skill)}
-                                    >
-                                        {skill}
-                                    </Chip>
-                                ))}
                             </div>
                         </FormItem>
                     </div>
 
-                    {/* Job Preferences Section */}
+                    {/* Job Preferences */}
                     <div className="mb-8">
                         <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
                             Предпочтения по работе
                         </h3>
 
-                        <FormItem label="Предпочитаемые типы работ">
-                            <div className="flex gap-2 mb-4">
-                                <Input
-                                    value={newJobType}
-                                    onChange={(e) =>
-                                        setNewJobType(e.target.value)
-                                    }
-                                    placeholder="Добавить тип работы"
-                                    className="flex-1"
-                                />
-                                <Button
-                                    variant="solid"
-                                    onClick={handleAddJobType}
-                                    disabled={!newJobType.trim()}
-                                >
-                                    Добавить
-                                </Button>
-                            </div>
-
-                            {/* Selected Job Types */}
+                        <FormItem label="Предпочитаемые типы работы">
+                            {/* Selected job types */}
                             {preferredJobTypes.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mb-4">
-                                    {preferredJobTypes.map((jobType, index) => (
-                                        <div
-                                            key={index}
-                                            className="flex items-center gap-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200 px-3 py-1 rounded-full text-sm"
-                                        >
-                                            <span>{jobType}</span>
-                                            <button
-                                                onClick={() =>
-                                                    handleRemoveJobType(jobType)
-                                                }
-                                                className="text-green-600 dark:text-green-400 hover:text-green-800 dark:hover:text-green-200"
+                                <div className="mb-6">
+                                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                        Выбранные типы работы
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {preferredJobTypes.map((type) => (
+                                            <div
+                                                key={type}
+                                                className="inline-flex items-center gap-1 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
                                             >
-                                                ×
-                                            </button>
-                                        </div>
-                                    ))}
+                                                <span>{type}</span>
+                                                <button
+                                                    onClick={() =>
+                                                        handleRemoveJobType(
+                                                            type,
+                                                        )
+                                                    }
+                                                    className="ml-1 text-blue-600 hover:text-blue-800 font-bold"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             )}
 
-                            {/* Popular Job Types */}
-                            <div className="flex flex-wrap gap-2">
-                                {popularJobTypes.map((jobType) => (
-                                    <Chip
-                                        key={jobType}
-                                        selected={preferredJobTypes.includes(
-                                            jobType,
-                                        )}
-                                        onClick={() =>
-                                            handleJobTypeToggle(jobType)
-                                        }
-                                    >
-                                        {jobType}
-                                    </Chip>
-                                ))}
+                            {/* Available job types */}
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Популярные типы работы
+                                </h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {popularJobTypes.map((type) => (
+                                        <Chip
+                                            key={type}
+                                            selected={preferredJobTypes.includes(
+                                                type,
+                                            )}
+                                            onClick={() =>
+                                                handleJobTypeToggle(type)
+                                            }
+                                        >
+                                            {type}
+                                        </Chip>
+                                    ))}
+                                </div>
                             </div>
                         </FormItem>
 
-                        <FormItem label="Предпочитаемые места работы">
-                            <div className="flex gap-2 mb-4">
-                                <Input
-                                    value={newLocation}
-                                    onChange={(e) =>
-                                        setNewLocation(e.target.value)
-                                    }
-                                    placeholder="Добавить место"
-                                    className="flex-1"
-                                />
-                                <Button
-                                    variant="solid"
-                                    onClick={handleAddLocation}
-                                    disabled={!newLocation.trim()}
-                                >
-                                    Добавить
-                                </Button>
-                            </div>
-
-                            {/* Selected Locations */}
+                        <FormItem label="Предпочитаемые локации">
+                            {/* Selected locations */}
                             {preferredLocations.length > 0 && (
-                                <div className="flex flex-wrap gap-2 mb-4">
-                                    {preferredLocations.map(
-                                        (location, index) => (
+                                <div className="mb-6">
+                                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                        Выбранные локации
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {preferredLocations.map((location) => (
                                             <div
-                                                key={index}
-                                                className="flex items-center gap-1 bg-purple-100 dark:bg-purple-900 text-purple-800 dark:text-purple-200 px-3 py-1 rounded-full text-sm"
+                                                key={location}
+                                                className="inline-flex items-center gap-1 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium"
                                             >
                                                 <span>{location}</span>
                                                 <button
@@ -436,31 +407,36 @@ const SkillsAndPreferencesStep = ({
                                                             location,
                                                         )
                                                     }
-                                                    className="text-purple-600 dark:text-purple-400 hover:text-purple-800 dark:hover:text-purple-200"
+                                                    className="ml-1 text-blue-600 hover:text-blue-800 font-bold"
                                                 >
                                                     ×
                                                 </button>
                                             </div>
-                                        ),
-                                    )}
+                                        ))}
+                                    </div>
                                 </div>
                             )}
 
-                            {/* Popular Locations */}
-                            <div className="flex flex-wrap gap-2">
-                                {popularLocations.map((location) => (
-                                    <Chip
-                                        key={location}
-                                        selected={preferredLocations.includes(
-                                            location,
-                                        )}
-                                        onClick={() =>
-                                            handleLocationToggle(location)
-                                        }
-                                    >
-                                        {location}
-                                    </Chip>
-                                ))}
+                            {/* Available locations */}
+                            <div>
+                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                    Популярные локации
+                                </h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {popularLocations.map((location) => (
+                                        <Chip
+                                            key={location}
+                                            selected={preferredLocations.includes(
+                                                location,
+                                            )}
+                                            onClick={() =>
+                                                handleLocationToggle(location)
+                                            }
+                                        >
+                                            {location}
+                                        </Chip>
+                                    ))}
+                                </div>
                             </div>
                         </FormItem>
                     </div>
