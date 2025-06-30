@@ -1,21 +1,25 @@
 import ApiService from './ApiService'
+import {
+    PostAiChatResponse,
+    Conversation,
+} from '@/app/(protected-pages)/assistants/[id]/main/testing/types'
+import { ChatHistory } from '@/app/(protected-pages)/assistants/[id]/main/testing/types'
 
 type TAssistant = {
-    id: number,
-    config_id: number,
-    company_name: string,
-    assistant_name: string,
-    style: string,
+    id: number
+    config_id: number
+    company_name: string
+    assistant_name: string
+    style: string
     purpose: string[]
 }
 type TAssistants = TAssistant[]
 const PREFIX = '/assistants'
 
 type MessagePayload = {
-    participant: string,
-    message: string,
-    reset?: boolean,
-
+    participant: string
+    message: string
+    reset?: boolean
 }
 
 type SendMessageSuccessResponse = {
@@ -26,26 +30,60 @@ type SendMessageFailureResponse = {
 }
 type MessageResponse = SendMessageSuccessResponse | SendMessageFailureResponse
 
-export async function apiGetAssistants() {
-    return ApiService.fetchDataWithAxios<TAssistants>({
-        url: `${PREFIX}`,
+type GetAssistantsRequest = {
+    pageIndex?: number
+    pageSize?: number
+    sortKey?: string
+    order?: 'asc' | 'desc' | ''
+    query?: string
+}
+
+type GetAssistantsResponse = {
+    data: {
+        id: string
+        name: string
+        description: string
+        model: string
+        lastEdited: number
+    }[]
+    total: number
+}
+
+type SendMessageRequest = {
+    participant: string
+    message: string
+}
+
+type SendMessageResponse = {
+    replies: string[]
+}
+
+export async function apiGetAssistants(
+    data: GetAssistantsRequest,
+): Promise<GetAssistantsResponse> {
+    return ApiService.fetchDataWithAxios({
+        url: '/main/assistants',
+        method: 'get',
+        data,
+    })
+}
+
+export async function apiGetAssistant(
+    assistantId: string,
+): Promise<{ chat_history: ChatHistory[] }> {
+    return ApiService.fetchDataWithAxios({
+        url: `/main/assistants/${assistantId}`,
         method: 'get',
     })
 }
 
-export async function apiGetAssistantById(id: number | string) {
-    return ApiService.fetchDataWithAxios<TAssistant>({
-        url: `${PREFIX}/${id}`,
-        method: 'get',
-    })
-}
-
-
-export async function apiSendMessageToAssistant(id: number | string, payload: MessagePayload) {
-    return ApiService.fetchDataWithAxios<MessageResponse>({
-        url: `${PREFIX}/${id}/chat/`,
+export async function apiSendMessageToAssistant(
+    assistantId: string,
+    data: SendMessageRequest,
+): Promise<PostAiChatResponse | { error: string }> {
+    return ApiService.fetchDataWithAxios({
+        url: `/main/assistants/${assistantId}/chat`,
         method: 'post',
-        data: payload,
+        data,
     })
 }
-

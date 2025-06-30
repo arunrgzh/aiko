@@ -35,6 +35,15 @@ const ApiService = {
     },
 
     /**
+     * Alias для fetchDataWithAxios для совместимости
+     */
+    fetchData<Response = unknown, Request = Record<string, unknown>>(
+        options: FetchDataOptions<Response, Request>,
+    ): Promise<Response> {
+        return this.fetchDataWithAxios<Response, Request>(options)
+    },
+
+    /**
      * multipart/form-data запрос
      * @template T - тип данных, который придёт в ответе
      */

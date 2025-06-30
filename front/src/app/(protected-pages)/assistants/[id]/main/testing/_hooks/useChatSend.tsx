@@ -43,21 +43,19 @@ const useChatSend = () => {
                 isMyMessage: true,
             })
         },
-        [pushConversation]
+        [pushConversation],
     )
 
-    const handleError = useCallback<ErrorHandler>(
-        (error) => {
-            console.error('ChatSend error:', error)
-            toast.push(
-                <Notification type="danger" title="Ошибка общения">
-                    {(error as Error).message || 'Что-то пошло не так. Попробуйте позже.'}
-                </Notification>,
-                { placement: 'top-end' }
-            )
-        },
-        []
-    )
+    const handleError = useCallback<ErrorHandler>((error) => {
+        console.error('ChatSend error:', error)
+        toast.push(
+            <Notification type="danger" title="Ошибка общения">
+                {(error as Error).message ||
+                    'Что-то пошло не так. Попробуйте позже.'}
+            </Notification>,
+            { placement: 'top-end' },
+        )
+    }, [])
 
     const sendMessage = useCallback(
         async (id: string, prompt: string) => {
@@ -76,7 +74,11 @@ const useChatSend = () => {
                 const reply = resp.replies[0]
                 pushConversation(id, {
                     id: uniqueId('ai-'),
-                    sender: { id: 'ai', name: 'Chat AI', avatarImageUrl: '/img/thumbs/ai.jpg' },
+                    sender: {
+                        id: 'ai',
+                        name: 'Chat AI',
+                        avatarImageUrl: '/img/thumbs/ai.jpg',
+                    },
                     content: reply,
                     timestamp: dayjs().toDate(),
                     type: 'regular',
@@ -85,12 +87,17 @@ const useChatSend = () => {
                 })
             } catch (err) {
                 handleError(err)
-            }
-            finally {
+            } finally {
                 setIsTyping(false)
             }
         },
-        [setIsTyping,initParticipant, params.id, pushConversation, handleError]
+        [
+            setIsTyping,
+            initParticipant,
+            params.id,
+            pushConversation,
+            handleError,
+        ],
     )
 
     const handleSend = useCallback(
@@ -108,7 +115,7 @@ const useChatSend = () => {
                         lastConversation: '',
                         createdTime: dayjs().unix(),
                         updatedTime: dayjs().unix(),
-                        enable: false,
+                        enable: true,
                     })
                     createMyMessage(newId, prompt)
                     setSelectedConversation(newId)
@@ -116,12 +123,19 @@ const useChatSend = () => {
                 }
             } catch (err) {
                 handleError(err)
-            }
-            finally {
+            } finally {
                 setIsTyping(false)
             }
         },
-        [selectedConversation, pushChatHistory, setSelectedConversation, createMyMessage, sendMessage, handleError, setIsTyping]
+        [
+            selectedConversation,
+            pushChatHistory,
+            setSelectedConversation,
+            createMyMessage,
+            sendMessage,
+            handleError,
+            setIsTyping,
+        ],
     )
 
     return { handleSend }

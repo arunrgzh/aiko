@@ -33,13 +33,13 @@ async def create_refresh_token(data: dict) -> str:
     })
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
-async def verify_token(token: str, credentials_exception: HTTPException) -> TokenData:
+async def verify_token(token: str, credentials_exception: HTTPException, token_type: str = "access") -> TokenData:
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
-        if payload.get("type") != "access":
+        if payload.get("type") != token_type:
             raise credentials_exception
         return TokenData(username=username)
     except JWTError:

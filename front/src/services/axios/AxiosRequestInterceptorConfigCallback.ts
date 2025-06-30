@@ -1,12 +1,21 @@
 import type { InternalAxiosRequestConfig } from 'axios'
-import { API_ACCESS_TOKEN_KEY} from '@/constants/app.constant'
+import { getSession } from 'next-auth/react'
 
-const AxiosRequestInterceptorConfigCallback = (
+const AxiosRequestInterceptorConfigCallback = async (
     config: InternalAxiosRequestConfig,
 ) => {
-    const token = localStorage.getItem(API_ACCESS_TOKEN_KEY);
-    if (token && config.headers) {
-        config.headers['Authorization'] = `Bearer ${token}`
+    console.log('🔍 Axios Request Interceptor: Getting session...')
+    const session = await getSession()
+    console.log('🔍 Session:', session)
+
+    if (session?.accessToken && config.headers) {
+        console.log(
+            '✅ Adding authorization header with token:',
+            session.accessToken.substring(0, 20) + '...',
+        )
+        config.headers['Authorization'] = `Bearer ${session.accessToken}`
+    } else {
+        console.log('❌ No access token found in session')
     }
     return config
 }
