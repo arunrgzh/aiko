@@ -11,8 +11,8 @@ const AxiosBase = axios.create({
 })
 
 AxiosBase.interceptors.request.use(
-    (config) => {
-        return AxiosRequestInterceptorConfigCallback(config)
+    async (config) => {
+        return await AxiosRequestInterceptorConfigCallback(config)
     },
     (error) => {
         return Promise.reject(error)
