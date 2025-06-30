@@ -4,10 +4,8 @@ import Steps from '@/components/ui/Steps'
 import Content from './Content'
 import { useCreationFlowStore } from '@/app/(protected-pages)/bot-flow/_general/store/flowCreation'
 
-
-
 export default function Flow() {
-    const step = useCreationFlowStore(state => state.step)
+    const step = useCreationFlowStore((state) => state.step)
 
     return (
         <div>
@@ -20,10 +18,7 @@ export default function Flow() {
             <div className="mt-6 py-3 bg-gray-50 dark:bg-gray-700 rounded flex items-center justify-center">
                 <Content step={step} />
             </div>
-            <div className="mt-4 text-right">
-            </div>
+            <div className="mt-4 text-right"></div>
         </div>
     )
 }
-
-
