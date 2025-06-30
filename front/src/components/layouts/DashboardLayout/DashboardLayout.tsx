@@ -9,8 +9,7 @@
 // } from '@/constants/theme.constant'
 // import FrameLessSide from './components/FrameLessSide'
 // import StackedSide from './components/StackedSide'
-// import TopBarClassic from './components/TopBarClassic'
-import ContentOverlay from './components/ContentOverlay'
+import TopBarClassic from './components/TopBarClassic'
 // import Blank from './components/Blank'
 import PageContainer from '@/components/template/PageContainer'
 import queryRoute from '@/utils/queryRoute'
@@ -46,9 +45,11 @@ const DashboardLayout = ({ children }: CommonProps) => {
     const route = queryRoute(pathname)
 
     return (
-        <ContentOverlay withSidePanel={false} isMainPages={true}>
-            <PageContainer className={'h-screen'} {...route?.meta}>{children}</PageContainer>
-        </ContentOverlay>
+        <TopBarClassic>
+            <PageContainer className={'h-screen'} {...route?.meta}>
+                {children}
+            </PageContainer>
+        </TopBarClassic>
     )
 }
 

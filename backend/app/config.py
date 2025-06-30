@@ -18,6 +18,14 @@ class Settings(BaseSettings):
     # Frontend
     frontend_url: str = "http://localhost:3000"
 
+    # Azure OpenAI API (используем ваши переменные из azure_test.py)
+    azure_openai_api_key: Optional[str] = None
+    azure_openai_base_url: Optional[str] = None  # Изменено с endpoint
+    azure_openai_api_version: Optional[str] = None
+    azure_openai_deployment_name: str = "gpt-4o"  # Ваш deployment
+    azure_openai_max_tokens: int = 4096
+    azure_openai_temperature: float = 0.2
+
     # Environment
     environment: str = "development"
     debug: bool = True

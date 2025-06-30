@@ -22,24 +22,29 @@ const Header = (props: HeaderProps) => {
     } = props
 
     return (
-        <header className={classNames('header', className)}>
+        <header
+            className={classNames(
+                'header bg-white dark:bg-gray-900 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 relative z-10',
+                className,
+            )}
+        >
             <div
                 className={classNames(
-                    'header-wrapper',
+                    'header-wrapper flex items-center justify-between px-6',
                     container && 'container mx-auto',
                     wrapperClass,
                 )}
                 style={{ height: HEADER_HEIGHT }}
             >
-                <div className="header-action header-action-start">
+                <div className="header-action header-action-start flex items-center gap-4">
                     {headerStart}
                 </div>
                 {headerMiddle && (
-                    <div className="header-action header-action-middle">
+                    <div className="header-action header-action-middle flex-1 flex items-center justify-center">
                         {headerMiddle}
                     </div>
                 )}
-                <div className="header-action header-action-end">
+                <div className="header-action header-action-end flex items-center gap-4">
                     {headerEnd}
                 </div>
             </div>

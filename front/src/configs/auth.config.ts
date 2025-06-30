@@ -13,6 +13,7 @@ type AccessPayload = { sub: string; exp: number }
 const API_URL = process.env.API_URL!
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
+    console.log('🔄 NextAuth: Attempting to refresh token...')
     const res = await fetch(`${API_URL}/api/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -21,12 +22,18 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
     })
 
     if (!res.ok) {
+        console.error(
+            '❌ NextAuth: Token refresh failed:',
+            res.status,
+            res.statusText,
+        )
         return { ...token, error: 'RefreshAccessTokenError' }
     }
 
     const data = (await res.json()) as FastAPIAuthResponse
     const decoded = jwtDecode<AccessPayload>(data.access_token)
 
+    console.log('✅ NextAuth: Token refreshed successfully')
     return {
         ...token,
         accessToken: data.access_token,
@@ -82,6 +89,7 @@ export const authOptions: NextAuthConfig = {
     callbacks: {
         async jwt({ token, user }): Promise<JWT> {
             if (user) {
+                console.log('🔑 NextAuth: New user login, storing tokens...')
                 return {
                     ...token,
                     accessToken: user.accessToken,
@@ -91,13 +99,29 @@ export const authOptions: NextAuthConfig = {
                     isFirstLogin: user.isFirstLogin,
                 }
             }
+
+            console.log('🔍 NextAuth: Checking token expiry...', {
+                expires: new Date(token.accessTokenExpires),
+                now: new Date(Date.now()),
+                isExpired: Date.now() >= token.accessTokenExpires,
+            })
+
             if (Date.now() < token.accessTokenExpires) {
+                console.log('✅ NextAuth: Token still valid')
                 return token
             }
+
+            console.log('⏰ NextAuth: Token expired, refreshing...')
             return await refreshAccessToken(token)
         },
 
         async session({ session, token }): Promise<Session> {
+            console.log('🔗 NextAuth: Creating session...', {
+                hasAccessToken: !!token.accessToken,
+                hasError: !!token.error,
+                tokenError: token.error,
+            })
+
             session.user.id = String(token.id)
             session.accessToken = token.accessToken
             session.error = token.error

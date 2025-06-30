@@ -1,44 +1,47 @@
-import axios from 'axios';
-import { API_REFRESH_TOKEN_KEY, API_ACCESS_TOKEN_KEY } from '@/constants/app.constant';
-import type { RefreshResponse } from '@/@types/auth';
+import axios from 'axios'
+import {
+    API_REFRESH_TOKEN_KEY,
+    API_ACCESS_TOKEN_KEY,
+} from '@/constants/app.constant'
+import type { RefreshResponse } from '@/@types/auth'
 
-let isRefreshing = false;
-let subscribers: Array<(token: string) => void> = [];
+let isRefreshing = false
+let subscribers: Array<(token: string) => void> = []
 
 export function addSubscriber(cb: (token: string) => void) {
-    subscribers.push(cb);
+    subscribers.push(cb)
 }
 
 export function onRefreshed(token: string) {
-    subscribers.forEach(cb => cb(token));
-    subscribers = [];
+    subscribers.forEach((cb) => cb(token))
+    subscribers = []
 }
 
 export function setRefreshing(value: boolean) {
-    isRefreshing = value;
+    isRefreshing = value
 }
 
 export function getRefreshing(): boolean {
-    return isRefreshing;
+    return isRefreshing
 }
 
 export async function getNewAccessToken(): Promise<string> {
-    const refreshToken = localStorage.getItem(API_REFRESH_TOKEN_KEY);
+    const refreshToken = localStorage.getItem(API_REFRESH_TOKEN_KEY)
     if (!refreshToken) {
-        throw new Error('No refresh token available');
+        throw new Error('No refresh token available')
     }
 
     const response = await axios.post<RefreshResponse>(
         '/api/refresh',
         { refreshToken },
-        { baseURL: '' }
-    );
+        { baseURL: '' },
+    )
 
-    const { accessToken, refreshToken: newRefreshToken } = response.data;
-    localStorage.setItem(API_ACCESS_TOKEN_KEY, accessToken);
+    const { accessToken, refreshToken: newRefreshToken } = response.data
+    localStorage.setItem(API_ACCESS_TOKEN_KEY, accessToken)
     if (newRefreshToken) {
-        localStorage.setItem(API_REFRESH_TOKEN_KEY, newRefreshToken);
+        localStorage.setItem(API_REFRESH_TOKEN_KEY, newRefreshToken)
     }
 
-    return accessToken;
+    return accessToken
 }

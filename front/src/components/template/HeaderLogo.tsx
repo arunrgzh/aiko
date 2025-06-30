@@ -8,9 +8,12 @@ const HeaderLogo = ({ mode }: { mode?: Mode }) => {
     const defaultMode = useTheme((state) => state.mode)
 
     return (
-        <Link href={appConfig.authenticatedEntryPath}>
+        <Link
+            href={appConfig.authenticatedEntryPath}
+            className="flex items-center"
+        >
             <Logo
-                imgClass="max-h-10"
+                imgClass="max-h-14"
                 mode={mode || defaultMode}
                 className="hidden lg:block"
             />

@@ -24,8 +24,8 @@ const Logo = (props: LogoProps) => {
         logoHeight,
     } = props
 
-    const width = logoWidth || (type === 'full' ? 120 : 40)
-    const height = logoHeight || (type === 'full' ? 40 : 40)
+    const width = logoWidth || (type === 'full' ? 180 : 60)
+    const height = logoHeight || (type === 'full' ? 60 : 60)
 
     return (
         <div className={classNames('logo', className)} style={style}>
@@ -33,7 +33,7 @@ const Logo = (props: LogoProps) => {
                 <>
                     <Image
                         className={classNames(
-                            '',
+                            'hover:opacity-80 transition-opacity duration-200',
                             type === 'full' ? '' : 'hidden',
                             imgClass,
                         )}
@@ -45,7 +45,7 @@ const Logo = (props: LogoProps) => {
                     />
                     <Image
                         className={classNames(
-                            '',
+                            'hover:opacity-80 transition-opacity duration-200',
                             type === 'streamline' ? '' : 'hidden',
                             imgClass,
                         )}
@@ -61,6 +61,7 @@ const Logo = (props: LogoProps) => {
                 <>
                     <Image
                         className={classNames(
+                            'hover:opacity-80 transition-opacity duration-200',
                             type === 'full' ? '' : 'hidden',
                             imgClass,
                         )}
@@ -72,6 +73,7 @@ const Logo = (props: LogoProps) => {
                     />
                     <Image
                         className={classNames(
+                            'hover:opacity-80 transition-opacity duration-200',
                             type === 'streamline' ? '' : 'hidden',
                             imgClass,
                         )}

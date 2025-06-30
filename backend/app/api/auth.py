@@ -72,8 +72,8 @@ async def refresh_token(refresh_token: str = Body(..., embed=True), db: AsyncSes
     )
     
     try:
-        payload = await verify_token(refresh_token, credentials_exception)
-        username: str = payload.username
+        payload = await verify_token(refresh_token, credentials_exception, token_type="refresh")
+        username = payload.username
         if username is None:
             raise credentials_exception
     except:
