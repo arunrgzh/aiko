@@ -1,4 +1,4 @@
-export const APP_NAME = 'Xrox'
+export const APP_NAME = 'AI-Komekshi'
 export const REDIRECT_URL_KEY = 'redirectUrl'
 export const COOKIES_KEY = {
     THEME: 'theme',

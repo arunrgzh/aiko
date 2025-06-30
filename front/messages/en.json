@@ -116,9 +116,14 @@
 
     "nav": {
         "main": {
-            "dashboard": "Dashboard",
-            "pricing": "Pricing",
-            "blog": "Blog"
+            "all": "All",
+            "questionnaire": "Questionnaire",
+            "vacancies": "Vacancies",
+            "ai-chat": "AI Chat",
+            "profile": "Profile",
+            "responses": "My Responses",
+            "interviews": "Practice Interviews",
+            "settings": "Profile Settings"
         },
         "assistants": {
             "assistants": "Assistants",
