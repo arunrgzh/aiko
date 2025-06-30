@@ -11,6 +11,11 @@ import AccessibilityStep from './steps/AccessibilityStep'
 import CompletionStep from './steps/CompletionStep'
 import { Spinner } from '@/components/ui/Spinner'
 import Container from '@/components/shared/Container'
+import {
+    mapToBackendFormat,
+    mapToFrontendFormat,
+    type OnboardingProfileData,
+} from '@/utils/onboardingMapper'
 
 export type OnboardingData = {
     // Step 1: Personal Information
@@ -87,6 +92,50 @@ const OnboardingPage = () => {
 
     const totalSteps = 5
 
+    // Загрузить существующие данные онбординга
+    const loadOnboardingData = useCallback(async () => {
+        if (!session?.accessToken) return
+
+        try {
+            const response = await fetch('/api/onboarding/profile', {
+                method: 'GET',
+                headers: {
+                    Authorization: `Bearer ${session.accessToken}`,
+                },
+            })
+
+            if (response.ok) {
+                const backendData: OnboardingProfileData = await response.json()
+                const frontendData = mapToFrontendFormat(backendData)
+                setOnboardingData(frontendData)
+            }
+        } catch (error) {
+            console.error('Error loading onboarding data:', error)
+        }
+    }, [session?.accessToken])
+
+    // Автоматически сохранить данные
+    const saveOnboardingData = useCallback(
+        async (data: OnboardingData) => {
+            if (!session?.accessToken) return
+
+            try {
+                const backendData = mapToBackendFormat(data)
+                await fetch('/api/onboarding/profile', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${session.accessToken}`,
+                    },
+                    body: JSON.stringify(backendData),
+                })
+            } catch (error) {
+                console.error('Error saving onboarding data:', error)
+            }
+        },
+        [session?.accessToken],
+    )
+
     useEffect(() => {
         console.log('Onboarding useEffect - session:', session)
         console.log(
@@ -107,9 +156,11 @@ const OnboardingPage = () => {
                 )
                 router.push('/main/dashboard')
             } else {
-                // Показываем онбординг
-                console.log('Showing onboarding - setting loading to false')
-                setLoading(false)
+                // Загружаем существующие данные онбординга и показываем форму
+                console.log('Loading onboarding data and showing form')
+                loadOnboardingData().finally(() => {
+                    setLoading(false)
+                })
             }
         } else if (session?.user?.id) {
             // Если есть user.id но нет accessToken, показываем онбординг
@@ -121,7 +172,18 @@ const OnboardingPage = () => {
             // Если сессия еще не загружена, оставляем loading = true
             console.log('Session not loaded yet - keeping loading true')
         }
-    }, [session, router])
+    }, [session, router, loadOnboardingData])
+
+    // Автоматическое сохранение данных при их изменении
+    useEffect(() => {
+        if (Object.keys(onboardingData).length > 0 && session?.accessToken) {
+            const timeoutId = setTimeout(() => {
+                saveOnboardingData(onboardingData)
+            }, 1000) // Сохраняем через 1 секунду после последнего изменения
+
+            return () => clearTimeout(timeoutId)
+        }
+    }, [onboardingData, saveOnboardingData, session?.accessToken])
 
     // Таймаут для загрузки - если через 5 секунд сессия не загрузилась, показываем онбординг
     useEffect(() => {
@@ -157,31 +219,39 @@ const OnboardingPage = () => {
     const handleComplete = async () => {
         setSaving(true)
         try {
-            // Save onboarding data to backend
+            // Сохраняем финальные данные онбординга
+            const backendData = mapToBackendFormat(onboardingData)
             const response = await fetch('/api/onboarding/profile', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${session?.accessToken}`,
                 },
-                body: JSON.stringify({
-                    ...onboardingData,
-                    onboarding_completed: true,
-                    current_step: totalSteps,
-                }),
+                body: JSON.stringify(backendData),
             })
 
             if (response.ok) {
-                // Mark onboarding as completed
-                await fetch('/api/onboarding/complete', {
-                    method: 'POST',
-                    headers: {
-                        Authorization: `Bearer ${session?.accessToken}`,
+                // Отмечаем онбординг как завершенный
+                const completeResponse = await fetch(
+                    '/api/onboarding/complete',
+                    {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            Authorization: `Bearer ${session?.accessToken}`,
+                        },
+                        body: JSON.stringify({ mark_as_completed: true }),
                     },
-                })
+                )
 
-                // Redirect to dashboard
-                router.push('/main/dashboard')
+                if (completeResponse.ok) {
+                    // Перенаправляем на дашборд
+                    router.push('/main/dashboard')
+                } else {
+                    console.error('Error marking onboarding as completed')
+                }
+            } else {
+                console.error('Error saving final onboarding data')
             }
         } catch (error) {
             console.error('Error completing onboarding:', error)
