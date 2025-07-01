@@ -62,7 +62,7 @@ export async function apiGetAssistants(
     data: GetAssistantsRequest,
 ): Promise<GetAssistantsResponse> {
     return ApiService.fetchDataWithAxios({
-        url: '/main/assistants',
+        url: '/assistants',
         method: 'get',
         data,
     })
@@ -72,7 +72,7 @@ export async function apiGetAssistant(
     assistantId: string,
 ): Promise<{ chat_history: ChatHistory[] }> {
     return ApiService.fetchDataWithAxios({
-        url: `/main/assistants/${assistantId}`,
+        url: `/assistants/${assistantId}`,
         method: 'get',
     })
 }
@@ -80,10 +80,25 @@ export async function apiGetAssistant(
 export async function apiSendMessageToAssistant(
     assistantId: string,
     data: SendMessageRequest,
-): Promise<PostAiChatResponse | { error: string }> {
-    return ApiService.fetchDataWithAxios({
-        url: `/main/assistants/${assistantId}/chat`,
-        method: 'post',
+): Promise<SendMessageResponse | { error: string }> {
+    console.log('🚀 AssistantsService: Sending message to assistant', {
+        assistantId,
         data,
+        url: `/assistants/${assistantId}/chat`,
     })
+
+    try {
+        const result = await ApiService.fetchDataWithAxios<
+            SendMessageResponse | { error: string }
+        >({
+            url: `/assistants/${assistantId}/chat`,
+            method: 'post',
+            data,
+        })
+        console.log('✅ AssistantsService: Message sent successfully', result)
+        return result
+    } catch (error) {
+        console.error('❌ AssistantsService: Message sending failed', error)
+        throw error
+    }
 }

@@ -1,48 +1,61 @@
 import { NextResponse } from 'next/server'
 import NextAuth from 'next-auth'
 import authConfig from '@/configs/auth.config'
-import {
-    authRoutes as _authRoutes,
-    // publicRoutes as _publicRoutes
-} from '@/configs/routes.config/routes.config'
-// import { REDIRECT_URL_KEY } from '@/constants/app.constant'
+import { authRoutes as _authRoutes } from '@/configs/routes.config/routes.config'
 import appConfig from '@/configs/app.config'
 
 const { auth } = NextAuth(authConfig)
 
-// const publicRoutes = Object.keys(_publicRoutes)
 const authRoutes = Object.keys(_authRoutes)
-const apiAuthPath = `${appConfig.apiPrefix}/auth`
+
+// Routes that definitely don't need auth checking
+const staticPaths = [
+    '/_next',
+    '/api/auth', // NextAuth handles its own auth
+    '/favicon.ico',
+    '/public',
+    '/static',
+    '/images',
+    '/img',
+    '/css',
+    '/js',
+]
 
 export default auth((req) => {
     const { nextUrl } = req
     const pathname = nextUrl.pathname
 
-    if (pathname.startsWith(apiAuthPath)) return
-
-    const isSignedIn = Boolean(req.auth?.accessToken)
-    console.log('is signed in', isSignedIn)
-    // const isPublic = publicRoutes.includes(pathname)
-    const isAuthPage = authRoutes.includes(pathname)
-
-    if (isAuthPage && isSignedIn) {
-        return NextResponse.redirect(
-            new URL(appConfig.authenticatedEntryPath, nextUrl),
-        )
+    // Skip auth for static paths and API auth routes
+    if (staticPaths.some((path) => pathname.startsWith(path))) {
+        return NextResponse.next()
     }
 
-    // if (!isSignedIn && !isPublic) {
-    //     const callback = `${pathname}${nextUrl.search}`
-    //     const redirectUrl = new URL(
-    //         `${appConfig.unAuthenticatedEntryPath}?${REDIRECT_URL_KEY}=${encodeURIComponent(callback)}`,
-    //         nextUrl
-    //     )
-    //     return NextResponse.redirect(redirectUrl)
-    // }
+    // Check if this is an auth page that needs redirect check
+    const isAuthPage = authRoutes.includes(pathname)
 
-    return
+    // Only check auth for auth pages (where signed-in users should be redirected)
+    if (isAuthPage) {
+        const isSignedIn = Boolean(req.auth?.accessToken)
+
+        if (isSignedIn) {
+            return NextResponse.redirect(
+                new URL(appConfig.authenticatedEntryPath, nextUrl),
+            )
+        }
+    }
+
+    return NextResponse.next()
 })
 
 export const config = {
-    matcher: ['/((?!.+\.[\\w]+$|_next).*)', '/', '/(api)(.*)'],
+    // More specific matcher to reduce unnecessary middleware runs
+    matcher: [
+        // Auth pages that need redirect logic
+        '/sign-in',
+        '/sign-up',
+        '/forgot-password',
+        '/reset-password',
+        // Skip all static files, _next, and api routes except specific ones
+        '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+    ],
 }

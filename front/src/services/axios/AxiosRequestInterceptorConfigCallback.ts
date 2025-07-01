@@ -1,23 +1,66 @@
 import type { InternalAxiosRequestConfig } from 'axios'
 import { getSession } from 'next-auth/react'
 
+// Cache for session token to avoid excessive getSession calls
+let cachedToken: string | null = null
+let tokenExpiry: number = 0
+let isRefreshing = false
+
 const AxiosRequestInterceptorConfigCallback = async (
     config: InternalAxiosRequestConfig,
 ) => {
-    console.log('🔍 Axios Request Interceptor: Getting session...')
-    const session = await getSession()
-    console.log('🔍 Session:', session)
+    // Only fetch session if we don't have a cached token or it's expired
+    const now = Date.now()
 
-    if (session?.accessToken && config.headers) {
-        console.log(
-            '✅ Adding authorization header with token:',
-            session.accessToken.substring(0, 20) + '...',
-        )
-        config.headers['Authorization'] = `Bearer ${session.accessToken}`
-    } else {
-        console.log('❌ No access token found in session')
+    if (!cachedToken || now >= tokenExpiry) {
+        // Avoid multiple simultaneous session fetches
+        if (!isRefreshing) {
+            isRefreshing = true
+            try {
+                // Only log in development for debugging
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('🔍 Fetching fresh session token...')
+                }
+                const session = await getSession()
+
+                if (session?.accessToken) {
+                    cachedToken = session.accessToken
+                    // Cache token for 10 minutes or use token expiry
+                    tokenExpiry = session.user?.accessTokenExpires
+                        ? session.user.accessTokenExpires - 60000 // 1 minute before expiry
+                        : now + 10 * 60 * 1000 // 10 minutes fallback
+
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log(
+                            '✅ Token cached until:',
+                            new Date(tokenExpiry),
+                        )
+                    }
+                } else {
+                    cachedToken = null
+                    tokenExpiry = 0
+                    if (process.env.NODE_ENV === 'development') {
+                        console.log('❌ No access token in session')
+                    }
+                }
+            } finally {
+                isRefreshing = false
+            }
+        }
     }
+
+    // Add cached token to request
+    if (cachedToken && config.headers) {
+        config.headers['Authorization'] = `Bearer ${cachedToken}`
+    }
+
     return config
+}
+
+// Export function to clear cache when needed
+export const clearTokenCache = () => {
+    cachedToken = null
+    tokenExpiry = 0
 }
 
 export default AxiosRequestInterceptorConfigCallback

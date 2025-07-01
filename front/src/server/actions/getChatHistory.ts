@@ -1,5 +1,5 @@
 import { apiGetAssistant } from '@/services/AssistantsService'
-import { ChatHistory } from '@/app/(protected-pages)/assistants/[id]/main/testing/types'
+import { ChatHistory } from '@/app/(protected-pages)/main/ai-chat/types'
 
 export default async function getChatHistory(
     assistantId: string,

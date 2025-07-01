@@ -3,13 +3,10 @@ import Avatar from '@/components/ui/Avatar'
 import Dropdown from '@/components/ui/Dropdown'
 import withHeaderItem from '@/utils/hoc/withHeaderItem'
 import Link from 'next/link'
-import signOut from '@/server/actions/auth/handleSignOut'
+import { signOut } from 'next-auth/react'
+import { clearTokenCache } from '@/services/axios/AxiosRequestInterceptorConfigCallback'
 import useCurrentSession from '@/utils/hooks/useCurrentSession'
-import {
-    PiUserDuotone,
-    PiGearDuotone,
-    PiSignOutDuotone,
-} from 'react-icons/pi'
+import { PiUserDuotone, PiGearDuotone, PiSignOutDuotone } from 'react-icons/pi'
 
 import type { JSX } from 'react'
 
@@ -31,11 +28,13 @@ const _UserDropdown = () => {
     const { session } = useCurrentSession()
 
     const handleSignOut = async () => {
-        await signOut()
+        // Clear the token cache before signing out
+        clearTokenCache()
+        await signOut({ callbackUrl: '/sign-in' })
     }
 
     const avatarProps = {
-        icon: <PiUserDuotone />
+        icon: <PiUserDuotone />,
     }
 
     return (
