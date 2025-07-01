@@ -49,24 +49,26 @@ const ChatLandingView = () => {
     const { handleSend } = useChatSend()
 
     return (
-        <div className="max-w-[900px] w-full mx-auto mt-20">
+        <div className="max-w-[900px] w-full mx-auto mt-20 mb-16 px-4">
             <div>
-                <div className="heading-text text-4xl leading-snug">
+                <div className="heading-text text-4xl leading-snug mb-12">
                     <span className="font-semibold bg-linear-to-r from-indigo-500 to-red-400 bg-clip-text text-transparent text-5xl">
                         Hello, there
                     </span>
                     <br />
                     <span>How can I help you today?</span>
                 </div>
-                <div className="mt-8 grid grid-cols-2 xl:grid-cols-4 gap-4">
+                <div className="mt-8 mb-12 grid grid-cols-2 xl:grid-cols-4 gap-6">
                     {promptSuggestion.map((suggestion) => (
                         <div
                             key={suggestion.title}
-                            className="flex flex-col gap-4 justify-between rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-5 min-h-40 2xl:min-h-60 cursor-pointer"
+                            className="flex flex-col gap-4 justify-between rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-6 min-h-44 2xl:min-h-64 cursor-pointer transition-all duration-200 hover:shadow-lg"
                             role="button"
                             onClick={() => handleSend(suggestion.title)}
                         >
-                            <h6 className="font-normal">{suggestion.title}</h6>
+                            <h6 className="font-normal text-sm leading-relaxed">
+                                {suggestion.title}
+                            </h6>
                             <div>
                                 <div className="bg-white dark:bg-gray-800 rounded-full p-2 inline-flex">
                                     <span className="text-2xl">
