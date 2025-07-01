@@ -5,15 +5,13 @@ import Card from '@/components/ui/Card'
 import ChatBox from '@/components/view/ChatBox'
 import ChatLandingView from './ChatLandingView'
 import ChatMobileNav from './ChatMobileNav'
-import ChatCustomContent from './ChatCustomContent'
-import ChatCustomAction from './ChatCustomAction'
 import { useGenerativeChatStore } from '../_store/generativeChatStore'
 import useChatSend from '../_hooks/useChatSend'
 import type { ScrollBarRef } from '@/components/view/ChatBox'
 
 const ChatView = () => {
     const scrollRef = useRef<ScrollBarRef>(null)
-    const { selectedConversation, chatHistory, isTyping, disabledChatFresh } =
+    const { selectedConversation, chatHistory, isTyping } =
         useGenerativeChatStore()
     const { handleSend } = useChatSend()
 
@@ -43,60 +41,27 @@ const ChatView = () => {
         await handleSend(value)
     }
 
-    const handleFinish = (id: string) => {
-        console.log(id)
-        disabledChatFresh(id)
-        scrollToBottom()
-    }
-
     return (
         <Card className="flex-1 h-full" bodyClass="h-full p-0">
             <ChatMobileNav />
             <ChatBox
                 ref={scrollRef}
                 messageList={messageList}
-                placeholder="Enter a prompt here"
+                placeholder="Введите ваш вопрос здесь"
                 showMessageList={Boolean(selectedConversation)}
                 showAvatar={true}
                 avatarGap={true}
-                containerClass="h-[calc(100%-40px)] xl:h-full p-4"
-                messageListClass="h-[calc(100%-120px)] xl:h-[calc(100%-100px)] pb-8"
+                containerClass="h-full min-h-[600px]"
+                messageListClass="h-[calc(100vh-200px)] min-h-[500px] p-4"
                 typing={
                     isTyping
                         ? {
                               id: 'ai',
-                              name: 'Chat AI',
+                              name: 'AI Помощник',
                               avatarImageUrl: '/img/thumbs/ai.jpg',
                           }
                         : false
                 }
-                customRenderer={(message) => {
-                    if (message.sender.id === 'ai') {
-                        return (
-                            <ChatCustomContent
-                                key={message.id}
-                                content={message.content as string}
-                                triggerTyping={
-                                    message.fresh ? message.fresh : false
-                                }
-                                onFinish={() => handleFinish(message.id)}
-                            />
-                        )
-                    }
-
-                    return message.content
-                }}
-                customAction={(message) => {
-                    if (message.sender.id === 'ai') {
-                        return (
-                            <ChatCustomAction
-                                content={message.content as string}
-                            />
-                        )
-                    }
-
-                    return null
-                }}
                 onInputChange={handleInputChange}
             >
                 {!selectedConversation && <ChatLandingView />}
