@@ -25,12 +25,25 @@ const ApiService = {
     fetchDataWithAxios<Response = unknown, Request = Record<string, unknown>>(
         options: FetchDataOptions<Response, Request>,
     ): Promise<Response> {
+        console.log('📡 ApiService: Making request', options)
         return new Promise<Response>((resolve, reject) => {
             AxiosBase(options)
-                .then((response: AxiosResponse<Response>) =>
-                    resolve(response.data),
-                )
-                .catch((error: AxiosError) => reject(error))
+                .then((response: AxiosResponse<Response>) => {
+                    console.log(
+                        '✅ ApiService: Request successful',
+                        response.status,
+                        response.data,
+                    )
+                    resolve(response.data)
+                })
+                .catch((error: AxiosError) => {
+                    console.error(
+                        '❌ ApiService: Request failed',
+                        error.response?.status,
+                        error.message,
+                    )
+                    reject(error)
+                })
         })
     },
 
