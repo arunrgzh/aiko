@@ -1,13 +1,17 @@
 import { AxiosError, InternalAxiosRequestConfig } from 'axios'
 import AxiosBase from './AxiosBase'
 import { getSession, signOut } from 'next-auth/react'
+import { clearTokenCache } from './AxiosRequestInterceptorConfigCallback'
 
 const AxiosResponseInterceptorErrorCallback = async (error: AxiosError) => {
-    console.log(
-        '🚨 Axios Response Error:',
-        error.response?.status,
-        error.response?.data,
-    )
+    // Only log in development
+    if (process.env.NODE_ENV === 'development') {
+        console.log(
+            '🚨 Axios Response Error:',
+            error.response?.status,
+            error.response?.data,
+        )
+    }
 
     const originalReq = error.config as InternalAxiosRequestConfig & {
         _retry?: boolean
@@ -21,16 +25,31 @@ const AxiosResponseInterceptorErrorCallback = async (error: AxiosError) => {
     const status = error.response?.status
 
     if (status === 401 && !originalReq._retry) {
-        console.log('🔄 Attempting token refresh for 401 error...')
+        if (process.env.NODE_ENV === 'development') {
+            console.log(
+                '🔄 401 error - clearing token cache and attempting refresh...',
+            )
+        }
         originalReq._retry = true
+
+        // Clear the cached token since it's invalid
+        clearTokenCache()
 
         try {
             // Try to get a fresh session (NextAuth will refresh if needed)
             const session = await getSession()
-            console.log('🔍 Refresh attempt - Session:', session)
+
+            if (process.env.NODE_ENV === 'development') {
+                console.log(
+                    '🔍 Refresh attempt - Session valid:',
+                    !!session?.accessToken,
+                )
+            }
 
             if (session?.accessToken && !session.error) {
-                console.log('✅ Got fresh token, retrying request...')
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('✅ Got fresh token, retrying request...')
+                }
                 // Update the request with the new token
                 if (originalReq.headers) {
                     originalReq.headers['Authorization'] =

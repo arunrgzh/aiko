@@ -1,51 +1,50 @@
 'use client'
 
-import Card from '@/components/ui/Card'
-import Button from '@/components/ui/Button'
-import { TbMessageCircle } from 'react-icons/tb'
+import { useEffect, useState } from 'react'
+import ChatProvider from './_components/ChatProvider'
+import ChatView from './_components/ChatView'
+import ChatSideNav from './_components/ChatSideNav'
+import ChatHistoryRenameDialog from './_components/ChatHistoryRenameDialog'
+import getChatHistory from '@/server/actions/getChatHistory'
+import type { ChatHistories } from './types'
+
+// Use a default assistant ID for now
+// TODO: In the future, this could come from user preferences or be selectable
+const DEFAULT_ASSISTANT_ID = '1'
 
 export default function AiChatPage() {
+    const [chatHistory, setChatHistory] = useState<ChatHistories>([])
+    const [isLoading, setIsLoading] = useState(false) // Start with no loading since we have empty state
+
+    // Load chat history after component mounts (non-blocking)
+    useEffect(() => {
+        const loadChatHistory = async () => {
+            setIsLoading(true)
+            try {
+                const history = await getChatHistory(DEFAULT_ASSISTANT_ID)
+                setChatHistory(history)
+            } catch (error) {
+                console.error('Failed to fetch chat history:', error)
+                // Continue with empty chat history if the fetch fails
+                setChatHistory([])
+            } finally {
+                setIsLoading(false)
+            }
+        }
+
+        // Only load if we don't have any data yet
+        loadChatHistory()
+    }, [])
+
     return (
-        <div className="space-y-6">
-            <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                    ИИ Помощник
-                </h1>
-                <p className="text-gray-600 dark:text-gray-400">
-                    Интеллектуальный помощник для поиска работы и карьерного
-                    развития
-                </p>
+        <ChatProvider chatHistory={chatHistory}>
+            <div className="h-full">
+                <div className="flex flex-auto gap-4 h-full">
+                    <ChatView />
+                    <ChatSideNav />
+                    <ChatHistoryRenameDialog />
+                </div>
             </div>
-
-            <Card className="p-6">
-                <div className="flex items-center gap-4 mb-6">
-                    <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center">
-                        <TbMessageCircle className="w-8 h-8 text-purple-600 dark:text-purple-400" />
-                    </div>
-                    <div>
-                        <h3 className="text-xl font-semibold">
-                            Чат с ИИ помощником
-                        </h3>
-                        <p className="text-green-600 dark:text-green-400 text-sm">
-                            ● Онлайн
-                        </p>
-                    </div>
-                </div>
-
-                <div className="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-6">
-                    <h4 className="font-semibold mb-4">Как я могу помочь:</h4>
-                    <ul className="space-y-2 text-gray-600 dark:text-gray-400">
-                        <li>• Найти подходящие вакансии</li>
-                        <li>• Подготовиться к собеседованию</li>
-                        <li>• Составить или улучшить резюме</li>
-                        <li>• Дать советы по карьерному развитию</li>
-                    </ul>
-                </div>
-
-                <Button variant="solid" size="lg" block>
-                    Начать новый чат
-                </Button>
-            </Card>
-        </div>
+        </ChatProvider>
     )
 }

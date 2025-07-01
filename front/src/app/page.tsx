@@ -12,6 +12,16 @@ export default function Page() {
     const { session } = useCurrentSession()
 
     useEffect(() => {
+        // Check if we should always go to landing (for development/testing)
+        const alwaysShowLanding =
+            process.env.NEXT_PUBLIC_ALWAYS_SHOW_LANDING === 'true'
+
+        if (alwaysShowLanding) {
+            router.push(appConfig.unAuthenticatedEntryPath)
+            return
+        }
+
+        // Smart routing based on authentication state
         if (session?.accessToken !== undefined) {
             // Check if user needs onboarding
             if (session.user.isFirstLogin) {
