@@ -24,23 +24,23 @@ const promptSuggestion: {
     type: PromptType
 }[] = [
     {
-        title: 'Help me sound like an expert for an upcoming trip',
-        prompt: `I'm going whale watching this weekend and want to appear knowledgeable about killer whales. Tell me a few unique and interesting facts I can share.`,
-        type: 'guide',
-    },
-    {
-        title: 'Outline an logical sales pitch for a new product',
-        prompt: `Structure a sales pitch for a hair dryer that's also a microphone. Be concise and organize the sales pitch logically. `,
+        title: 'Помогите мне подготовить резюме с учетом моих особенностей',
+        prompt: `Я хочу составить эффективное резюме, которое подчеркнет мои сильные стороны и навыки. Учтите, что у меня есть инвалидность, и я хочу правильно представить свой опыт работодателям.`,
         type: 'writing',
     },
     {
-        title: 'Help me get organized with a list of 10 tips',
-        prompt: `Give me 10 tips for room organization. `,
+        title: 'Найдите подходящие вакансии для людей с инвалидностью',
+        prompt: `Помогите мне найти работодателей и вакансии, которые открыты для найма людей с инвалидностью. Расскажите о программах трудоустройства и квотах.`,
+        type: 'guide',
+    },
+    {
+        title: 'Подготовьте меня к собеседованию',
+        prompt: `Дайте советы по подготовке к собеседованию. Как рассказать о своих способностях, как обсудить необходимые адаптации рабочего места, и как произвести положительное впечатление.`,
         type: 'idea',
     },
     {
-        title: 'Write code for a specific task, including edge cases',
-        prompt: `Write a Java function that takes a path as an input and creates a file storing the current system date. Consider edge cases.`,
+        title: 'Какие профессии подходят для моих навыков?',
+        prompt: `Помогите определить карьерные возможности и профессии, которые подходят для людей с различными типами инвалидности. Расскажите о дистанционной работе и гибких вариантах трудоустройства.`,
         type: 'coding',
     },
 ]
@@ -53,18 +53,18 @@ const ChatLandingView = () => {
             <div>
                 <div className="heading-text text-4xl leading-snug mb-12">
                     <span className="font-semibold bg-linear-to-r from-indigo-500 to-red-400 bg-clip-text text-transparent text-5xl">
-                        Hello, there
+                        Привет!
                     </span>
                     <br />
-                    <span>How can I help you today?</span>
+                    <span>Как я могу помочь вам найти работу сегодня?</span>
                 </div>
-                <div className="mt-8 mb-12 grid grid-cols-2 xl:grid-cols-4 gap-6">
+                <div className="mt-8 mb-12 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                     {promptSuggestion.map((suggestion) => (
                         <div
                             key={suggestion.title}
                             className="flex flex-col gap-4 justify-between rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 p-6 min-h-44 2xl:min-h-64 cursor-pointer transition-all duration-200 hover:shadow-lg"
                             role="button"
-                            onClick={() => handleSend(suggestion.title)}
+                            onClick={() => handleSend(suggestion.prompt)}
                         >
                             <h6 className="font-normal text-sm leading-relaxed">
                                 {suggestion.title}
