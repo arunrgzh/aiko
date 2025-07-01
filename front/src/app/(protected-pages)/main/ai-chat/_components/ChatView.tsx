@@ -50,7 +50,7 @@ const ChatView = () => {
     }
 
     return (
-        <Card className="flex-1 h-full" bodyClass="h-full">
+        <Card className="flex-1 h-full" bodyClass="h-full p-0">
             <ChatMobileNav />
             <ChatBox
                 ref={scrollRef}
@@ -59,8 +59,8 @@ const ChatView = () => {
                 showMessageList={Boolean(selectedConversation)}
                 showAvatar={true}
                 avatarGap={true}
-                containerClass="h-[calc(100%-30px)] xl:h-full"
-                messageListClass="h-[calc(100%-100px)] xl:h-[calc(100%-70px)]"
+                containerClass="h-[calc(100%-40px)] xl:h-full p-4"
+                messageListClass="h-[calc(100%-120px)] xl:h-[calc(100%-100px)] pb-8"
                 typing={
                     isTyping
                         ? {
