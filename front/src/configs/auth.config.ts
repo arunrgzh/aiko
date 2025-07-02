@@ -10,7 +10,7 @@ type FastAPIAuthResponse = {
 }
 type AccessPayload = { sub: string; exp: number }
 
-const API_URL = process.env.API_URL!
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
     const res = await fetch(`${API_URL}/api/auth/refresh`, {

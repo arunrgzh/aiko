@@ -5,17 +5,20 @@ export async function POST(req: NextRequest) {
     try {
         const { refreshToken } = (await req.json()) as RefreshRequest
 
-        const res = await fetch('http://46.226.123.179:8081/api/token/', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ refresh: refreshToken }),
-        })
+        const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/auth/refresh`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ refresh_token: refreshToken }),
+            },
+        )
 
         const data = await res.json()
         return NextResponse.json(
             {
-                accessToken: data.access,
-                refreshToken: data.refresh || refreshToken,
+                accessToken: data.access_token,
+                refreshToken: data.refresh_token || refreshToken,
             },
             { status: res.status },
         )
