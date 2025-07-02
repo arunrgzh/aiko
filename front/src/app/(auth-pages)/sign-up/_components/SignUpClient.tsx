@@ -37,16 +37,25 @@ const SignUpClient = () => {
             )
             router.push('/sign-in')
         } catch (error) {
-            console.error('Signup error:', {
-                name: error instanceof Error ? error.name : 'Unknown',
-                message: error instanceof Error ? error.message : String(error),
-            })
+            console.error('Signup error:', error)
 
-            const errorMessage =
-                error instanceof Error
-                    ? error.message
-                    : 'An unexpected error occurred during sign up'
+            let errorMessage = 'An unexpected error occurred during sign up'
 
+            if (error instanceof Error) {
+                errorMessage = error.message
+            } else if (typeof error === 'string') {
+                errorMessage = error
+            } else if (error && typeof error === 'object') {
+                // Try to extract error message from various possible properties
+                const errorObj = error as any
+                errorMessage =
+                    errorObj.message ||
+                    errorObj.error ||
+                    errorObj.detail ||
+                    JSON.stringify(error)
+            }
+
+            console.error('Processed error message:', errorMessage)
             setMessage(errorMessage)
             toast.push(
                 <Notification title="Sign Up Failed" type="danger">

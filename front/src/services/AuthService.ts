@@ -25,7 +25,9 @@ export async function apiSignUp(data: SignUpCredential) {
         method: 'post',
         data,
     }).catch((error) => {
-        console.log('Auth service error:', error.response?.data)
+        console.error('Auth service error:', error)
+        console.error('Auth service error response:', error.response?.data)
+
         const errorData = error.response?.data
         if (errorData) {
             // Handle different error formats
@@ -38,6 +40,12 @@ export async function apiSignUp(data: SignUpCredential) {
                       JSON.stringify(errorData)
             throw new Error(errorMessage)
         }
+
+        // Handle network errors or other issues
+        if (error.message) {
+            throw new Error(error.message)
+        }
+
         throw new Error('Failed to sign up')
     })
 }
