@@ -29,8 +29,12 @@ export async function POST(req: NextRequest) {
         console.log('FastAPI response:', data)
 
         if (!res.ok) {
+            console.error('Backend registration failed:', {
+                status: res.status,
+                data: data,
+            })
             const errorMessage =
-                data.detail || data.message || 'Failed to sign up'
+                data.detail || data.message || data.error || 'Failed to sign up'
             return NextResponse.json(
                 { error: errorMessage },
                 { status: res.status },

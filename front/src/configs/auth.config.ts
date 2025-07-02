@@ -106,7 +106,7 @@ export const authOptions: NextAuthConfig = {
     },
 
     pages: {
-        signIn: '/auth/sign-in',
+        signIn: '/sign-in',
     },
     logger: {
         error(code, ...message) {
