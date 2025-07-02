@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Optional, List, Any
 from datetime import datetime
 
 class AssistantBase(BaseModel):
@@ -30,7 +30,7 @@ class AssistantResponse(AssistantBase):
         from_attributes = True
 
 class AssistantWithChatHistory(AssistantResponse):
-    chat_history: List["ChatHistoryResponse"] = []
+    chat_history: List[Any] = []
 
 # Для совместимости с фронтендом
 class AssistantListItem(BaseModel):

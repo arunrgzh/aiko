@@ -24,17 +24,20 @@ from ..auth.jwt import get_current_user
 from ..config import settings
 
 router = APIRouter(prefix="/main/assistants", tags=["assistants"])
+logger = logging.getLogger(__name__)
 
 # Инициализация Azure OpenAI клиента
 azure_openai_client = None
 if settings.azure_openai_api_key and settings.azure_openai_base_url:
-    azure_openai_client = AsyncAzureOpenAI(
-        api_key=settings.azure_openai_api_key,
-        azure_endpoint=settings.azure_openai_base_url,
-        api_version=settings.azure_openai_api_version
-    )
-
-logger = logging.getLogger(__name__)
+    try:
+        azure_openai_client = AsyncAzureOpenAI(
+            api_key=settings.azure_openai_api_key,
+            azure_endpoint=settings.azure_openai_base_url,
+            api_version=settings.azure_openai_api_version
+        )
+    except Exception as e:
+        logger.error(f"Failed to create Azure OpenAI client: {e}")
+        azure_openai_client = None
 
 @router.get("/", response_model=AssistantsListResponse)
 async def get_assistants(
@@ -154,21 +157,28 @@ async def send_message_to_assistant(
     chat_history = None
     
     if participant_id and participant_id != "":
-        # Ищем существующий чат
-        chat_result = await db.execute(
-            select(ChatHistory)
-            .where(ChatHistory.id == int(participant_id))
-            .where(ChatHistory.user_id == current_user.id)
-            # .where(ChatHistory.assistant_id == assistant_id)
-            .options(selectinload(ChatHistory.messages))
-        )
-        chat_history = chat_result.scalar_one_or_none()
+        # Проверяем, является ли participant_id числом (существующий чат)
+        try:
+            chat_id = int(participant_id)
+            # Ищем существующий чат по ID
+            chat_result = await db.execute(
+                select(ChatHistory)
+                .where(ChatHistory.id == chat_id)
+                .where(ChatHistory.user_id == current_user.id)
+                .where(ChatHistory.assistant_id == assistant_id)
+                .options(selectinload(ChatHistory.messages))
+            )
+            chat_history = chat_result.scalar_one_or_none()
+        except ValueError:
+            # participant_id не является числом - это новый чат с UUID
+            # Не ищем существующий чат, создадим новый
+            chat_history = None
     
     if not chat_history:
         # Создаем новый чат
         current_time = int(time.time())
         chat_history = ChatHistory(
-            assistant_id=1,
+            assistant_id=assistant_id,  # Используем правильный assistant_id из URL
             user_id=current_user.id,
             title=request.message[:50] + "..." if len(request.message) > 50 else request.message,
             last_conversation=request.message,
@@ -191,11 +201,19 @@ async def send_message_to_assistant(
     )
     db.add(user_message)
     
-    # Генерируем ответ ассистента
+    # Загружаем историю сообщений ПЕРЕД вызовом AI API
+    messages_result = await db.execute(
+        select(Message)
+        .where(Message.chat_history_id == chat_history.id)
+        .order_by(Message.id.desc())
+        .limit(10)
+    )
+    recent_messages = messages_result.scalars().all()
+    
+    # Генерируем ответ ассистента (передаем список сообщений, НЕ chat_history)
     ai_response_content = await generate_ai_response(
         user_message=request.message,
-        # assistant=assistant,
-        chat_history=chat_history
+        recent_messages=list(reversed(recent_messages))  # Переворачиваем для правильной очередности
     )
     
     # Сохраняем ответ ассистента
@@ -211,11 +229,15 @@ async def send_message_to_assistant(
     )
     db.add(ai_message)
     
-    # Обновляем последнее сообщение в чате
-    # chat_history.last_conversation = ai_response_content
-    # chat_history.updated_time = int(time.time())
-    
-    await db.commit()
+    # Сохраняем все изменения
+    try:
+        await db.commit()
+        logger.info(f"💾 Successfully saved message to database")
+    except Exception as e:
+        logger.error(f"❌ Database error: {str(e)}")
+        await db.rollback()
+        # Все равно возвращаем ответ, даже если не смогли сохранить в БД
+        pass
     
     # Возвращаем ответ в формате, совместимом с фронтендом
     return ChatMessageResponse(
@@ -234,8 +256,7 @@ async def send_message_to_assistant(
 
 async def generate_ai_response(
     user_message: str, 
-    # assistant: Assistant,
-    chat_history: ChatHistory
+    recent_messages: list | None = None
 ) -> str:
     """Генерирует ответ ассистента используя Azure OpenAI API"""
     
@@ -243,6 +264,8 @@ async def generate_ai_response(
     if not azure_openai_client or not settings.azure_openai_api_key:
         logger.warning("Azure OpenAI API not configured, using mock responses")
         return generate_mock_ai_response(user_message)
+    
+    logger.info(f"🤖 Calling Azure OpenAI API for message: {user_message[:50]}...")
     
     try:
         # Подготавливаем контекст разговора
@@ -258,7 +281,7 @@ async def generate_ai_response(
         #     # Дефолтный системный промпт для поиска работы
         messages.append({
             "role": "system",
-            "content": """Ты - профессиональный консультант по карьере и поиску работы в AI-Komek. 
+            "content": """Ты - профессиональный консультант по карьере и поиску работы для людей с инвалидностью в AI-Komek. 
             Твоя задача - помогать пользователям с:
             - Поиском подходящих вакансий
             - Составлением резюме
@@ -269,19 +292,19 @@ async def generate_ai_response(
             Отвечай дружелюбно, профессионально и конкретно. Используй русский язык."""
         })
         
-        # Добавляем историю последних сообщений (ограничиваем до 10 сообщений)
-        recent_messages = sorted(chat_history.messages, key=lambda x: x.created_at)[-10:]
-        for msg in recent_messages:
-            if msg.role == MessageRole.USER:
-                messages.append({
-                    "role": "user",
-                    "content": msg.content
-                })
-            elif msg.role == MessageRole.AI:
-                messages.append({
-                    "role": "assistant", 
-                    "content": msg.content
-                })
+        # Добавляем историю последних сообщений
+        if recent_messages:
+            for msg in recent_messages:
+                if msg.role == MessageRole.USER:
+                    messages.append({
+                        "role": "user",
+                        "content": msg.content
+                    })
+                elif msg.role == MessageRole.AI:
+                    messages.append({
+                        "role": "assistant", 
+                        "content": msg.content
+                    })
         
         # Добавляем текущее сообщение пользователя
         messages.append({
@@ -305,10 +328,12 @@ async def generate_ai_response(
             logger.error("Empty response from Azure OpenAI")
             return generate_mock_ai_response(user_message)
             
+        logger.info(f"✅ Azure OpenAI API response received: {len(ai_response)} characters")
         return ai_response.strip()
         
     except Exception as e:
-        logger.error(f"Error calling Azure OpenAI API: {str(e)}")
+        logger.error(f"❌ Error calling Azure OpenAI API: {str(e)}")
+        logger.error(f"   Using mock response instead")
         # В случае ошибки возвращаем мок-ответ
         return generate_mock_ai_response(user_message)
 
