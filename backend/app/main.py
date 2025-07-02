@@ -7,7 +7,8 @@ load_dotenv()
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from .api import auth, onboarding, assistants
+from .api import auth, onboarding, assistants, notifications
+from .api import settings as settings_api
 from .database import engine, Base, async_session
 from .models.assistant import Assistant
 from .models.user import User
@@ -36,6 +37,8 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(onboarding.router)
 app.include_router(assistants.router)
+app.include_router(notifications.router)
+app.include_router(settings_api.router)
 
 async def create_default_assistants():
     """Создает дефолтных ассистентов для всех пользователей"""
