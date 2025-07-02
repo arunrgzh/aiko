@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     azure_openai_api_key: Optional[str] = None
     azure_openai_base_url: Optional[str] = None  # Изменено с endpoint
     azure_openai_api_version: Optional[str] = None
-    azure_openai_deployment_name: str = "gpt-4o"  # Ваш deployment
+    azure_openai_deployment_name: str = "gpt-4o"  # Working deployment name
     azure_openai_max_tokens: int = 4096
     azure_openai_temperature: float = 0.2
 

@@ -126,9 +126,9 @@ async def get_assistant(
     
     return response
 
-@router.post("/[id]/chat", response_model=ChatMessageResponse)
+@router.post("/{assistant_id}/chat", response_model=ChatMessageResponse)
 async def send_message_to_assistant(
-    # assistant_id: int,
+    assistant_id: int,
     request: SendMessageRequest,
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)

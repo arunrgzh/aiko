@@ -62,7 +62,7 @@ export async function apiGetAssistants(
     data: GetAssistantsRequest,
 ): Promise<GetAssistantsResponse> {
     return ApiService.fetchDataWithAxios({
-        url: '/assistants',
+        url: '/main/assistants',
         method: 'get',
         data,
     })
@@ -72,7 +72,7 @@ export async function apiGetAssistant(
     assistantId: string,
 ): Promise<{ chat_history: ChatHistory[] }> {
     return ApiService.fetchDataWithAxios({
-        url: `/assistants/${assistantId}`,
+        url: `/main/assistants/${assistantId}`,
         method: 'get',
     })
 }
@@ -84,14 +84,14 @@ export async function apiSendMessageToAssistant(
     console.log('🚀 AssistantsService: Sending message to assistant', {
         assistantId,
         data,
-        url: `/assistants/${assistantId}/chat`,
+        url: `/main/assistants/${assistantId}/chat`,
     })
 
     try {
         const result = await ApiService.fetchDataWithAxios<
             SendMessageResponse | { error: string }
         >({
-            url: `/assistants/${assistantId}/chat`,
+            url: `/main/assistants/${assistantId}/chat`,
             method: 'post',
             data,
         })

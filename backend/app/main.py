@@ -1,5 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
