@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AI-Komek Chat Test</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 20px;
+            }
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            .chat-box {
+                border: 1px solid #ddd;
+                padding: 20px;
+                margin: 10px 0;
+                min-height: 300px;
+                background: #f9f9f9;
+            }
+            .input-area {
+                margin: 10px 0;
+            }
+            .input-area input {
+                width: 70%;
+                padding: 10px;
+            }
+            .input-area button {
+                padding: 10px 20px;
+                background: #007bff;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+            .message {
+                margin: 10px 0;
+                padding: 10px;
+                border-radius: 5px;
+            }
+            .user-message {
+                background: #e3f2fd;
+                text-align: right;
+            }
+            .bot-message {
+                background: #f1f8e9;
+            }
+            .error {
+                color: red;
+                background: #ffebee;
+            }
+            .log {
+                font-size: 12px;
+                color: #666;
+                white-space: pre-wrap;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>🤖 AI-Komek Chat Test</h1>
+
+            <div>
+                <h3>1. Authentication</h3>
+                <input
+                    type="text"
+                    id="username"
+                    placeholder="Username"
+                    value="testuser123"
+                />
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Password"
+                    value="testpassword123"
+                />
+                <button onclick="login()">Login</button>
+                <div id="auth-status"></div>
+            </div>
+
+            <div>
+                <h3>2. Chat Test</h3>
+                <div class="input-area">
+                    <input
+                        type="text"
+                        id="message-input"
+                        placeholder="Type your message..."
+                        value="Hello, I need help with job searching"
+                    />
+                    <button onclick="sendMessage()">Send</button>
+                </div>
+                <div id="chat-box" class="chat-box"></div>
+            </div>
+
+            <div>
+                <h3>3. Debug Log</h3>
+                <div id="debug-log" class="log"></div>
+            </div>
+        </div>
+
+        <script>
+            let authToken = null
+            const API_BASE = 'http://localhost:8000'
+
+            function log(message) {
+                const logDiv = document.getElementById('debug-log')
+                logDiv.textContent +=
+                    new Date().toLocaleTimeString() + ': ' + message + '\n'
+                console.log(message)
+            }
+
+            async function login() {
+                const username = document.getElementById('username').value
+                const password = document.getElementById('password').value
+
+                log('Attempting login...')
+
+                try {
+                    const response = await fetch(`${API_BASE}/api/auth/login`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ username, password }),
+                    })
+
+                    log(`Login response status: ${response.status}`)
+
+                    if (response.ok) {
+                        const data = await response.json()
+                        authToken = data.access_token
+                        document.getElementById('auth-status').innerHTML =
+                            '<span style="color: green;">✅ Logged in successfully!</span>'
+                        log('Login successful, token received')
+                    } else {
+                        const error = await response.text()
+                        document.getElementById('auth-status').innerHTML =
+                            '<span style="color: red;">❌ Login failed</span>'
+                        log(`Login failed: ${error}`)
+                    }
+                } catch (error) {
+                    log(`Login error: ${error.message}`)
+                    document.getElementById('auth-status').innerHTML =
+                        '<span style="color: red;">❌ Network error</span>'
+                }
+            }
+
+            async function sendMessage() {
+                if (!authToken) {
+                    alert('Please login first')
+                    return
+                }
+
+                const message = document.getElementById('message-input').value
+                if (!message.trim()) return
+
+                // Add user message to chat
+                addMessageToChat(message, 'user')
+                document.getElementById('message-input').value = ''
+
+                log(`Sending message: ${message}`)
+
+                try {
+                    const chatData = {
+                        participant: 'web-test-chat',
+                        message: message,
+                    }
+
+                    log(`Request payload: ${JSON.stringify(chatData)}`)
+
+                    const response = await fetch(
+                        `${API_BASE}/main/assistants/1/chat`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                Authorization: `Bearer ${authToken}`,
+                            },
+                            body: JSON.stringify(chatData),
+                        }
+                    )
+
+                    log(`Chat response status: ${response.status}`)
+                    log(
+                        `Response headers: ${JSON.stringify(
+                            Object.fromEntries(response.headers)
+                        )}`
+                    )
+
+                    if (response.ok) {
+                        const chatResponse = await response.json()
+                        log(
+                            `Chat response: ${JSON.stringify(
+                                chatResponse,
+                                null,
+                                2
+                            )}`
+                        )
+
+                        // Check response structure
+                        if (
+                            chatResponse.choices &&
+                            chatResponse.choices.length > 0
+                        ) {
+                            const choice = chatResponse.choices[0]
+                            log(`First choice: ${JSON.stringify(choice)}`)
+
+                            if (choice.message && choice.message.content) {
+                                addMessageToChat(choice.message.content, 'bot')
+                                log('✅ Chat message displayed successfully')
+                            } else {
+                                log('❌ No message.content in choice')
+                                addMessageToChat(
+                                    'Error: No content in response',
+                                    'error'
+                                )
+                            }
+                        } else {
+                            log(
+                                '❌ No choices in response or choices array empty'
+                            )
+                            addMessageToChat(
+                                'Error: Invalid response format',
+                                'error'
+                            )
+                        }
+                    } else {
+                        const error = await response.text()
+                        log(`Chat request failed: ${error}`)
+                        addMessageToChat(`Error: ${error}`, 'error')
+                    }
+                } catch (error) {
+                    log(`Network error: ${error.message}`)
+                    addMessageToChat(`Network error: ${error.message}`, 'error')
+                }
+            }
+
+            function addMessageToChat(content, type) {
+                const chatBox = document.getElementById('chat-box')
+                const messageDiv = document.createElement('div')
+                messageDiv.className = `message ${type}-message`
+                messageDiv.textContent = content
+                chatBox.appendChild(messageDiv)
+                chatBox.scrollTop = chatBox.scrollHeight
+            }
+
+            // Allow Enter key to send message
+            document
+                .getElementById('message-input')
+                .addEventListener('keypress', function (e) {
+                    if (e.key === 'Enter') {
+                        sendMessage()
+                    }
+                })
+
+            // Auto-login for testing
+            window.onload = function () {
+                log('Page loaded, ready for testing')
+            }
+        </script>
+    </body>
+</html>

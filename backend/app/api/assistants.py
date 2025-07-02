@@ -138,121 +138,158 @@ async def send_message_to_assistant(
 ):
     """Отправить сообщение ассистенту"""
     
-    # Проверяем существование ассистента
-    # result = await db.execute(
-    #     select(Assistant)
-    #     # .where(Assistant.id == assistant_id)
-    #     .where(Assistant.user_id == current_user.id)
-    # )
-    # assistant = result.scalar_one_or_none()
+    logger.info(f"🔥 Chat request received: assistant_id={assistant_id}, user={current_user.username}")
+    logger.info(f"🔥 Message: {request.message[:100]}...")
     
-    # if not assistant:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_404_NOT_FOUND,
-    #         detail="Assistant not found"
-    #     )
-    
-    # Находим или создаем историю чата
-    participant_id = request.participant
-    chat_history = None
-    
-    if participant_id and participant_id != "":
-        # Проверяем, является ли participant_id числом (существующий чат)
-        try:
-            chat_id = int(participant_id)
-            # Ищем существующий чат по ID
-            chat_result = await db.execute(
-                select(ChatHistory)
-                .where(ChatHistory.id == chat_id)
-                .where(ChatHistory.user_id == current_user.id)
-                .where(ChatHistory.assistant_id == assistant_id)
-                .options(selectinload(ChatHistory.messages))
-            )
-            chat_history = chat_result.scalar_one_or_none()
-        except ValueError:
-            # participant_id не является числом - это новый чат с UUID
-            # Не ищем существующий чат, создадим новый
-            chat_history = None
-    
-    if not chat_history:
-        # Создаем новый чат
-        current_time = int(time.time())
-        chat_history = ChatHistory(
-            assistant_id=assistant_id,  # Используем правильный assistant_id из URL
-            user_id=current_user.id,
-            title=request.message[:50] + "..." if len(request.message) > 50 else request.message,
-            last_conversation=request.message,
-            created_time=current_time,
-            updated_time=current_time,
-            enable=True
-        )
-        db.add(chat_history)
-        await db.flush()  # Получаем ID
-    
-    # Сохраняем сообщение пользователя
-    user_message = Message(
-        chat_history_id=chat_history.id,
-        content=request.message,
-        role=MessageRole.USER,
-        sender_id="user",
-        sender_name=current_user.username,
-        is_my_message=True,
-        fresh=False
-    )
-    db.add(user_message)
-    
-    # Загружаем историю сообщений ПЕРЕД вызовом AI API
-    messages_result = await db.execute(
-        select(Message)
-        .where(Message.chat_history_id == chat_history.id)
-        .order_by(Message.id.desc())
-        .limit(10)
-    )
-    recent_messages = messages_result.scalars().all()
-    
-    # Генерируем ответ ассистента (передаем список сообщений, НЕ chat_history)
-    ai_response_content = await generate_ai_response(
-        user_message=request.message,
-        recent_messages=list(reversed(recent_messages))  # Переворачиваем для правильной очередности
-    )
-    
-    # Сохраняем ответ ассистента
-    ai_message = Message(
-        chat_history_id=chat_history.id,
-        content=ai_response_content,
-        role=MessageRole.AI,
-        sender_id="ai",
-        sender_name="BOT",
-        avatar_image_url="/img/thumbs/ai.jpg",
-        is_my_message=False,
-        fresh=True
-    )
-    db.add(ai_message)
-    
-    # Сохраняем все изменения
     try:
-        await db.commit()
-        logger.info(f"💾 Successfully saved message to database")
-    except Exception as e:
-        logger.error(f"❌ Database error: {str(e)}")
-        await db.rollback()
-        # Все равно возвращаем ответ, даже если не смогли сохранить в БД
-        pass
+        # Check if assistant exists and belongs to user
+        result = await db.execute(
+            select(Assistant)
+            .where(Assistant.id == assistant_id)
+            .where(Assistant.user_id == current_user.id)
+        )
+        assistant = result.scalar_one_or_none()
+        
+        # If no assistant found, create a default one for this user
+        if not assistant:
+            logger.info(f"Creating default assistant for user {current_user.id}")
+            assistant = Assistant(
+                user_id=current_user.id,
+                name="AI Помощник по поиску работы",
+                description="Ваш персональный AI-ассистент для поиска работы и карьерного консультирования",
+                model="gpt-4o",
+                system_prompt="Ты - профессиональный консультант по карьере и поиску работы. Помогай пользователям находить подходящие вакансии, составлять резюме и готовиться к собеседованиям.",
+                temperature="0.7",
+                max_tokens=4096,
+                is_active=True
+            )
+            db.add(assistant)
+            await db.commit()
+            await db.refresh(assistant)
     
-    # Возвращаем ответ в формате, совместимом с фронтендом
-    return ChatMessageResponse(
-        id=str(uuid.uuid4()),
-        choices=[{
-            "finish_reason": "stop",
-            "index": 0,
-            "message": {
-                "content": ai_response_content,
-                "role": "assistant"
-            }
-        }],
-        created=int(time.time()),
-        model="gpt-4o"
-    )
+        # Находим или создаем историю чата
+        participant_id = request.participant
+        chat_history = None
+        
+        if participant_id and participant_id != "":
+            # Проверяем, является ли participant_id числом (существующий чат)
+            try:
+                chat_id = int(participant_id)
+                # Ищем существующий чат по ID
+                chat_result = await db.execute(
+                    select(ChatHistory)
+                    .where(ChatHistory.id == chat_id)
+                    .where(ChatHistory.user_id == current_user.id)
+                    .where(ChatHistory.assistant_id == assistant.id)
+                    .options(selectinload(ChatHistory.messages))
+                )
+                chat_history = chat_result.scalar_one_or_none()
+            except ValueError:
+                # participant_id не является числом - это новый чат с UUID
+                # Не ищем существующий чат, создадим новый
+                chat_history = None
+        
+        if not chat_history:
+            # Создаем новый чат
+            current_time = int(time.time())
+            chat_history = ChatHistory(
+                assistant_id=assistant.id,
+                user_id=current_user.id,
+                title=request.message[:50] + "..." if len(request.message) > 50 else request.message,
+                last_conversation=request.message,
+                created_time=current_time,
+                updated_time=current_time,
+                enable=True
+            )
+            db.add(chat_history)
+            await db.flush()  # Получаем ID
+        
+        # Сохраняем сообщение пользователя
+        user_message = Message(
+            chat_history_id=chat_history.id,
+            content=request.message,
+            role=MessageRole.USER,
+            sender_id="user",
+            sender_name=current_user.username,
+            is_my_message=True,
+            fresh=False
+        )
+        db.add(user_message)
+        
+        # Загружаем историю сообщений ПЕРЕД вызовом AI API
+        messages_result = await db.execute(
+            select(Message)
+            .where(Message.chat_history_id == chat_history.id)
+            .order_by(Message.id.desc())
+            .limit(10)
+        )
+        recent_messages = messages_result.scalars().all()
+        
+        # Генерируем ответ ассистента (передаем список сообщений, НЕ chat_history)
+        ai_response_content = await generate_ai_response(
+            user_message=request.message,
+            recent_messages=list(reversed(recent_messages))  # Переворачиваем для правильной очередности
+        )
+        
+        # Сохраняем ответ ассистента
+        ai_message = Message(
+            chat_history_id=chat_history.id,
+            content=ai_response_content,
+            role=MessageRole.AI,
+            sender_id="ai",
+            sender_name="BOT",
+            avatar_image_url="/img/thumbs/ai.jpg",
+            is_my_message=False,
+            fresh=True
+        )
+        db.add(ai_message)
+        
+        # Сохраняем все изменения
+        try:
+            await db.commit()
+            logger.info(f"💾 Successfully saved message to database")
+        except Exception as e:
+            logger.error(f"❌ Database error: {str(e)}")
+            await db.rollback()
+            # Все равно возвращаем ответ, даже если не смогли сохранить в БД
+            pass
+        
+        # Возвращаем ответ в формате, совместимом с фронтендом
+        response = ChatMessageResponse(
+            id=str(uuid.uuid4()),
+            choices=[{
+                "finish_reason": "stop",
+                "index": 0,
+                "message": {
+                    "content": ai_response_content,
+                    "role": "assistant"
+                }
+            }],
+            created=int(time.time()),
+            model="gpt-4o"
+        )
+        
+        logger.info(f"✅ Chat response prepared successfully")
+        return response
+        
+    except Exception as e:
+        logger.error(f"❌ Error in chat endpoint: {str(e)}")
+        logger.exception("Full error traceback:")
+        
+        # Return error response but in the expected format
+        return ChatMessageResponse(
+            id=str(uuid.uuid4()),
+            choices=[{
+                "finish_reason": "stop",
+                "index": 0,
+                "message": {
+                    "content": f"Извините, произошла ошибка при обработке вашего сообщения. Попробуйте еще раз. (Ошибка: {str(e)})",
+                    "role": "assistant"
+                }
+            }],
+            created=int(time.time()),
+            model="gpt-4o"
+        )
 
 async def generate_ai_response(
     user_message: str, 
@@ -340,20 +377,22 @@ async def generate_ai_response(
 def generate_mock_ai_response(user_message: str) -> str:
     """Генерирует мок-ответ ассистента (fallback)"""
     responses = [
-        "Это мок-ответ ассистента для демонстрации. В реальном приложении здесь будет интеграция с AI API.",
-        "Спасибо за ваше сообщение! Я ассистент AI-Komek и готов помочь вам с поиском работы.",
-        "Понятно! Давайте разберем этот вопрос подробнее. Какую именно помощь вам нужна?",
-        "Отличный вопрос! Как ваш AI-помощник, я рекомендую следующие шаги...",
-        "Я анализирую ваш запрос и готов предложить несколько вариантов решения."
+        "Здравствуйте! Если у вас есть вопросы о поиске работы, составлении резюме или развитии карьеры, я готов помочь. Пожалуйста, уточните, чем могу быть полезен! 😊",
+        "Спасибо за ваше сообщение! Я ассистент AI-Komek и готов помочь вам с поиском работы. О чем хотели бы поговорить?",
+        "Понятно! Давайте разберем этот вопрос подробнее. Какую именно помощь вам нужна в поиске работы?",
+        "Отличный вопрос! Как ваш AI-помощник, я рекомендую следующие шаги для успешного трудоустройства...",
+        "Я анализирую ваш запрос и готов предложить несколько вариантов решения для вашей карьеры."
     ]
     
     # Простая логика для разных типов ответов
     user_lower = user_message.lower()
     
-    if any(word in user_lower for word in ['код', 'программирование', 'разработка']):
-        return "Вот пример кода для вашей задачи:\n\n```python\ndef example():\n    print('Это демонстрационный код')\n```\n\nОбратите внимание, что это мок-ответ для демонстрации."
-    elif any(word in user_lower for word in ['список', 'пункты']):
-        return "Вот список рекомендаций:\n\n1. Первый пункт\n2. Второй пункт\n3. Третий пункт\n\nЭто демонстрационный список."
+    if any(word in user_lower for word in ['резюме', 'cv']):
+        return "Для составления качественного резюме рекомендую:\n\n1. Указать четкую цель трудоустройства\n2. Выделить ключевые навыки и достижения\n3. Добавить информацию об образовании\n4. Указать опыт работы в хронологическом порядке\n\nМогу помочь с конкретными разделами резюме. О чем хотели бы узнать подробнее?"
+    elif any(word in user_lower for word in ['собеседование', 'интервью']):
+        return "Для успешного прохождения собеседования советую:\n\n1. Изучить информацию о компании\n2. Подготовить ответы на типичные вопросы\n3. Подумать о вопросах работодателю\n4. Подготовить примеры из опыта работы\n\nЕсть конкретные вопросы о подготовке к собеседованию?"
+    elif any(word in user_lower for word in ['работа', 'вакансии', 'поиск']):
+        return "Для эффективного поиска работы рекомендую:\n\n1. Определить целевые должности и компании\n2. Обновить резюме под каждую вакансию\n3. Использовать различные каналы поиска\n4. Подготовиться к сетевому взаимодействию\n\nВ какой сфере ищете работу? Могу дать более конкретные советы."
     else:
         import random
         return random.choice(responses) 

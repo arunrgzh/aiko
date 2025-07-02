@@ -27,9 +27,9 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.frontend_url],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", settings.frontend_url],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
@@ -40,46 +40,18 @@ app.include_router(assistants.router)
 app.include_router(notifications.router)
 app.include_router(settings_api.router)
 
-async def create_default_assistants():
-    """Создает дефолтных ассистентов для всех пользователей"""
-    async with async_session() as session:
-        try:
-            # Получаем всех пользователей, у которых нет ассистентов
-            result = await session.execute(
-                select(User)
-                .outerjoin(Assistant)
-                .where(Assistant.id == None)
-            )
-            users_without_assistants = result.scalars().all()
-            
-            for user in users_without_assistants:
-                # Создаем дефолтного ассистента
-                default_assistant = Assistant(
-                    user_id=user.id,
-                    name="AI Помощник по поиску работы",
-                    description="Ваш персональный AI-ассистент для поиска работы и карьерного консультирования",
-                    model="gpt-4o",  # Ваш Azure deployment name
-                    system_prompt="Ты - профессиональный консультант по карьере и поиску работы. Помогай пользователям находить подходящие вакансии, составлять резюме и готовиться к собеседованиям.",
-                    temperature="0.7",
-                    max_tokens=4096,  # Увеличили лимит для GPT-4o
-                    is_active=True
-                )
-                session.add(default_assistant)
-            
-            await session.commit()
-        except Exception as e:
-            await session.rollback()
-            print(f"Error creating default assistants: {e}")
-        finally:
-            await session.close()
+# async def create_default_assistants():
+#     """Создает дефолтных ассистентов для всех пользователей"""
+#     # TODO: Fix async session handling
+#     pass
 
 @app.on_event("startup")
 async def init_db():
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
     
-    # Создаем дефолтных ассистентов после создания таблиц
-    await create_default_assistants()
+    # TODO: Fix async session for creating default assistants
+    # await create_default_assistants()
 
 @app.get("/")
 async def root():
