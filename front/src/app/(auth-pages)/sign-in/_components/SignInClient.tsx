@@ -21,18 +21,37 @@ const SignInClient = () => {
         setSubmitting,
         setMessage,
     }: OnSignInPayload) => {
-        onSignInWithCredentials(values, callbackUrl || '').then((data) => {
+        try {
+            const data = await onSignInWithCredentials(
+                values,
+                callbackUrl || '',
+            )
+
             if (data?.error) {
                 setMessage(data.error as string)
                 setSubmitting(false)
+                return
             }
-        })
 
+            if (data?.success && data?.redirectTo) {
+                console.log('🎯 Redirecting to:', data.redirectTo)
+                // Use window.location for a hard redirect to ensure session is refreshed
+                window.location.href = data.redirectTo
+                return
+            }
 
+            // Fallback redirect
+            console.log('🎯 Fallback redirect to dashboard')
+            window.location.href = appConfig.authenticatedEntryPath
+        } catch (error) {
+            console.error('Sign-in error:', error)
+            setMessage('An unexpected error occurred')
+            setSubmitting(false)
+        }
     }
 
     const handleOAuthSignIn = async ({ type }: OnOauthSignInPayload) => {
-        if (type === 'google' || type === 'github') {
+        if (type === 'google') {
             await signIn(type, {
                 callbackUrl: callbackUrl || appConfig.authenticatedEntryPath,
             })

@@ -54,10 +54,10 @@ async def get_assistants(
     assistant_items = [
         AssistantListItem(
             id=str(assistant.id),
-            name=assistant.name,
-            description=assistant.description,
-            model=assistant.model,
-            lastEdited=int(assistant.updated_at.timestamp()) if assistant.updated_at else int(assistant.created_at.timestamp())
+            name=str(assistant.name),
+            description=str(assistant.description) if assistant.description is not None else None,
+            model=str(assistant.model),
+            lastEdited=int(assistant.updated_at.timestamp()) if assistant.updated_at is not None else int(assistant.created_at.timestamp())
         )
         for assistant in assistants
     ]

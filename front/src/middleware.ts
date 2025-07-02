@@ -30,18 +30,14 @@ export default auth((req) => {
         return NextResponse.next()
     }
 
-    // Check if this is an auth page that needs redirect check
+    const isSignedIn = Boolean(req.auth?.accessToken)
     const isAuthPage = authRoutes.includes(pathname)
 
-    // Only check auth for auth pages (where signed-in users should be redirected)
-    if (isAuthPage) {
-        const isSignedIn = Boolean(req.auth?.accessToken)
-
-        if (isSignedIn) {
-            return NextResponse.redirect(
-                new URL(appConfig.authenticatedEntryPath, nextUrl),
-            )
-        }
+    // Redirect authenticated users away from auth pages
+    if (isAuthPage && isSignedIn) {
+        return NextResponse.redirect(
+            new URL(appConfig.authenticatedEntryPath, nextUrl),
+        )
     }
 
     return NextResponse.next()
