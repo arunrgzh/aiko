@@ -18,6 +18,9 @@ app = FastAPI(
     title="AI-Komek API",
     description="Backend API for AI-Komek application",
     version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
 )
 
 # Add CORS middleware
@@ -37,29 +40,35 @@ app.include_router(assistants.router)
 async def create_default_assistants():
     """Создает дефолтных ассистентов для всех пользователей"""
     async with async_session() as session:
-        # Получаем всех пользователей, у которых нет ассистентов
-        result = await session.execute(
-            select(User)
-            .outerjoin(Assistant)
-            .where(Assistant.id == None)
-        )
-        users_without_assistants = result.scalars().all()
-        
-        for user in users_without_assistants:
-            # Создаем дефолтного ассистента
-            default_assistant = Assistant(
-                user_id=user.id,
-                name="AI Помощник по поиску работы",
-                description="Ваш персональный AI-ассистент для поиска работы и карьерного консультирования",
-                model="gpt-4o",  # Ваш Azure deployment name
-                system_prompt="Ты - профессиональный консультант по карьере и поиску работы. Помогай пользователям находить подходящие вакансии, составлять резюме и готовиться к собеседованиям.",
-                temperature="0.7",
-                max_tokens=4096,  # Увеличили лимит для GPT-4o
-                is_active=True
+        try:
+            # Получаем всех пользователей, у которых нет ассистентов
+            result = await session.execute(
+                select(User)
+                .outerjoin(Assistant)
+                .where(Assistant.id == None)
             )
-            session.add(default_assistant)
-        
-        await session.commit()
+            users_without_assistants = result.scalars().all()
+            
+            for user in users_without_assistants:
+                # Создаем дефолтного ассистента
+                default_assistant = Assistant(
+                    user_id=user.id,
+                    name="AI Помощник по поиску работы",
+                    description="Ваш персональный AI-ассистент для поиска работы и карьерного консультирования",
+                    model="gpt-4o",  # Ваш Azure deployment name
+                    system_prompt="Ты - профессиональный консультант по карьере и поиску работы. Помогай пользователям находить подходящие вакансии, составлять резюме и готовиться к собеседованиям.",
+                    temperature="0.7",
+                    max_tokens=4096,  # Увеличили лимит для GPT-4o
+                    is_active=True
+                )
+                session.add(default_assistant)
+            
+            await session.commit()
+        except Exception as e:
+            await session.rollback()
+            print(f"Error creating default assistants: {e}")
+        finally:
+            await session.close()
 
 @app.on_event("startup")
 async def init_db():
