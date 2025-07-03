@@ -1,28 +1,33 @@
 #!/usr/bin/env python3
 """
-Simple startup script for AI-Komek FastAPI application
-
-Run this script to start the development server:
-python start_server.py
-
-Or use uvicorn directly:
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+Startup script for AI-Komek Backend Server
+This script properly handles imports and starts the FastAPI application
 """
 
 import sys
 import os
+import uvicorn
 
 # Add the current directory to Python path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, os.path.dirname(__file__))
 
-if __name__ == "__main__":
-    import uvicorn
+def main():
+    """Start the FastAPI server"""
+    print("🚀 Starting AI-Komek Backend Server...")
+    print("📍 http://localhost:8000")
+    print("📖 API Docs: http://localhost:8000/docs")
+    print("🔄 Auto-reload enabled for development")
+    print("-" * 50)
     
-    # Start the server
+    # Start the server using uvicorn
     uvicorn.run(
         "app.main:app",
-        host="0.0.0.0", 
+        host="0.0.0.0",
         port=8000,
         reload=True,
+        reload_dirs=["app"],
         log_level="info"
-    ) 
+    )
+
+if __name__ == "__main__":
+    main() 

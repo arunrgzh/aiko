@@ -140,6 +140,10 @@ async def send_message_to_assistant(
     
     logger.info(f"🔥 Chat request received: assistant_id={assistant_id}, user={current_user.username}")
     logger.info(f"🔥 Message: {request.message[:100]}...")
+    if request.images:
+        logger.info(f"📸 Images received: {len(request.images)} images")
+    else:
+        logger.info("📸 No images in request")
     
     try:
         # Check if assistant exists and belongs to user
@@ -158,7 +162,7 @@ async def send_message_to_assistant(
                 name="AI Помощник по поиску работы",
                 description="Ваш персональный AI-ассистент для поиска работы и карьерного консультирования",
                 model="gpt-4o",
-                system_prompt="Ты - профессиональный консультант по карьере и поиску работы. Помогай пользователям находить подходящие вакансии, составлять резюме и готовиться к собеседованиям.",
+                system_prompt="Ты - профессиональный консультант по карьере и поиску работы. Помогай пользователям находить подходящие вакансии, составлять резюме и готовиться к собеседованиям. Будь вежливым и профессиональным.",
                 temperature="0.7",
                 max_tokens=4096,
                 is_active=True
@@ -228,7 +232,8 @@ async def send_message_to_assistant(
         # Генерируем ответ ассистента (передаем список сообщений, НЕ chat_history)
         ai_response_content = await generate_ai_response(
             user_message=request.message,
-            recent_messages=list(reversed(recent_messages))  # Переворачиваем для правильной очередности
+            recent_messages=list(reversed(recent_messages)),  # Переворачиваем для правильной очередности
+            images=request.images  # Передаем изображения
         )
         
         # Сохраняем ответ ассистента
@@ -273,14 +278,15 @@ async def send_message_to_assistant(
 
 async def generate_ai_response(
     user_message: str, 
-    recent_messages: list | None = None
+    recent_messages: list | None = None,
+    images: list[str] | None = None
 ) -> str:
     """Генерирует ответ ассистента используя Azure OpenAI API"""
     
     # Если Azure OpenAI API не настроен, используем мок-ответы
     if not azure_openai_client or not settings.azure_openai_api_key:
         logger.warning("Azure OpenAI API not configured, using mock responses")
-        return generate_mock_ai_response(user_message)
+        return generate_mock_ai_response(user_message, images)
     
     logger.info(f"🤖 Calling Azure OpenAI API for message: {user_message[:50]}...")
     
@@ -324,10 +330,21 @@ async def generate_ai_response(
                     })
         
         # Добавляем текущее сообщение пользователя
-        messages.append({
-            "role": "user",
-            "content": user_message
-        })
+        if images and len(images) > 0:
+            # Сообщение с изображениями - используем строку как fallback для совместимости
+            content_text = f"{user_message}\n\n[Изображение прикреплено]"
+            messages.append({
+                "role": "user", 
+                "content": content_text
+            })
+            
+            logger.info(f"📸 Received {len(images)} images for analysis")
+        else:
+            # Обычное текстовое сообщение
+            messages.append({
+                "role": "user",
+                "content": user_message
+            })
         
         # Вызываем Azure OpenAI API
         response = await azure_openai_client.chat.completions.create(
@@ -352,10 +369,33 @@ async def generate_ai_response(
         logger.error(f"❌ Error calling Azure OpenAI API: {str(e)}")
         logger.error(f"   Using mock response instead")
         # В случае ошибки возвращаем мок-ответ
-        return generate_mock_ai_response(user_message)
+        return generate_mock_ai_response(user_message, images)
 
-def generate_mock_ai_response(user_message: str) -> str:
+def generate_mock_ai_response(user_message: str, images: list[str] | None = None) -> str:
     """Генерирует мок-ответ ассистента (fallback)"""
+    
+    logger.info(f"🎭 Mock response called with message: {user_message[:50]}...")
+    if images:
+        logger.info(f"🎭 Mock response called WITH {len(images)} images")
+    else:
+        logger.info("🎭 Mock response called without images")
+    
+    # Специальный ответ для изображений
+    if images and len(images) > 0:
+        return f"""Отлично! Я вижу, что вы прислали {len(images)} изображение(й). 
+
+🔍 **Что я могу сделать с изображениями:**
+
+📋 **Анализ резюме** - если это скан или фото резюме, я могу дать советы по улучшению структуры и содержания
+
+📄 **Анализ документов** - помогу разобрать любые документы связанные с трудоустройством
+
+💼 **Анализ вакансий** - если это скриншот вакансии, подскажу как лучше к ней подготовиться
+
+🎯 **Подготовка к собеседованию** - если это материалы о компании, помогу подготовить вопросы
+
+Опишите, что именно на изображении, и я дам максимально полезные советы для вашего трудоустройства!"""
+
     responses = [
         "Здравствуйте! Если у вас есть вопросы о поиске работы, составлении резюме или развитии карьеры, я готов помочь. Пожалуйста, уточните, чем могу быть полезен! 😊",
         "Спасибо за ваше сообщение! Я ассистент AI-Komek и готов помочь вам с поиском работы. О чем хотели бы поговорить?",

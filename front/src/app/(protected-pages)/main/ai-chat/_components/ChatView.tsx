@@ -7,6 +7,11 @@ import ChatLandingView from './ChatLandingView'
 import ChatMobileNav from './ChatMobileNav'
 import { useGenerativeChatStore } from '../_store/generativeChatStore'
 import useChatSend from '../_hooks/useChatSend'
+import {
+    createFileMessage,
+    convertFilesToBase64,
+    isImageFile,
+} from '../utils/fileUtils'
 import type { ScrollBarRef } from '@/components/view/ChatBox'
 
 const ChatView = () => {
@@ -34,11 +39,28 @@ const ChatView = () => {
 
     const handleInputChange = async ({
         value,
+        attachments = [],
     }: {
         value: string
         attachments?: File[]
     }) => {
-        await handleSend(value)
+        try {
+            // Create message with file information
+            const messageWithFiles = await createFileMessage(value, attachments)
+
+            // Convert image files to base64 for AI analysis
+            const imageBase64s =
+                attachments.length > 0
+                    ? await convertFilesToBase64(attachments)
+                    : []
+
+            // Pass both message and images to handleSend
+            await handleSend(messageWithFiles, attachments, imageBase64s)
+        } catch (error) {
+            console.error('Error handling file message:', error)
+            // Fallback to text-only message
+            await handleSend(value || 'Ошибка при обработке файлов')
+        }
     }
 
     return (
