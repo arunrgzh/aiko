@@ -52,6 +52,7 @@ type GetAssistantsResponse = {
 type SendMessageRequest = {
     participant: string
     message: string
+    images?: string[]
 }
 
 type SendMessageResponse = {

@@ -28,7 +28,11 @@ const ChatInput = (props: ChatInputProps) => {
     }
 
     const handleChange = () => {
-        if (inputRef.current?.value) {
+        const hasText = inputRef.current?.value?.trim()
+        const hasAttachments = attachments.length > 0
+
+        // Send if there's either text or attachments
+        if (hasText || hasAttachments) {
             onInputChange?.({
                 value: inputRef.current?.value || '',
                 attachments,
@@ -39,11 +43,17 @@ const ChatInput = (props: ChatInputProps) => {
 
     const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         if (event.key === 'Enter') {
-            onInputChange?.({
-                value: inputRef.current?.value || '',
-                attachments,
-            })
-            handleInputClear()
+            const hasText = inputRef.current?.value?.trim()
+            const hasAttachments = attachments.length > 0
+
+            // Send if there's either text or attachments
+            if (hasText || hasAttachments) {
+                onInputChange?.({
+                    value: inputRef.current?.value || '',
+                    attachments,
+                })
+                handleInputClear()
+            }
         }
     }
 

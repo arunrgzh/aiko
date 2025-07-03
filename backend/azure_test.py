@@ -41,12 +41,12 @@ for deployment in common_deployments:
                 }
             ],
             max_tokens=100,
-            temperature=0.5,
+            temperature=0.6,
             model=deployment
         )
         
         print(f"✅ SUCCESS! Deployment '{deployment}' works!")
-        print(f"   Response: {response.choices[0].message.content[:100]}...")
+       
         print(f"\n🎯 Use this deployment name: {deployment}")
         break
         
