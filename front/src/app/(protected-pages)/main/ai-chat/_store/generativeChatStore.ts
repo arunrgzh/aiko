@@ -25,6 +25,7 @@ type GenerativeChatAction = {
     pushChatHistory: (payload: ChatHistory) => void
     pushConversation: (id: string, conversation: Conversation) => void
     disabledChatFresh: (id: string) => void
+    clearAllChatHistory: () => void
 }
 
 const initialState: GenerativeChatState = {
@@ -102,4 +103,10 @@ export const useGenerativeChatStore = create<
             })
             return { chatHistory }
         }),
+    clearAllChatHistory: () =>
+        set(() => ({
+            chatHistory: [],
+            selectedConversation: '',
+            selectedConversationRecord: [],
+        })),
 }))
