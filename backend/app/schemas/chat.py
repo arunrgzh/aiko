@@ -64,6 +64,7 @@ class ChatHistoryResponse(BaseModel):
 class SendMessageRequest(BaseModel):
     participant: str
     message: str
+    images: Optional[List[str]] = None  # Base64 encoded images
 
 class SendMessageResponse(BaseModel):
     replies: List[str]
