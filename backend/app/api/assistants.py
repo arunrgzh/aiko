@@ -18,7 +18,7 @@ from ..schemas.assistant import (
 )
 from ..schemas.chat import (
     SendMessageRequest, SendMessageResponse, ChatHistoryResponse,
-    ConversationMessage, SenderInfo, ChatMessageResponse
+    ConversationMessage, SenderInfo
 )
 from ..auth.jwt import get_current_user
 from ..config import settings
@@ -129,7 +129,7 @@ async def get_assistant(
     
     return response
 
-@router.post("/{assistant_id}/chat", response_model=ChatMessageResponse)
+@router.post("/{assistant_id}/chat", response_model=SendMessageResponse)
 async def send_message_to_assistant(
     assistant_id: int,
     request: SendMessageRequest,
@@ -255,18 +255,8 @@ async def send_message_to_assistant(
             pass
         
         # Возвращаем ответ в формате, совместимом с фронтендом
-        response = ChatMessageResponse(
-            id=str(uuid.uuid4()),
-            choices=[{
-                "finish_reason": "stop",
-                "index": 0,
-                "message": {
-                    "content": ai_response_content,
-                    "role": "assistant"
-                }
-            }],
-            created=int(time.time()),
-            model="gpt-4o"
+        response = SendMessageResponse(
+            replies=[ai_response_content]
         )
         
         logger.info(f"✅ Chat response prepared successfully")
@@ -277,18 +267,8 @@ async def send_message_to_assistant(
         logger.exception("Full error traceback:")
         
         # Return error response but in the expected format
-        return ChatMessageResponse(
-            id=str(uuid.uuid4()),
-            choices=[{
-                "finish_reason": "stop",
-                "index": 0,
-                "message": {
-                    "content": f"Извините, произошла ошибка при обработке вашего сообщения. Попробуйте еще раз. (Ошибка: {str(e)})",
-                    "role": "assistant"
-                }
-            }],
-            created=int(time.time()),
-            model="gpt-4o"
+        return SendMessageResponse(
+            replies=[f"Извините, произошла ошибка при обработке вашего сообщения. Попробуйте еще раз. (Ошибка: {str(e)})"]
         )
 
 async def generate_ai_response(

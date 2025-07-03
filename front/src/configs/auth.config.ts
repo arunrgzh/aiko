@@ -78,8 +78,19 @@ export const authOptions: NextAuthConfig = {
 
     callbacks: {
         async jwt({ token, user }): Promise<JWT> {
+            // Debug logging
+            if (process.env.NODE_ENV === 'development') {
+                console.log('🔍 NextAuth JWT Callback:', {
+                    isNewUser: !!user,
+                    hasStoredToken: !!token.accessToken,
+                    tokenExpires: token.accessTokenExpires,
+                    now: Date.now(),
+                })
+            }
+
             if (user) {
-                return {
+                // New login - store user data
+                const newToken = {
                     ...token,
                     accessToken: user.accessToken,
                     refreshToken: user.refreshToken,
@@ -87,12 +98,31 @@ export const authOptions: NextAuthConfig = {
                     id: String(user.id),
                     isFirstLogin: user.isFirstLogin,
                 }
+
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('✅ Storing new JWT token:', {
+                        accessToken: user.accessToken?.slice(0, 20) + '...',
+                        expires: new Date(user.accessTokenExpires),
+                    })
+                }
+
+                return newToken
             }
 
+            // Check if token is still valid
             if (Date.now() < token.accessTokenExpires) {
+                if (process.env.NODE_ENV === 'development') {
+                    console.log(
+                        '✅ Token still valid, returning existing token',
+                    )
+                }
                 return token
             }
 
+            // Token expired, try to refresh
+            if (process.env.NODE_ENV === 'development') {
+                console.log('🔄 Token expired, attempting refresh...')
+            }
             return await refreshAccessToken(token)
         },
 
@@ -101,6 +131,17 @@ export const authOptions: NextAuthConfig = {
             session.accessToken = token.accessToken
             session.error = token.error
             session.user.isFirstLogin = token.isFirstLogin
+            session.user.accessTokenExpires = token.accessTokenExpires
+
+            // Debug logging
+            if (process.env.NODE_ENV === 'development') {
+                console.log('🔍 NextAuth Session Callback:', {
+                    hasAccessToken: !!token.accessToken,
+                    tokenExpires: token.accessTokenExpires,
+                    error: token.error,
+                })
+            }
+
             return session
         },
     },

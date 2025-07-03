@@ -23,6 +23,18 @@ const AxiosRequestInterceptorConfigCallback = async (
                 }
                 const session = await getSession()
 
+                if (process.env.NODE_ENV === 'development') {
+                    console.log('📡 Session data:', {
+                        hasSession: !!session,
+                        hasAccessToken: !!session?.accessToken,
+                        hasUser: !!session?.user,
+                        sessionKeys: session ? Object.keys(session) : [],
+                        userKeys: session?.user
+                            ? Object.keys(session.user)
+                            : [],
+                    })
+                }
+
                 if (session?.accessToken) {
                     cachedToken = session.accessToken
                     // Cache token for 10 minutes or use token expiry
@@ -34,6 +46,8 @@ const AxiosRequestInterceptorConfigCallback = async (
                         console.log(
                             '✅ Token cached until:',
                             new Date(tokenExpiry),
+                            'Token preview:',
+                            session.accessToken.slice(0, 20) + '...',
                         )
                     }
                 } else {
@@ -41,6 +55,10 @@ const AxiosRequestInterceptorConfigCallback = async (
                     tokenExpiry = 0
                     if (process.env.NODE_ENV === 'development') {
                         console.log('❌ No access token in session')
+                        console.log(
+                            'Session content:',
+                            JSON.stringify(session, null, 2),
+                        )
                     }
                 }
             } finally {
