@@ -136,7 +136,7 @@ const ChatHistory = ({ queryText = '', onClick }: ChatHistoryProps) => {
                     {/* Empty State */}
                     {filteredChatHistory.length === 0 && queryText && (
                         <div className="text-center text-gray-500 dark:text-gray-400 py-4">
-                            No chats found matching "{queryText}"
+                            No chats found matching &quot;{queryText}&quot;
                         </div>
                     )}
                 </div>
