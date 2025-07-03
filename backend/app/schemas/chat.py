@@ -68,8 +68,4 @@ class SendMessageRequest(BaseModel):
 class SendMessageResponse(BaseModel):
     replies: List[str]
 
-class ChatMessageResponse(BaseModel):
-    id: str
-    choices: List[dict]
-    created: int
-    model: str 
+# Removed ChatMessageResponse - using SendMessageResponse instead 

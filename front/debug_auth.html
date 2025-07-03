@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Debug Frontend Auth</title>
+    </head>
+    <body>
+        <h1>🔍 Debug Frontend Authentication</h1>
+
+        <h2>Step 1: Test Direct API Call</h2>
+        <button onclick="testDirectAPI()">Test Direct API</button>
+        <div id="direct-result"></div>
+
+        <h2>Step 2: Check NextAuth Session</h2>
+        <button onclick="checkSession()">Check Session</button>
+        <div id="session-result"></div>
+
+        <h2>Step 3: Test Frontend Login</h2>
+        <button onclick="testFrontendLogin()">Test Frontend Login</button>
+        <div id="frontend-result"></div>
+
+        <script>
+            // Test 1: Direct API call (should work)
+            async function testDirectAPI() {
+                const result = document.getElementById('direct-result')
+                try {
+                    // Login directly
+                    const loginResp = await fetch(
+                        'http://localhost:8000/api/auth/login',
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                username: 'testuser123',
+                                password: 'testpassword123',
+                            }),
+                        },
+                    )
+
+                    if (!loginResp.ok) {
+                        result.innerHTML = `❌ Direct login failed: ${loginResp.status}`
+                        return
+                    }
+
+                    const loginData = await loginResp.json()
+                    const token = loginData.access_token
+
+                    // Test assistants
+                    const assistantsResp = await fetch(
+                        'http://localhost:8000/main/assistants/',
+                        {
+                            headers: { Authorization: `Bearer ${token}` },
+                        },
+                    )
+
+                    result.innerHTML = `✅ Direct API: Login ${loginResp.status}, Assistants ${assistantsResp.status}`
+                } catch (error) {
+                    result.innerHTML = `❌ Direct API Error: ${error.message}`
+                }
+            }
+
+            // Test 2: Check what NextAuth session contains
+            async function checkSession() {
+                const result = document.getElementById('session-result')
+                try {
+                    // This assumes you're on a Next.js page with NextAuth
+                    const session = await fetch('/api/auth/session').then((r) =>
+                        r.json(),
+                    )
+                    result.innerHTML = `<pre>${JSON.stringify(session, null, 2)}</pre>`
+                } catch (error) {
+                    result.innerHTML = `❌ Session check failed: ${error.message}`
+                }
+            }
+
+            // Test 3: Test frontend's API service
+            async function testFrontendLogin() {
+                const result = document.getElementById('frontend-result')
+                try {
+                    // Test your frontend's auth API route
+                    const resp = await fetch('/api/auth/signin', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: 'testuser123',
+                            password: 'testpassword123',
+                        }),
+                    })
+
+                    result.innerHTML = `Frontend auth status: ${resp.status}`
+                } catch (error) {
+                    result.innerHTML = `❌ Frontend auth error: ${error.message}`
+                }
+            }
+        </script>
+    </body>
+</html>
