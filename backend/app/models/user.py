@@ -21,4 +21,10 @@ class User(Base):
     assistants = relationship("Assistant", back_populates="user", cascade="all, delete-orphan")
     chat_histories = relationship("ChatHistory", back_populates="user", cascade="all, delete-orphan")
     assessment_results = relationship("AssessmentResult", back_populates="user", cascade="all, delete-orphan")
-    profile_summary = relationship("ProfileSummary", back_populates="user", uselist=False, cascade="all, delete-orphan") 
+    profile_summary = relationship("ProfileSummary", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    
+    # Job-related relationships
+    job_recommendations = relationship("JobRecommendation", back_populates="user", cascade="all, delete-orphan")
+    saved_jobs = relationship("SavedJob", back_populates="user", cascade="all, delete-orphan")
+    job_feedbacks = relationship("JobFeedback", back_populates="user", cascade="all, delete-orphan")
+    job_preferences = relationship("UserJobPreferences", back_populates="user", uselist=False, cascade="all, delete-orphan") 

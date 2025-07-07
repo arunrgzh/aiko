@@ -6,11 +6,14 @@ from typing import Optional
 from ..database import get_db
 from ..models.user import User
 from ..models.onboarding import OnboardingProfile
+from ..models.job import UserJobPreferences
 from ..schemas.onboarding import OnboardingProfileCreate, OnboardingProfileUpdate, OnboardingProfileResponse, OnboardingCompleteRequest
 from ..schemas.assessment import TakeAssessmentOption
 from ..auth.jwt import get_current_user
+from ..services.user_mapping_service import UserMappingService
 
 router = APIRouter(prefix="/api/onboarding", tags=["onboarding"])
+user_mapping_service = UserMappingService()
 
 @router.post("/profile", response_model=OnboardingProfileResponse)
 async def create_or_update_profile(
@@ -112,9 +115,48 @@ async def complete_onboarding(
         .values(is_first_login=False)
     )
     
-    await db.commit()
-    
-    return {"message": "Onboarding completed successfully"}
+    # Создаем или обновляем job preferences на основе данных онбординга
+    try:
+        # Проверяем, есть ли уже preferences
+        existing_prefs_result = await db.execute(
+            select(UserJobPreferences).where(UserJobPreferences.user_id == current_user.id)
+        )
+        existing_prefs = existing_prefs_result.scalar_one_or_none()
+        
+        if not existing_prefs:
+            # Создаем новые preferences
+            job_preferences = await user_mapping_service.create_preferences_from_onboarding(
+                current_user, db
+            )
+            db.add(job_preferences)
+        else:
+            # Обновляем существующие preferences
+            onboarding_result = await db.execute(
+                select(OnboardingProfile).where(OnboardingProfile.user_id == current_user.id)
+            )
+            onboarding_profile = onboarding_result.scalar_one_or_none()
+            
+            if onboarding_profile:
+                updated_prefs = await user_mapping_service.update_preferences_from_onboarding_changes(
+                    current_user.id, onboarding_profile, db # type: ignore
+                )
+        
+        await db.commit()
+        
+        return {
+            "message": "Onboarding completed successfully",
+            "job_preferences_created": True
+        }
+        
+    except Exception as e:
+        # Не фейлим весь запрос, если не удалось создать preferences
+        await db.commit()  # Все равно сохраняем основные изменения
+        
+        return {
+            "message": "Onboarding completed successfully",
+            "job_preferences_created": False,
+            "note": "Job preferences will be created during first job search"
+        }
 
 @router.get("/progress")
 async def get_onboarding_progress(
