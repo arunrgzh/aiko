@@ -7,7 +7,8 @@ load_dotenv()
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from .api import auth, onboarding, assistants, notifications
+from .api import auth, onboarding, assistants, notifications, hh_auth, assessment
+# TODO: Add hh_parser after fixing encoding issues
 from .api import settings as settings_api
 from .database import engine, Base, async_session
 from .models.assistant import Assistant
@@ -36,9 +37,14 @@ app.add_middleware(
 # Include routers
 app.include_router(auth.router)
 app.include_router(onboarding.router)
+app.include_router(assessment.router)
 app.include_router(assistants.router)
 app.include_router(notifications.router)
 app.include_router(settings_api.router)
+
+# Include HeadHunter routers
+app.include_router(hh_auth.router)  # OAuth авторизация
+# app.include_router(hh_parser.router)  # TODO: Добавить после исправления файла
 
 # async def create_default_assistants():
 #     """Создает дефолтных ассистентов для всех пользователей"""

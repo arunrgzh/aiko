@@ -1,3 +1,6 @@
+/* eslint-disable no-use-before-define */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+
 'use client'
 
 import { useEffect, useState, useCallback } from 'react'
@@ -11,6 +14,16 @@ import AccessibilityStep from './steps/AccessibilityStep'
 import CompletionStep from './steps/CompletionStep'
 import { Spinner } from '@/components/ui/Spinner'
 import Container from '@/components/shared/Container'
+import AssessmentChoiceModal from '@/components/shared/AssessmentChoiceModal'
+import AssessmentQuestions from '@/components/shared/AssessmentQuestions'
+import AssistantSuggestion from '@/components/shared/AssistantSuggestion'
+import AssessmentService from '@/services/AssessmentService'
+import type {
+    AssessmentQuestion,
+    AssessmentAnswer,
+    AssessmentResult,
+    ProfileSummary,
+} from '@/services/AssessmentService'
 import {
     mapToBackendFormat,
     mapToFrontendFormat,
@@ -90,6 +103,28 @@ const OnboardingPage = () => {
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
 
+    // Assessment flow state
+    const [showAssessmentChoice, setShowAssessmentChoice] = useState(false)
+    const [assessmentMode, setAssessmentMode] = useState<
+        'assessment' | 'traditional' | null
+    >(null)
+    const [assessmentQuestions, setAssessmentQuestions] = useState<
+        AssessmentQuestion[]
+    >([])
+    const [assessmentResult, setAssessmentResult] =
+        useState<AssessmentResult | null>(null)
+    const [profileSummary, setProfileSummary] = useState<ProfileSummary | null>(
+        null,
+    )
+    const [assessmentLoading, setAssessmentLoading] = useState(false)
+
+    // Assistant suggestion state
+    const [showAssistantSuggestion, setShowAssistantSuggestion] =
+        useState(false)
+    const [assistantDismissed, setAssistantDismissed] = useState(false)
+    const [stepStartTime, setStepStartTime] = useState<number>(Date.now())
+    const [uncertaintyReason, setUncertaintyReason] = useState<string>('')
+
     const totalSteps = 5
 
     // Загрузить существующие данные онбординга
@@ -149,6 +184,15 @@ const OnboardingPage = () => {
 
         // Проверяем, загружена ли сессия (есть ли accessToken)
         if (session?.accessToken) {
+            // FOR TESTING: Always show assessment choice modal regardless of first login status
+            console.log(
+                'Loading onboarding data and showing choice (TESTING MODE)',
+            )
+            loadOnboardingData().finally(() => {
+                setLoading(false)
+            })
+
+            /* ORIGINAL PRODUCTION CODE (commented out for testing):
             // Если пользователь уже прошел онбординг
             if (!session.user.isFirstLogin) {
                 console.log(
@@ -156,12 +200,14 @@ const OnboardingPage = () => {
                 )
                 router.push('/main/dashboard')
             } else {
-                // Загружаем существующие данные онбординга и показываем форму
-                console.log('Loading onboarding data and showing form')
+                // Загружаем существующие данные онбординга и показываем выбор
+                console.log('Loading onboarding data and showing choice')
                 loadOnboardingData().finally(() => {
                     setLoading(false)
+                    setShowAssessmentChoice(true)
                 })
             }
+            */
         } else if (session?.user?.id) {
             // Если есть user.id но нет accessToken, показываем онбординг
             console.log(
@@ -207,6 +253,7 @@ const OnboardingPage = () => {
     const handleNext = useCallback(async () => {
         if (currentStep < totalSteps) {
             setCurrentStep((prev) => prev + 1)
+            setStepStartTime(Date.now())
         }
     }, [currentStep, totalSteps])
 
@@ -264,10 +311,245 @@ const OnboardingPage = () => {
         (step: number) => {
             if (step >= 1 && step <= totalSteps) {
                 setCurrentStep(step)
+                setStepStartTime(Date.now())
             }
         },
         [totalSteps],
     )
+
+    // Function to detect user uncertainty
+    const detectUncertainty = useCallback(() => {
+        const timeSpentOnStep = Date.now() - stepStartTime
+        const minTime = 10000 // 10 seconds
+
+        // Check if user is on step 3 (skills) and conditions suggest uncertainty
+        if (
+            currentStep === 3 &&
+            !assistantDismissed &&
+            !showAssessmentChoice &&
+            !assessmentMode
+        ) {
+            const skillsCount = onboardingData.skills?.length || 0
+            const hasPreferences =
+                (onboardingData.preferred_job_types?.length || 0) > 0
+
+            let reason = ''
+            let shouldShow = false
+
+            // Condition 1: Spent too much time on skills step
+            if (timeSpentOnStep > 30000) {
+                // 5 seconds
+                reason = 'Я заметил, что вы долго выбираете навыки'
+                shouldShow = true
+            }
+            // Condition 2: Very few skills selected after some time
+            else if (timeSpentOnStep > minTime && skillsCount < 3) {
+                reason = 'Не уверены в своих навыках?'
+                shouldShow = true
+            }
+            // Condition 3: No job preferences after some time
+            else if (timeSpentOnStep > minTime && !hasPreferences) {
+                reason = 'Затрудняетесь с выбором предпочтений по работе?'
+                shouldShow = true
+            }
+            // Condition 4: Just completed step 2 with minimal info
+            else if (
+                currentStep === 3 &&
+                skillsCount === 0 &&
+                timeSpentOnStep < 10000
+            ) {
+                reason = 'Хотите быстро определить свои сильные стороны?'
+                shouldShow = true
+            }
+
+            if (shouldShow && reason) {
+                setUncertaintyReason(reason)
+                setShowAssistantSuggestion(true)
+            }
+        }
+    }, [
+        currentStep,
+        stepStartTime,
+        assistantDismissed,
+        showAssessmentChoice,
+        assessmentMode,
+        onboardingData,
+    ])
+
+    // Check for uncertainty every 5 seconds
+    useEffect(() => {
+        const interval = setInterval(detectUncertainty, 5000)
+        return () => clearInterval(interval)
+    }, [detectUncertainty])
+
+    // Show assistant suggestion after completing steps 1-2
+    useEffect(() => {
+        if (
+            currentStep === 3 &&
+            !assistantDismissed &&
+            !showAssessmentChoice &&
+            !assessmentMode
+        ) {
+            // Wait a bit after entering step 3 before checking
+            const timer = setTimeout(() => {
+                detectUncertainty()
+            }, 5000) // 5 seconds after entering step 3
+
+            return () => clearTimeout(timer)
+        }
+    }, [
+        currentStep,
+        assistantDismissed,
+        showAssessmentChoice,
+        assessmentMode,
+        detectUncertainty,
+    ])
+
+    // Assessment handlers
+    const handleChooseAssessment = useCallback(async () => {
+        console.log('🎯 Starting assessment flow...')
+        setAssessmentLoading(true)
+        try {
+            // First, save any existing onboarding data
+            if (
+                Object.keys(onboardingData).length > 0 &&
+                session?.accessToken
+            ) {
+                console.log(
+                    '💾 Saving existing onboarding data before assessment...',
+                )
+                await saveOnboardingData(onboardingData)
+                console.log('✅ Onboarding data saved')
+            }
+
+            // Choose assessment option (now with data preservation)
+            console.log('📡 Calling chooseAssessmentOption...')
+            const choiceResult = await AssessmentService.chooseAssessmentOption(
+                {
+                    take_assessment: true,
+                    skip_onboarding_data: false, // Changed to false to preserve data
+                },
+            )
+            console.log('✅ Assessment option chosen:', choiceResult)
+
+            // Load assessment questions
+            console.log('📝 Loading assessment questions...')
+            const questionsData = await AssessmentService.getQuestions()
+            console.log('✅ Questions loaded:', questionsData)
+
+            setAssessmentQuestions(questionsData.questions)
+            setAssessmentMode('assessment')
+            setShowAssessmentChoice(false)
+            console.log('🚀 Assessment mode activated!')
+        } catch (error) {
+            console.error('❌ Error starting assessment:', error)
+            // Show user-friendly error
+            alert(
+                'Произошла ошибка при загрузке теста. Пожалуйста, попробуйте еще раз.',
+            )
+        } finally {
+            setAssessmentLoading(false)
+        }
+    }, [onboardingData, saveOnboardingData, session?.accessToken])
+
+    const handleChooseTraditional = useCallback(async () => {
+        console.log('📋 Starting traditional onboarding flow...')
+        setAssessmentLoading(true)
+        try {
+            // Choose traditional onboarding
+            console.log('📡 Calling chooseAssessmentOption for traditional...')
+            const choiceResult = await AssessmentService.chooseAssessmentOption(
+                {
+                    take_assessment: false,
+                },
+            )
+            console.log('✅ Traditional option chosen:', choiceResult)
+
+            setAssessmentMode('traditional')
+            setShowAssessmentChoice(false)
+            console.log('📝 Traditional onboarding mode activated!')
+        } catch (error) {
+            console.error('❌ Error choosing traditional onboarding:', error)
+            // Show user-friendly error
+            alert('Произошла ошибка. Пожалуйста, попробуйте еще раз.')
+        } finally {
+            setAssessmentLoading(false)
+        }
+    }, [])
+
+    // Assistant accept handler moved here to avoid use-before-define error
+    const handleAssistantSuggestionAccept = useCallback(async () => {
+        setShowAssistantSuggestion(false)
+        setAssistantDismissed(true)
+
+        // Save current data first
+        if (Object.keys(onboardingData).length > 0 && session?.accessToken) {
+            await saveOnboardingData(onboardingData)
+        }
+
+        // Directly start assessment flow
+        await handleChooseAssessment()
+    }, [
+        onboardingData,
+        saveOnboardingData,
+        session?.accessToken,
+        handleChooseAssessment,
+    ])
+
+    const handleAssistantSuggestionDismiss = useCallback(() => {
+        setShowAssistantSuggestion(false)
+        setAssistantDismissed(true)
+    }, [])
+
+    const handleAssessmentSubmit = useCallback(
+        async (answers: AssessmentAnswer[]) => {
+            setAssessmentLoading(true)
+            try {
+                const result = await AssessmentService.submitAssessment(answers)
+                setAssessmentResult(result)
+
+                // Get profile summary
+                const summary = await AssessmentService.getProfileSummary()
+                setProfileSummary(summary)
+            } catch (error) {
+                console.error('Error submitting assessment:', error)
+            } finally {
+                setAssessmentLoading(false)
+            }
+        },
+        [],
+    )
+
+    const handleAssessmentComplete = useCallback(async () => {
+        setSaving(true)
+        try {
+            // Mark onboarding as complete
+            const completeResponse = await fetch('/api/onboarding/complete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session?.accessToken}`,
+                },
+                body: JSON.stringify({ mark_as_completed: true }),
+            })
+
+            if (completeResponse.ok) {
+                router.push('/main/dashboard')
+            } else {
+                console.error('Error marking onboarding as completed')
+            }
+        } catch (error) {
+            console.error('Error completing assessment:', error)
+        } finally {
+            setSaving(false)
+        }
+    }, [session?.accessToken, router])
+
+    const handleRetakeAssessment = useCallback(() => {
+        setAssessmentResult(null)
+        setProfileSummary(null)
+        setShowAssessmentChoice(true)
+    }, [])
 
     const renderStep = () => {
         switch (currentStep) {
@@ -321,6 +603,16 @@ const OnboardingPage = () => {
         }
     }
 
+    // Debug current state
+    console.log('🎨 Render state:', {
+        loading,
+        showAssessmentChoice,
+        assessmentMode,
+        assessmentQuestions: assessmentQuestions.length,
+        assessmentResult: !!assessmentResult,
+        assessmentLoading,
+    })
+
     if (loading) {
         return (
             <Container className="flex items-center justify-center h-screen">
@@ -329,14 +621,167 @@ const OnboardingPage = () => {
         )
     }
 
+    // Show assessment results
+    if (assessmentResult) {
+        return (
+            <Container className="py-8">
+                <div className="max-w-4xl mx-auto text-center">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-6">
+                        🎉 Результаты теста
+                    </h1>
+                    <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg mb-8">
+                        <div className="text-6xl font-bold text-indigo-600 mb-4">
+                            {assessmentResult.overall_score.toFixed(1)}/5
+                        </div>
+                        <h3 className="text-xl font-semibold mb-4">
+                            Общий балл
+                        </h3>
+
+                        {/* Strengths */}
+                        <div className="grid md:grid-cols-2 gap-6 mt-8">
+                            <div className="text-left">
+                                <h4 className="text-lg font-semibold text-green-600 mb-3">
+                                    ✅ Ваши сильные стороны:
+                                </h4>
+                                <ul className="space-y-2">
+                                    {assessmentResult.top_strengths.map(
+                                        (strength, index) => (
+                                            <li
+                                                key={index}
+                                                className="text-gray-700 dark:text-gray-300"
+                                            >
+                                                • {strength.description} (
+                                                {strength.score.toFixed(1)})
+                                            </li>
+                                        ),
+                                    )}
+                                </ul>
+                            </div>
+
+                            <div className="text-left">
+                                <h4 className="text-lg font-semibold text-amber-600 mb-3">
+                                    💡 Области для развития:
+                                </h4>
+                                {assessmentResult.top_weaknesses.length > 0 ? (
+                                    <ul className="space-y-2">
+                                        {assessmentResult.top_weaknesses.map(
+                                            (weakness, index) => (
+                                                <li
+                                                    key={index}
+                                                    className="text-gray-700 dark:text-gray-300"
+                                                >
+                                                    • {weakness.description} (
+                                                    {weakness.score.toFixed(1)})
+                                                </li>
+                                            ),
+                                        )}
+                                    </ul>
+                                ) : (
+                                    <p className="text-gray-700 dark:text-gray-300">
+                                        Отлично! Значительных областей для
+                                        улучшения не выявлено.
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Recommendations */}
+                        <div className="mt-8 p-6 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                            <h4 className="text-lg font-semibold text-indigo-800 dark:text-indigo-200 mb-3">
+                                🎯 Рекомендации:
+                            </h4>
+                            <p className="text-indigo-700 dark:text-indigo-300">
+                                {assessmentResult.improvement_suggestions}
+                            </p>
+                        </div>
+
+                        {/* Profile Summary */}
+                        {profileSummary?.summary_text && (
+                            <div className="mt-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                <h4 className="text-lg font-semibold text-blue-800 dark:text-blue-200 mb-3">
+                                    📋 Сводка профиля:
+                                </h4>
+                                <p className="text-blue-700 dark:text-blue-300">
+                                    {profileSummary.summary_text}
+                                </p>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="flex justify-center space-x-4">
+                        <button
+                            onClick={handleRetakeAssessment}
+                            className="px-6 py-3 border-2 border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition-colors"
+                        >
+                            🔄 Пройти тест заново
+                        </button>
+                        <button
+                            onClick={handleAssessmentComplete}
+                            disabled={saving}
+                            className="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 disabled:opacity-50 transition-all"
+                        >
+                            {saving
+                                ? 'Завершение...'
+                                : '✨ Продолжить в дашборд'}
+                        </button>
+                    </div>
+                </div>
+            </Container>
+        )
+    }
+
+    // Show assessment questions
+    if (assessmentMode === 'assessment' && assessmentQuestions.length > 0) {
+        return (
+            <Container className="py-8">
+                <AssessmentQuestions
+                    questions={assessmentQuestions}
+                    onSubmit={handleAssessmentSubmit}
+                    loading={assessmentLoading}
+                />
+            </Container>
+        )
+    }
+
+    // Show traditional onboarding or assessment choice
     return (
-        <OnboardingLayout
-            currentStep={currentStep}
-            totalSteps={totalSteps}
-            onStepChange={handleStepChange}
-        >
-            {renderStep()}
-        </OnboardingLayout>
+        <>
+            <OnboardingLayout
+                currentStep={currentStep}
+                totalSteps={totalSteps}
+                onStepChange={handleStepChange}
+            >
+                {assessmentMode === 'assessment' ? (
+                    <Container className="flex items-center justify-center h-96">
+                        <div className="text-center">
+                            <Spinner size={40} />
+                            <p className="mt-4 text-gray-600 dark:text-gray-400">
+                                Загрузка...
+                            </p>
+                        </div>
+                    </Container>
+                ) : (
+                    renderStep()
+                )}
+            </OnboardingLayout>
+
+            {/* Assessment Choice Modal */}
+            <AssessmentChoiceModal
+                isOpen={showAssessmentChoice}
+                onClose={() => setShowAssessmentChoice(false)}
+                onChooseAssessment={handleChooseAssessment}
+                onChooseTraditional={handleChooseTraditional}
+                loading={assessmentLoading}
+            />
+
+            {/* AI Assistant Suggestion */}
+            <AssistantSuggestion
+                isVisible={showAssistantSuggestion}
+                onTakeAssessment={handleAssistantSuggestionAccept}
+                onDismiss={handleAssistantSuggestionDismiss}
+                uncertaintyReason={uncertaintyReason}
+            />
+        </>
     )
 }
 

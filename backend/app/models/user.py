@@ -19,4 +19,6 @@ class User(Base):
     # Связи
     onboarding_profile = relationship("OnboardingProfile", back_populates="user", uselist=False)
     assistants = relationship("Assistant", back_populates="user", cascade="all, delete-orphan")
-    chat_histories = relationship("ChatHistory", back_populates="user", cascade="all, delete-orphan") 
+    chat_histories = relationship("ChatHistory", back_populates="user", cascade="all, delete-orphan")
+    assessment_results = relationship("AssessmentResult", back_populates="user", cascade="all, delete-orphan")
+    profile_summary = relationship("ProfileSummary", back_populates="user", uselist=False, cascade="all, delete-orphan") 
