@@ -1,5 +1,3 @@
-export default async function CorrectionPage(){
-    return <>
-    Correction Page
-    </>
+export default async function CorrectionPage() {
+    return <>Correction Page</>
 }

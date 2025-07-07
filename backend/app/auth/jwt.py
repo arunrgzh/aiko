@@ -36,7 +36,7 @@ async def create_refresh_token(data: dict) -> str:
 async def verify_token(token: str, credentials_exception: HTTPException, token_type: str = "access") -> TokenData:
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-        username: str = payload.get("sub")
+        username: Optional[str] = payload.get("sub")
         if username is None:
             raise credentials_exception
         if payload.get("type") != token_type:
@@ -55,10 +55,12 @@ async def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     token_data = await verify_token(token, credentials_exception)
+    if not token_data.username:
+        raise credentials_exception
     user = await get_user_by_username(token_data.username, db)
     if not user:
         raise credentials_exception
-    if not user.is_active:
+    if user.is_active is not True:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Inactive user"
@@ -66,6 +68,6 @@ async def get_current_user(
     return user
 
 async def get_current_active_user(current_user: User = Depends(get_current_user)) -> User:
-    if not current_user.is_active:
+    if current_user.is_active is not True:  # type: ignore
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user 

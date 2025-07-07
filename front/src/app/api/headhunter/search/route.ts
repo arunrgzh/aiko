@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
 
         const response = await fetch(url.toString(), {
             headers: {
-                'User-Agent': 'AI-Komek/1.0 (contact@ai-komek.kz)',
+                'User-Agent': 'AI-Komekshi/1.0 (contact@ai-komekshi.kz)',
             },
         })
 
