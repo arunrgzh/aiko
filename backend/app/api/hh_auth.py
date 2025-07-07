@@ -136,4 +136,68 @@ async def search_vacancies_open(
         raise HTTPException(status_code=500, detail="Ошибка соединения с HeadHunter API")
     except Exception as e:
         logger.error(f"Unexpected error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
+
+@router.get("/areas")
+async def get_areas():
+    """
+    Get HeadHunter areas (regions/cities) for Kazakhstan
+    """
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://api.hh.kz/areas/40",  # Kazakhstan
+                headers={"User-Agent": "AI-Komek Job Platform Parser"},
+                timeout=30.0
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                return {
+                    "success": True,
+                    "areas": data.get("areas", [])
+                }
+            else:
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"HeadHunter API error: {response.status_code}"
+                )
+                
+    except httpx.RequestError as e:
+        logger.error(f"Network error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Ошибка соединения с HeadHunter API")
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера")
+
+@router.get("/specializations")
+async def get_specializations():
+    """
+    Get HeadHunter specializations for job filtering
+    """
+    try:
+        async with httpx.AsyncClient() as client:
+            response = await client.get(
+                "https://api.hh.kz/specializations",
+                headers={"User-Agent": "AI-Komek Job Platform Parser"},
+                timeout=30.0
+            )
+            
+            if response.status_code == 200:
+                data = response.json()
+                return {
+                    "success": True,
+                    "specializations": data
+                }
+            else:
+                raise HTTPException(
+                    status_code=response.status_code,
+                    detail=f"HeadHunter API error: {response.status_code}"
+                )
+                
+    except httpx.RequestError as e:
+        logger.error(f"Network error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Ошибка соединения с HeadHunter API")
+    except Exception as e:
+        logger.error(f"Unexpected error: {str(e)}")
         raise HTTPException(status_code=500, detail="Внутренняя ошибка сервера") 
