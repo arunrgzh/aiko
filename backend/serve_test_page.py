@@ -9,7 +9,7 @@ from fastapi.responses import FileResponse
 import uvicorn
 
 # Create a simple app to serve static files
-static_app = FastAPI(title="AI-Komek Test Server")
+static_app = FastAPI(title="AI-Komekshi Test Server")
 
 # Serve the test HTML file
 @static_app.get("/test")
@@ -18,7 +18,7 @@ async def serve_test_page():
 
 @static_app.get("/")
 async def root():
-    return {"message": "AI-Komek Test Server - Go to /test for chat testing"}
+    return {"message": "AI-Komekshi Test Server - Go to /test for chat testing"}
 
 if __name__ == "__main__":
     print("🧪 Starting test server on http://localhost:8001")

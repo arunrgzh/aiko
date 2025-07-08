@@ -17,8 +17,8 @@ from .config import settings
 
 # Create FastAPI app
 app = FastAPI(
-    title="AI-Komek API",
-    description="Backend API for AI-Komek application",
+    title="AI-Komekshi API",
+    description="Backend API for AI-Komekshi application",
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
@@ -65,7 +65,7 @@ async def init_db():
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to AI-Komek API"}
+    return {"message": "Welcome to AI-Komekshi API"}
 
 @app.get("/health")
 async def health_check():

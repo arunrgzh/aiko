@@ -1,4 +1,4 @@
-# AI-Komek Backend Startup Guide
+# AI-Komekshi Backend Startup Guide
 
 ## Issues Fixed
 

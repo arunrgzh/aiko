@@ -25,7 +25,7 @@ class HeadHunterService:
     def __init__(self):
         self.base_url = "https://api.hh.kz"
         self.headers = {
-            "User-Agent": "AI-Komek Job Platform Parser",
+            "User-Agent": "AI-Komekshi Job Platform Parser",
             "Accept": "application/json"
         }
         self.timeout = 30.0

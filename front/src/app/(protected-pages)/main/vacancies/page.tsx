@@ -1,89 +1,190 @@
 'use client'
 
-import Card from '@/components/ui/Card'
-import Button from '@/components/ui/Button'
-import { TbPlus } from 'react-icons/tb'
+import { useState, useEffect } from 'react'
+import VacancyGenerationLoader from './_components/VacancyGenerationLoader'
+import VacancyRecommendations from './_components/VacancyRecommendations'
+import vacancyService from '@/services/VacancyService'
+import { JobRecommendation, DualRecommendationResponse } from './types'
 
 export default function VacanciesPage() {
-    return (
-        <div className="space-y-6">
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                        Вакансии
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-400">
-                        Просмотр и управление доступными вакансиями
+    const [isLoading, setIsLoading] = useState(true)
+    const [showLoader, setShowLoader] = useState(true)
+    const [personalRecommendations, setPersonalRecommendations] = useState<
+        JobRecommendation[]
+    >([])
+    const [assessmentRecommendations, setAssessmentRecommendations] = useState<
+        JobRecommendation[]
+    >([])
+    const [error, setError] = useState<string | null>(null)
+
+    useEffect(() => {
+        loadPersonalizedVacancies()
+    }, [])
+
+    const loadPersonalizedVacancies = async () => {
+        try {
+            setIsLoading(true)
+            setError(null)
+
+            // Get dual recommendations from enhanced service
+            const dualResponse = await vacancyService.getDualRecommendations()
+
+            // Extract recommendations from blocks
+            setPersonalRecommendations(
+                dualResponse.personal_block?.recommendations || [],
+            )
+
+            if (
+                dualResponse.assessment_block &&
+                dualResponse.user_has_assessment
+            ) {
+                setAssessmentRecommendations(
+                    dualResponse.assessment_block.recommendations || [],
+                )
+            } else {
+                setAssessmentRecommendations([])
+            }
+        } catch (err) {
+            console.error('Error loading personalized vacancies:', err)
+            setError('Ошибка при загрузке персонализированных вакансий')
+
+            // Try fallback to legacy endpoint
+            try {
+                const fallbackResponse =
+                    await vacancyService.getPersonalizedRecommendations()
+                setPersonalRecommendations(
+                    fallbackResponse.recommendations || [],
+                )
+                setAssessmentRecommendations([])
+                setError(null) // Clear error if fallback succeeds
+            } catch (fallbackErr) {
+                console.error('Fallback also failed:', fallbackErr)
+            }
+        } finally {
+            setIsLoading(false)
+            // Hide loader after a minimum time for better UX
+            setTimeout(() => setShowLoader(false), 500)
+        }
+    }
+
+    const handleSaveVacancy = async (id: number) => {
+        try {
+            await vacancyService.saveJobRecommendation(id, true)
+            // Update local state to reflect saved status
+            setPersonalRecommendations((prev) =>
+                prev.map((rec) =>
+                    rec.id === id ? { ...rec, is_saved: true } : rec,
+                ),
+            )
+            setAssessmentRecommendations((prev) =>
+                prev.map((rec) =>
+                    rec.id === id ? { ...rec, is_saved: true } : rec,
+                ),
+            )
+        } catch (err) {
+            console.error('Error saving vacancy:', err)
+        }
+    }
+
+    const handleApplyToVacancy = async (id: number) => {
+        try {
+            await vacancyService.applyToJob(id)
+            // Optionally show success notification or redirect
+            console.log('Successfully applied to vacancy:', id)
+        } catch (err) {
+            console.error('Error applying to vacancy:', err)
+        }
+    }
+
+    const handleViewDetails = async (id: number) => {
+        try {
+            // Find the vacancy in either recommendation list
+            const vacancy = [
+                ...personalRecommendations,
+                ...assessmentRecommendations,
+            ].find((rec) => rec.id === id)
+
+            if (vacancy?.hh_vacancy_id) {
+                const details = await vacancyService.getVacancyDetails(
+                    vacancy.hh_vacancy_id,
+                )
+
+                if (details.success && details.alternate_url) {
+                    // Open HeadHunter vacancy page in new tab
+                    window.open(details.alternate_url, '_blank')
+                } else {
+                    console.log('Vacancy details:', details)
+                }
+            }
+        } catch (err) {
+            console.error('Error viewing vacancy details:', err)
+        }
+    }
+
+    const handleSearch = async (query: string) => {
+        try {
+            setIsLoading(true)
+            const response = await vacancyService.searchVacancies({
+                text: query,
+            })
+            // Update recommendations with search results
+            setPersonalRecommendations(response.recommendations || [])
+            setAssessmentRecommendations([]) // Clear assessment recommendations during search
+        } catch (err) {
+            console.error('Error searching vacancies:', err)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const handleFilter = () => {
+        // Open filter modal or sidebar
+        console.log('Opening filters')
+    }
+
+    const handleRefresh = async () => {
+        setShowLoader(true)
+        await loadPersonalizedVacancies()
+    }
+
+    // Show loader during initial load or when explicitly loading
+    if (showLoader || (isLoading && personalRecommendations.length === 0)) {
+        return <VacancyGenerationLoader />
+    }
+
+    // Show error state if there's an error and no data
+    if (error && personalRecommendations.length === 0) {
+        return (
+            <div className="flex items-center justify-center min-h-[400px]">
+                <div className="text-center">
+                    <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                        Ошибка загрузки
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                        {error}
                     </p>
+                    <button
+                        onClick={loadPersonalizedVacancies}
+                        className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    >
+                        Попробовать снова
+                    </button>
                 </div>
-                <Button variant="solid" icon={<TbPlus />}>
-                    Добавить в избранное
-                </Button>
             </div>
+        )
+    }
 
-            <div className="space-y-4">
-                <Card className="p-6 hover:shadow-lg transition-shadow">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                            <h3 className="font-semibold text-lg mb-2">
-                                Frontend Developer
-                            </h3>
-                            <p className="text-gray-600 dark:text-gray-400 mb-2">
-                                React, TypeScript, Next.js • TechCorp
-                            </p>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                                <span>от 150,000 ₽</span>
-                                <span>•</span>
-                                <span>Удаленно</span>
-                                <span>•</span>
-                                <span>Полная занятость</span>
-                            </div>
-                        </div>
-                        <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-sm rounded-full">
-                            Новая
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <Button size="sm" variant="solid">
-                            Откликнуться
-                        </Button>
-                        <Button size="sm" variant="plain">
-                            Подробнее
-                        </Button>
-                    </div>
-                </Card>
-
-                <Card className="p-6 hover:shadow-lg transition-shadow">
-                    <div className="flex items-start justify-between mb-4">
-                        <div className="flex-1">
-                            <h3 className="font-semibold text-lg mb-2">
-                                UX/UI Designer
-                            </h3>
-                            <p className="text-gray-600 dark:text-gray-400 mb-2">
-                                Figma, Adobe Creative Suite • DesignStudio
-                            </p>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                                <span>от 120,000 ₽</span>
-                                <span>•</span>
-                                <span>Гибрид</span>
-                                <span>•</span>
-                                <span>Полная занятость</span>
-                            </div>
-                        </div>
-                        <span className="px-3 py-1 bg-green-100 dark:bg-green-900/20 text-green-600 dark:text-green-400 text-sm rounded-full">
-                            Рекомендуемая
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                        <Button size="sm" variant="solid">
-                            Откликнуться
-                        </Button>
-                        <Button size="sm" variant="plain">
-                            Подробнее
-                        </Button>
-                    </div>
-                </Card>
-            </div>
-        </div>
+    return (
+        <VacancyRecommendations
+            personalRecommendations={personalRecommendations}
+            assessmentRecommendations={assessmentRecommendations}
+            onRefresh={handleRefresh}
+            onFilter={handleFilter}
+            onSearch={handleSearch}
+            onSave={handleSaveVacancy}
+            onApply={handleApplyToVacancy}
+            onViewDetails={handleViewDetails}
+            isLoading={isLoading}
+        />
     )
 }
