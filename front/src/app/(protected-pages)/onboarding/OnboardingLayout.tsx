@@ -48,7 +48,7 @@ const OnboardingLayout = memo(
                         {/* Header */}
                         <div className="px-8 pt-8 pb-2">
                             <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 dark:text-white mb-1">
-                                Добро пожаловать в AI-Көмекші
+                                Добро пожаловать в AI-Komekshi
                             </h1>
                             <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">
                                 Давайте настроим ваш профиль
