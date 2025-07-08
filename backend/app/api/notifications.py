@@ -12,8 +12,8 @@ router = APIRouter(prefix="/notifications", tags=["notifications"])
 mock_notifications = [
     {
         "id": "e55adc24-1803-4ffd-b653-09be273f8df5",
-        "target": "AI-Komek",
-        "description": "Welcome to AI-Komek! Your account has been created successfully.",
+        "target": "AI-Komekshi",
+        "description": "Welcome to AI-Komekshi! Your account has been created successfully.",
         "date": "2 minutes ago",
         "image": "",
         "type": 1,

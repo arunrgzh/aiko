@@ -1,5 +1,5 @@
 """
-Celery configuration for AI-Komek job recommendations
+Celery configuration for AI-Komekshi job recommendations
 Run with: celery -A celery_app worker --loglevel=info
 Beat scheduler: celery -A celery_app beat --loglevel=info
 """

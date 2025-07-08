@@ -103,7 +103,7 @@ def test_openapi():
     print()
 
 if __name__ == "__main__":
-    print("🚀 Testing AI-Komek Backend API\n")
+    print("🚀 Testing AI-Komekshi Backend API\n")
     test_health()
     test_openapi()
     test_auth_and_protected_endpoints()

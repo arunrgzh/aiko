@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Startup script for AI-Komek Backend Server
+Startup script for AI-Komekshi Backend Server
 This script properly handles imports and starts the FastAPI application
 """
 
@@ -13,7 +13,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 def main():
     """Start the FastAPI server"""
-    print("🚀 Starting AI-Komek Backend Server...")
+    print("🚀 Starting AI-Komekshi Backend Server...")
     print("📍 http://localhost:8000")
     print("📖 API Docs: http://localhost:8000/docs")
     print("🔄 Auto-reload enabled for development")

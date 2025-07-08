@@ -122,7 +122,7 @@ async def get_vacancy_details(
             response = await client.get(
                 f"https://api.hh.kz/vacancies/{vacancy_id}",
                 headers={
-                    "User-Agent": "AI-Komek Job Platform Parser",
+                    "User-Agent": "AI-Komekshi Job Platform Parser",
                     "Accept": "application/json"
                 },
                 timeout=30.0

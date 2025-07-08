@@ -119,7 +119,7 @@ def test_cors():
     print(f"Access-Control headers: {[k for k in response.headers.keys() if 'access-control' in k.lower()]}")
 
 if __name__ == "__main__":
-    print("🚀 Testing AI-Komek Chat API\n")
+    print("🚀 Testing AI-Komekshi Chat API\n")
     test_chat_flow()
     test_cors()
     print("\n🏁 Chat test completed!") 

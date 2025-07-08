@@ -111,7 +111,7 @@ async def search_vacancies_open(
             response = await client.get(
                 "https://api.hh.kz/vacancies",
                 params=params,
-                headers={"User-Agent": "AI-Komek Job Platform Parser"},
+                headers={"User-Agent": "AI-Komekshi Job Platform Parser"},
                 timeout=30.0
             )
             
@@ -147,7 +147,7 @@ async def get_areas():
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 "https://api.hh.kz/areas/40",  # Kazakhstan
-                headers={"User-Agent": "AI-Komek Job Platform Parser"},
+                headers={"User-Agent": "AI-Komekshi Job Platform Parser"},
                 timeout=30.0
             )
             
@@ -179,7 +179,7 @@ async def get_specializations():
         async with httpx.AsyncClient() as client:
             response = await client.get(
                 "https://api.hh.kz/specializations",
-                headers={"User-Agent": "AI-Komek Job Platform Parser"},
+                headers={"User-Agent": "AI-Komekshi Job Platform Parser"},
                 timeout=30.0
             )
             

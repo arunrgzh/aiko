@@ -1,6 +1,6 @@
-# AI-Komek Backend
+# AI-Komekshi Backend
 
-Backend API для платформы AI-Komek - системы поиска работы с ИИ-помощником.
+Backend API для платформы AI-Komekshi - системы поиска работы с ИИ-помощником.
 
 ## Установка и запуск
 

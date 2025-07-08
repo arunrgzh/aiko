@@ -292,8 +292,8 @@ const OnboardingPage = () => {
                 )
 
                 if (completeResponse.ok) {
-                    // Перенаправляем на дашборд
-                    router.push('/main/dashboard')
+                    // Перенаправляем на персонализированные вакансии
+                    router.push('/main/vacancies')
                 } else {
                     console.error('Error marking onboarding as completed')
                 }
@@ -534,7 +534,7 @@ const OnboardingPage = () => {
             })
 
             if (completeResponse.ok) {
-                router.push('/main/dashboard')
+                router.push('/main/vacancies')
             } else {
                 console.error('Error marking onboarding as completed')
             }
@@ -720,9 +720,7 @@ const OnboardingPage = () => {
                             disabled={saving}
                             className="px-8 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-lg hover:from-indigo-600 hover:to-purple-700 disabled:opacity-50 transition-all"
                         >
-                            {saving
-                                ? 'Завершение...'
-                                : '✨ Продолжить в дашборд'}
+                            {saving ? 'Завершение...' : '✨ Найти вакансии'}
                         </button>
                     </div>
                 </div>

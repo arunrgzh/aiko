@@ -32,7 +32,7 @@ async def test_hh_vacancies():
                 "https://api.hh.kz/vacancies",
                 params=params,
                 headers={
-                    "User-Agent": "AI-Komek Job Platform Parser"
+                    "User-Agent": "AI-Komekshi Job Platform Parser"
                 },
                 timeout=30.0
             )
@@ -80,7 +80,7 @@ async def test_hh_areas():
             response = await client.get(
                 "https://api.hh.kz/areas",
                 headers={
-                    "User-Agent": "AI-Komek Job Platform Parser"
+                    "User-Agent": "AI-Komekshi Job Platform Parser"
                 },
                 timeout=30.0
             )
