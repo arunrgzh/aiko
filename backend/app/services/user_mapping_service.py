@@ -200,6 +200,10 @@ class UserMappingService:
             if profession_lower in self.job_title_mapping:
                 job_titles.extend(self.job_title_mapping[profession_lower][:5])
             
+            # Special handling for students
+            if "студент" in profession_lower:
+                job_titles.extend(["Стажер", "Ассистент", "Начинающий специалист", "Intern", "Assistant", "Junior"])
+
             # Add the profession itself
             job_titles.append(profile.profession)  # type: ignore
             

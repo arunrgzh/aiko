@@ -241,4 +241,27 @@ class JobAnalyticsResponse(BaseModel):
     average_salary_range: Dict[str, Optional[int]]  # min, max, currency
     most_active_areas: List[Dict[str, Any]]  # area name and count
     recommendation_accuracy: float  # Based on user feedback
-    last_updated: datetime 
+    last_updated: datetime
+
+# Enhanced Dual Recommendation Schemas
+class DualRecommendationBlock(BaseModel):
+    """Single recommendation block (personal or assessment-based)"""
+    source: str  # "onboarding" or "assessment"
+    title: str
+    description: str
+    recommendations: List[JobRecommendationResponse]
+    total_found: int
+
+class DualRecommendationResponse(BaseModel):
+    """Response containing both recommendation blocks"""
+    personal_block: DualRecommendationBlock
+    assessment_block: Optional[DualRecommendationBlock] = None
+    user_has_assessment: bool
+    total_recommendations: int
+    generated_at: datetime
+
+# Enhanced Job Recommendation with source
+class EnhancedJobRecommendationResponse(JobRecommendationResponse):
+    recommendation_source: str  # "onboarding" or "assessment"
+    source_explanation: Optional[str] = None  # Why this job was recommended
+    detailed_scores: Optional[Dict[str, float]] = None  # Detailed scoring breakdown 
