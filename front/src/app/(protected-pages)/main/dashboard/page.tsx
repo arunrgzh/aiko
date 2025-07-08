@@ -254,7 +254,7 @@ export default function DashboardPage() {
                         >
                             Добро пожаловать в{' '}
                             <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                AI-Komek
+                                AI-Komekshi
                             </span>
                         </motion.h1>
 

@@ -1,4 +1,4 @@
-# Fix for AI-Komek Backend 400/401 Authentication Issues
+# Fix for AI-Komekshi Backend 400/401 Authentication Issues
 
 ## Issues Fixed
 

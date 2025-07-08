@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AI-Komek FastAPI Application Runner
+AI-Komekshi FastAPI Application Runner
 
 This script runs the FastAPI application using uvicorn with proper configuration.
 """
