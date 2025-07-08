@@ -13,7 +13,7 @@ const appConfig: AppConfig = {
     apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
     apiPrefix:
         process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api',
-    authenticatedEntryPath: '/main/dashboard/',
+    authenticatedEntryPath: '/main/dashboard',
     unAuthenticatedEntryPath: '/landing',
     signInEntryPath: '/sign-in',
     onboardingPath: '/onboarding',

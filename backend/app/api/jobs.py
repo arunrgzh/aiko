@@ -8,6 +8,7 @@ from datetime import datetime, timedelta
 from ..database import get_db
 from ..models.user import User
 from ..models.job import JobRecommendation, SavedJob, JobFeedback, UserJobPreferences
+from ..models.onboarding import OnboardingProfile
 from ..schemas.job import (
     JobRecommendationListResponse, JobRecommendationResponse,
     SavedJobCreate, SavedJobUpdate, SavedJobResponse,
@@ -587,6 +588,64 @@ async def get_job_analytics(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get job analytics"
+        )
+
+@router.get("/debug/skills")
+async def debug_user_skills(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Debug endpoint to check user skills and preferences"""
+    
+    try:
+        # Get user preferences
+        prefs_result = await db.execute(
+            select(UserJobPreferences).where(UserJobPreferences.user_id == current_user.id)
+        )
+        preferences = prefs_result.scalar_one_or_none()
+        
+        # Get onboarding profile
+        onboarding_result = await db.execute(
+            select(OnboardingProfile).where(OnboardingProfile.user_id == current_user.id)
+        )
+        onboarding_profile = onboarding_result.scalar_one_or_none()
+        
+        # Get recent recommendations with skills
+        rec_result = await db.execute(
+            select(JobRecommendation)
+            .where(JobRecommendation.user_id == current_user.id)
+            .order_by(desc(JobRecommendation.created_at))
+            .limit(5)
+        )
+        recent_recommendations = rec_result.scalars().all()
+        
+        debug_info = {
+            "user_id": current_user.id,
+            "onboarding_completed": onboarding_profile.is_completed if onboarding_profile else False,
+            "onboarding_skills": getattr(onboarding_profile, 'skills', None) if onboarding_profile else None,
+            "preferences_exist": preferences is not None,
+            "preferred_skills": getattr(preferences, 'preferred_skills', None) if preferences else None,
+            "preferred_job_titles": getattr(preferences, 'preferred_job_titles', None) if preferences else None,
+            "preferred_areas": getattr(preferences, 'preferred_areas', None) if preferences else None,
+            "recent_recommendations": [
+                {
+                    "id": rec.id,
+                    "title": rec.title,
+                    "skills_match_score": rec.skills_match_score,
+                    "key_skills": rec.key_skills,
+                    "relevance_score": rec.relevance_score
+                }
+                for rec in recent_recommendations
+            ]
+        }
+        
+        return debug_info
+        
+    except Exception as e:
+        logger.error(f"Error in debug skills for user {current_user.id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to get debug information"
         )
 
 async def _should_refresh_recommendations(user_id: int, db: AsyncSession) -> bool:

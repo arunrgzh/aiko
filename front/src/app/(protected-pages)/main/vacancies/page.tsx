@@ -1,12 +1,17 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import VacancyGenerationLoader from './_components/VacancyGenerationLoader'
 import VacancyRecommendations from './_components/VacancyRecommendations'
+import AssistantSuggestion from '@/components/shared/AssistantSuggestion'
+import AssessmentChoiceModal from '@/components/shared/AssessmentChoiceModal'
+import AssessmentService from '@/services/AssessmentService'
 import vacancyService from '@/services/VacancyService'
 import { JobRecommendation } from './types'
 
 export default function VacanciesPage() {
+    const searchParams = useSearchParams()
     const [isLoading, setIsLoading] = useState(true)
     const [showLoader, setShowLoader] = useState(true)
     const [personalRecommendations, setPersonalRecommendations] = useState<
@@ -17,9 +22,24 @@ export default function VacanciesPage() {
     >([])
     const [error, setError] = useState<string | null>(null)
 
+    // Assistant suggestion state
+    const [showAssistantSuggestion, setShowAssistantSuggestion] =
+        useState(false)
+    const [showAssessmentChoice, setShowAssessmentChoice] = useState(false)
+    const [assessmentLoading, setAssessmentLoading] = useState(false)
+
     useEffect(() => {
         loadPersonalizedVacancies()
-    }, [])
+
+        // Check if user just completed onboarding
+        const shouldShowAssistant = searchParams.get('showAssistant') === '1'
+        if (shouldShowAssistant) {
+            // Show assistant suggestion after a short delay
+            setTimeout(() => {
+                setShowAssistantSuggestion(true)
+            }, 2000) // 2 seconds after page load
+        }
+    }, [searchParams])
 
     const loadPersonalizedVacancies = async () => {
         try {
@@ -147,6 +167,72 @@ export default function VacanciesPage() {
         await loadPersonalizedVacancies()
     }
 
+    // Assessment flow handlers
+    const handleChooseAssessment = async () => {
+        setShowAssistantSuggestion(false)
+        setAssessmentLoading(true)
+        try {
+            const choiceResult = await AssessmentService.chooseAssessmentOption(
+                {
+                    take_assessment: true,
+                    skip_onboarding_data: false,
+                },
+            )
+            console.log('Assessment option chosen:', choiceResult)
+            setShowAssessmentChoice(true)
+        } catch (error) {
+            console.error('Error starting assessment:', error)
+            alert(
+                'Произошла ошибка при загрузке теста. Пожалуйста, попробуйте еще раз.',
+            )
+        } finally {
+            setAssessmentLoading(false)
+        }
+    }
+
+    const handleDismissAssistant = () => {
+        setShowAssistantSuggestion(false)
+        // Clear the query parameter to prevent showing again
+        if (typeof window !== 'undefined') {
+            const url = new URL(window.location.href)
+            url.searchParams.delete('showAssistant')
+            window.history.replaceState({}, '', url.toString())
+        }
+    }
+
+    // Debug skills handler for development
+    const handleDebugSkills = async () => {
+        try {
+            const debugInfo = await vacancyService.debugUserSkills()
+            console.group('🔍 Skills Debug Information')
+            console.log('User ID:', debugInfo.user_id)
+            console.log('Onboarding Completed:', debugInfo.onboarding_completed)
+            console.log('Onboarding Skills:', debugInfo.onboarding_skills)
+            console.log('Preferences Exist:', debugInfo.preferences_exist)
+            console.log('Preferred Skills:', debugInfo.preferred_skills)
+            console.log('Preferred Job Titles:', debugInfo.preferred_job_titles)
+            console.log('Preferred Areas:', debugInfo.preferred_areas)
+            console.log(
+                'Recent Recommendations:',
+                debugInfo.recent_recommendations,
+            )
+            console.groupEnd()
+
+            // Also show a user-friendly alert
+            alert(`Информация о навыках:
+• Онбординг завершен: ${debugInfo.onboarding_completed ? 'Да' : 'Нет'}
+• Навыки из онбординга: ${debugInfo.onboarding_skills?.length || 0}
+• Настройки созданы: ${debugInfo.preferences_exist ? 'Да' : 'Нет'} 
+• Предпочитаемые навыки: ${debugInfo.preferred_skills?.length || 0}
+• Последние рекомендации: ${debugInfo.recent_recommendations?.length || 0}
+
+Подробности в консоли браузера (F12)`)
+        } catch (err) {
+            console.error('Error debugging skills:', err)
+            alert('Ошибка при получении информации о навыках')
+        }
+    }
+
     // Show loader during initial load or when explicitly loading
     if (showLoader || (isLoading && personalRecommendations.length === 0)) {
         return <VacancyGenerationLoader />
@@ -175,16 +261,41 @@ export default function VacanciesPage() {
     }
 
     return (
-        <VacancyRecommendations
-            personalRecommendations={personalRecommendations}
-            assessmentRecommendations={assessmentRecommendations}
-            onRefresh={handleRefresh}
-            onFilter={handleFilter}
-            onSearch={handleSearch}
-            onSave={handleSaveVacancy}
-            onApply={handleApplyToVacancy}
-            onViewDetails={handleViewDetails}
-            isLoading={isLoading}
-        />
+        <>
+            <VacancyRecommendations
+                personalRecommendations={personalRecommendations}
+                assessmentRecommendations={assessmentRecommendations}
+                onRefresh={handleRefresh}
+                onFilter={handleFilter}
+                onSearch={handleSearch}
+                onSave={handleSaveVacancy}
+                onApply={handleApplyToVacancy}
+                onViewDetails={handleViewDetails}
+                onDebugSkills={handleDebugSkills}
+                isLoading={isLoading}
+            />
+
+            {/* Assistant Suggestion for post-onboarding assessment */}
+            <AssistantSuggestion
+                isVisible={showAssistantSuggestion}
+                onTakeAssessment={handleChooseAssessment}
+                onDismiss={handleDismissAssistant}
+                uncertaintyReason="Теперь, когда ваш профиль настроен, хотите пройти быстрый тест для более точных рекомендаций?"
+            />
+
+            {/* Assessment Choice Modal */}
+            <AssessmentChoiceModal
+                isOpen={showAssessmentChoice}
+                onClose={() => setShowAssessmentChoice(false)}
+                onChooseAssessment={() => {
+                    // Handle assessment start - redirect to assessment page or show questions
+                    window.location.href = '/onboarding'
+                }}
+                onChooseTraditional={() => {
+                    setShowAssessmentChoice(false)
+                }}
+                loading={assessmentLoading}
+            />
+        </>
     )
 }
