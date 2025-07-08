@@ -63,7 +63,6 @@ export default function VacancyRecommendations({
                 : 'Рекомендации на основе результатов профессионального тестирования'
 
         const icon = type === 'personal' ? <TbUser /> : <TbBrain />
-        const color = type === 'personal' ? 'blue' : 'purple'
 
         return (
             <div className="space-y-6">

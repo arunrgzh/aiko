@@ -23,7 +23,7 @@ from ..schemas.chat import (
 from ..auth.jwt import get_current_user
 from ..config import settings
 
-router = APIRouter(prefix="/main/assistants", tags=["assistants"])
+router = APIRouter(prefix="/api/main/assistants", tags=["assistants"])
 logger = logging.getLogger(__name__)
 
 # Инициализация Azure OpenAI клиента
