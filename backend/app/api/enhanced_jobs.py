@@ -294,6 +294,7 @@ async def _convert_to_job_response(
         experience_required=experience_info.get("name"),
         description=_extract_description(vacancy),
         key_skills=_extract_skills(vacancy),
+        accept_handicapped_filter=enhanced_rec.accept_handicapped_filter,  # Add accessibility filter indicator
         relevance_score=scores.get("relevance_score", 0.0),
         skills_match_score=scores.get("skills_match_score", 0.0),
         location_match_score=scores.get("location_match_score", 0.0),
