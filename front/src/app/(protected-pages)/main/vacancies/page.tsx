@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import VacancyGenerationLoader from './_components/VacancyGenerationLoader'
 import VacancyRecommendations from './_components/VacancyRecommendations'
 import vacancyService from '@/services/VacancyService'
-import { JobRecommendation, DualRecommendationResponse } from './types'
+import { JobRecommendation } from './types'
 
 export default function VacanciesPage() {
     const [isLoading, setIsLoading] = useState(true)
