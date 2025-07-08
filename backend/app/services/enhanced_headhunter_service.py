@@ -159,8 +159,16 @@ class EnhancedHeadHunterService:
     def _add_inclusive_filters(self, params: Dict[str, Any], onboarding_profile: Optional[OnboardingProfile]) -> Dict[str, Any]:
         """Add mandatory inclusive filters to search parameters"""
         
-        # Add accessibility filter using HeadHunter's correct parameter format
-        # HeadHunter uses 'label' parameter with specific values for filtering
+        # NOTE: HeadHunter Kazakhstan has very few jobs explicitly marked as accepting 
+        # people with disabilities (~79 out of 2000+ jobs). To ensure users get 
+        # sufficient recommendations while still promoting inclusive hiring, we use 
+        # a hybrid approach:
+        
+        # Apply strict accessibility filter - this will ensure only jobs that explicitly 
+        # accept people with disabilities are shown (reduces from ~2000 to ~79 jobs)
+        params["accept_handicapped"] = "true"
+        
+        # Also add the label filter as backup
         params["label"] = "accept_handicapped"
         
         # Ensure Kazakhstan area if not specified
@@ -170,26 +178,8 @@ class EnhancedHeadHunterService:
         # Exclude archived vacancies
         params["archived"] = "false"
         
-        # Only active vacancies
-        params["only_with_salary"] = "false"  # Allow jobs without salary info
-        
-        # Add disability-specific workplace adaptations search if user has accessibility needs
-        if onboarding_profile and onboarding_profile.accessibility_adaptations:
-            accessibility_terms = []
-            
-            for adaptation in onboarding_profile.accessibility_adaptations:
-                if adaptation in ["wheelchair_accessible", "доступ_для_инвалидных_колясок"]:
-                    accessibility_terms.append("доступная среда")
-                elif adaptation in ["flexible_schedule", "гибкий_график"]:
-                    accessibility_terms.append("гибкий график")
-                elif adaptation in ["remote_work", "удаленная_работа"]:
-                    accessibility_terms.append("удаленная работа")
-            
-            if accessibility_terms:
-                if "text" in params:
-                    params["text"] += " OR " + " OR ".join(accessibility_terms)
-                else:
-                    params["text"] = " OR ".join(accessibility_terms)
+        # Allow jobs without salary info to increase diversity
+        params["only_with_salary"] = "false"
         
         return params
 
@@ -243,12 +233,14 @@ class EnhancedHeadHunterService:
                 params["employment"] = ",".join(hh_employment)
         
         # Salary
-        if onboarding_profile.min_salary:
-            params["salary"] = onboarding_profile.min_salary
+        min_salary = getattr(onboarding_profile, 'min_salary', None)
+        if min_salary:
+            params["salary"] = min_salary
         
         # Experience level
-        if onboarding_profile.experience_level and onboarding_profile.experience_level in self.experience_mapping:
-            params["experience"] = self.experience_mapping[onboarding_profile.experience_level]
+        experience_level = getattr(onboarding_profile, 'experience_level', None)
+        if experience_level and experience_level in self.experience_mapping:
+            params["experience"] = self.experience_mapping[experience_level]
         
         return params
 
