@@ -5,6 +5,7 @@
 
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import useCurrentSession from '@/utils/hooks/useCurrentSession'
 import OnboardingLayout from './OnboardingLayout'
 import PersonalInfoStep from './steps/PersonalInfoStep'
@@ -16,7 +17,6 @@ import { Spinner } from '@/components/ui/Spinner'
 import Container from '@/components/shared/Container'
 import AssessmentChoiceModal from '@/components/shared/AssessmentChoiceModal'
 import AssessmentQuestions from '@/components/shared/AssessmentQuestions'
-import AssistantSuggestion from '@/components/shared/AssistantSuggestion'
 import AssessmentService from '@/services/AssessmentService'
 import type {
     AssessmentQuestion,
@@ -98,6 +98,7 @@ export type OnboardingData = {
 const OnboardingPage = () => {
     const router = useRouter()
     const { session } = useCurrentSession()
+    const { update: updateSession } = useSession()
     const [currentStep, setCurrentStep] = useState(1)
     const [onboardingData, setOnboardingData] = useState<OnboardingData>({})
     const [loading, setLoading] = useState(true)
@@ -117,13 +118,6 @@ const OnboardingPage = () => {
         null,
     )
     const [assessmentLoading, setAssessmentLoading] = useState(false)
-
-    // Assistant suggestion state
-    const [showAssistantSuggestion, setShowAssistantSuggestion] =
-        useState(false)
-    const [assistantDismissed, setAssistantDismissed] = useState(false)
-    const [stepStartTime, setStepStartTime] = useState<number>(Date.now())
-    const [uncertaintyReason, setUncertaintyReason] = useState<string>('')
 
     const totalSteps = 5
 
@@ -253,7 +247,6 @@ const OnboardingPage = () => {
     const handleNext = useCallback(async () => {
         if (currentStep < totalSteps) {
             setCurrentStep((prev) => prev + 1)
-            setStepStartTime(Date.now())
         }
     }, [currentStep, totalSteps])
 
@@ -292,8 +285,14 @@ const OnboardingPage = () => {
                 )
 
                 if (completeResponse.ok) {
-                    // Перенаправляем на персонализированные вакансии
-                    router.push('/main/vacancies')
+                    // Обновляем сессию, чтобы получить актуальный isFirstLogin: false
+                    await updateSession()
+                    // Небольшая задержка чтобы сессия обновилась
+                    await new Promise((resolve) => setTimeout(resolve, 500))
+                    // Перенаправляем на персонализированные вакансии с флагом завершения
+                    router.push(
+                        '/main/vacancies?showAssistant=1&completedOnboarding=true',
+                    )
                 } else {
                     console.error('Error marking onboarding as completed')
                 }
@@ -311,99 +310,10 @@ const OnboardingPage = () => {
         (step: number) => {
             if (step >= 1 && step <= totalSteps) {
                 setCurrentStep(step)
-                setStepStartTime(Date.now())
             }
         },
         [totalSteps],
     )
-
-    // Function to detect user uncertainty
-    const detectUncertainty = useCallback(() => {
-        const timeSpentOnStep = Date.now() - stepStartTime
-        const minTime = 10000 // 10 seconds
-
-        // Check if user is on step 3 (skills) and conditions suggest uncertainty
-        if (
-            currentStep === 3 &&
-            !assistantDismissed &&
-            !showAssessmentChoice &&
-            !assessmentMode
-        ) {
-            const skillsCount = onboardingData.skills?.length || 0
-            const hasPreferences =
-                (onboardingData.preferred_job_types?.length || 0) > 0
-
-            let reason = ''
-            let shouldShow = false
-
-            // Condition 1: Spent too much time on skills step
-            if (timeSpentOnStep > 30000) {
-                // 5 seconds
-                reason = 'Я заметил, что вы долго выбираете навыки'
-                shouldShow = true
-            }
-            // Condition 2: Very few skills selected after some time
-            else if (timeSpentOnStep > minTime && skillsCount < 3) {
-                reason = 'Не уверены в своих навыках?'
-                shouldShow = true
-            }
-            // Condition 3: No job preferences after some time
-            else if (timeSpentOnStep > minTime && !hasPreferences) {
-                reason = 'Затрудняетесь с выбором предпочтений по работе?'
-                shouldShow = true
-            }
-            // Condition 4: Just completed step 2 with minimal info
-            else if (
-                currentStep === 3 &&
-                skillsCount === 0 &&
-                timeSpentOnStep < 10000
-            ) {
-                reason = 'Хотите быстро определить свои сильные стороны?'
-                shouldShow = true
-            }
-
-            if (shouldShow && reason) {
-                setUncertaintyReason(reason)
-                setShowAssistantSuggestion(true)
-            }
-        }
-    }, [
-        currentStep,
-        stepStartTime,
-        assistantDismissed,
-        showAssessmentChoice,
-        assessmentMode,
-        onboardingData,
-    ])
-
-    // Check for uncertainty every 5 seconds
-    useEffect(() => {
-        const interval = setInterval(detectUncertainty, 5000)
-        return () => clearInterval(interval)
-    }, [detectUncertainty])
-
-    // Show assistant suggestion after completing steps 1-2
-    useEffect(() => {
-        if (
-            currentStep === 3 &&
-            !assistantDismissed &&
-            !showAssessmentChoice &&
-            !assessmentMode
-        ) {
-            // Wait a bit after entering step 3 before checking
-            const timer = setTimeout(() => {
-                detectUncertainty()
-            }, 5000) // 5 seconds after entering step 3
-
-            return () => clearTimeout(timer)
-        }
-    }, [
-        currentStep,
-        assistantDismissed,
-        showAssessmentChoice,
-        assessmentMode,
-        detectUncertainty,
-    ])
 
     // Assessment handlers
     const handleChooseAssessment = useCallback(async () => {
@@ -477,30 +387,6 @@ const OnboardingPage = () => {
         }
     }, [])
 
-    // Assistant accept handler moved here to avoid use-before-define error
-    const handleAssistantSuggestionAccept = useCallback(async () => {
-        setShowAssistantSuggestion(false)
-        setAssistantDismissed(true)
-
-        // Save current data first
-        if (Object.keys(onboardingData).length > 0 && session?.accessToken) {
-            await saveOnboardingData(onboardingData)
-        }
-
-        // Directly start assessment flow
-        await handleChooseAssessment()
-    }, [
-        onboardingData,
-        saveOnboardingData,
-        session?.accessToken,
-        handleChooseAssessment,
-    ])
-
-    const handleAssistantSuggestionDismiss = useCallback(() => {
-        setShowAssistantSuggestion(false)
-        setAssistantDismissed(true)
-    }, [])
-
     const handleAssessmentSubmit = useCallback(
         async (answers: AssessmentAnswer[]) => {
             setAssessmentLoading(true)
@@ -534,7 +420,11 @@ const OnboardingPage = () => {
             })
 
             if (completeResponse.ok) {
-                router.push('/main/vacancies')
+                // Обновляем сессию, чтобы получить актуальный isFirstLogin: false
+                await updateSession()
+                // Небольшая задержка чтобы сессия обновилась
+                await new Promise((resolve) => setTimeout(resolve, 500))
+                router.push('/main/vacancies?completedOnboarding=true')
             } else {
                 console.error('Error marking onboarding as completed')
             }
@@ -770,14 +660,6 @@ const OnboardingPage = () => {
                 onChooseAssessment={handleChooseAssessment}
                 onChooseTraditional={handleChooseTraditional}
                 loading={assessmentLoading}
-            />
-
-            {/* AI Assistant Suggestion */}
-            <AssistantSuggestion
-                isVisible={showAssistantSuggestion}
-                onTakeAssessment={handleAssistantSuggestionAccept}
-                onDismiss={handleAssistantSuggestionDismiss}
-                uncertaintyReason={uncertaintyReason}
             />
         </>
     )

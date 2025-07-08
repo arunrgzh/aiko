@@ -308,6 +308,48 @@ class VacancyService {
 
         return response
     }
+
+    /**
+     * Debug user skills and preferences
+     */
+    async debugUserSkills(): Promise<{
+        user_id: number
+        onboarding_completed: boolean
+        onboarding_skills: string[] | null
+        preferences_exist: boolean
+        preferred_skills: string[] | null
+        preferred_job_titles: string[] | null
+        preferred_areas: string[] | null
+        recent_recommendations: Array<{
+            id: number
+            title: string
+            skills_match_score: number
+            key_skills: string[] | null
+            relevance_score: number
+        }>
+    }> {
+        const response = await ApiService.fetchData<{
+            user_id: number
+            onboarding_completed: boolean
+            onboarding_skills: string[] | null
+            preferences_exist: boolean
+            preferred_skills: string[] | null
+            preferred_job_titles: string[] | null
+            preferred_areas: string[] | null
+            recent_recommendations: Array<{
+                id: number
+                title: string
+                skills_match_score: number
+                key_skills: string[] | null
+                relevance_score: number
+            }>
+        }>({
+            url: '/jobs/debug/skills',
+            method: 'GET',
+        })
+
+        return response
+    }
 }
 
 export default new VacancyService()
