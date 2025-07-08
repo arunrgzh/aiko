@@ -37,6 +37,7 @@ class JobRecommendationBase(BaseModel):
     experience_required: Optional[str] = None
     description: Optional[str] = None
     key_skills: Optional[List[str]] = None
+    accept_handicapped_filter: Optional[bool] = None  # Indicates if job was found using accessibility filter
 
 class JobRecommendationCreate(JobRecommendationBase):
     hh_vacancy_id: str

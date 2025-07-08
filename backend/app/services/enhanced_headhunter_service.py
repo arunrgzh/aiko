@@ -16,11 +16,12 @@ logger = logging.getLogger(__name__)
 
 class EnhancedRecommendation:
     """Enhanced recommendation with source information"""
-    def __init__(self, vacancy: Dict[str, Any], scores: Dict[str, float], source: str):
+    def __init__(self, vacancy: Dict[str, Any], scores: Dict[str, float], source: str, accept_handicapped_filter: bool = False):
         self.vacancy = vacancy
         self.scores = scores
         self.source = source  # "onboarding" or "assessment"
         self.hh_vacancy_id = vacancy["id"]
+        self.accept_handicapped_filter = accept_handicapped_filter  # Whether found using accessibility filter
 
 class EnhancedHeadHunterService:
     """Enhanced HeadHunter service with dual recommendation blocks and accessibility filters"""
@@ -133,7 +134,7 @@ class EnhancedHeadHunterService:
         # Process onboarding-based recommendations
         for vacancy in onboarding_detailed:
             scores = await self._calculate_recommendation_scores(vacancy, onboarding_profile, assessment_result)
-            recommendation = EnhancedRecommendation(vacancy, scores, "onboarding")
+            recommendation = EnhancedRecommendation(vacancy, scores, "onboarding", accept_handicapped_filter=True)
             personal_recommendations.append(recommendation)
         
         # Process assessment-based recommendations
@@ -142,7 +143,7 @@ class EnhancedHeadHunterService:
                 # Skip if already in personal recommendations
                 if vacancy["id"] not in [r.hh_vacancy_id for r in personal_recommendations]:
                     scores = await self._calculate_assessment_scores(vacancy, assessment_result, onboarding_profile)
-                    recommendation = EnhancedRecommendation(vacancy, scores, "assessment")
+                    recommendation = EnhancedRecommendation(vacancy, scores, "assessment", accept_handicapped_filter=True)
                     assessment_recommendations.append(recommendation)
         
         # Sort by relevance
