@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import useCurrentSession from '@/utils/hooks/useCurrentSession'
 import appConfig from '@/configs/app.config'
 import { Spinner } from '@/components/ui/Spinner'
@@ -15,6 +15,8 @@ interface ProtectedLayoutProps {
 export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     const router = useRouter()
     const { session } = useCurrentSession()
+    const searchParams = useSearchParams()
+    const completedOnboarding = searchParams.get('completedOnboarding')
 
     useEffect(() => {
         // If no session or no access token, redirect to sign-in
@@ -30,7 +32,8 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
         }
 
         // If user is on first login, redirect to onboarding
-        if (session.user.isFirstLogin) {
+        // But skip if they just completed onboarding to prevent redirect loops
+        if (session.user.isFirstLogin && !completedOnboarding) {
             router.push(appConfig.onboardingPath)
             return
         }

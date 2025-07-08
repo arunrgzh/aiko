@@ -109,9 +109,17 @@ class EnhancedHeadHunterService:
             logger.info(f"Assessment search params: {assessment_params}")
 
         # Search HH API in parallel
+        tasks = [self._search_hh_api(onboarding_params)]
+        if assessment_result:
+            tasks.append(self._search_hh_api(assessment_params))
+        else:
+            # Create a coroutine that returns empty list
+            async def empty_result():
+                return []
+            tasks.append(empty_result())
+        
         onboarding_vacancies, assessment_vacancies = await asyncio.gather(
-            self._search_hh_api(onboarding_params),
-            self._search_hh_api(assessment_params) if assessment_result else asyncio.coroutine(lambda: [])(),
+            *tasks,
             return_exceptions=True
         )
         

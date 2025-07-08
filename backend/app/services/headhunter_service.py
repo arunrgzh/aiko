@@ -220,15 +220,26 @@ class HeadHunterService:
         # Skills-based search text
         search_terms = []
         
-        # Use override skills or preferences
-        skills = request.override_skills or preferences.preferred_skills  # type: ignore
-        if skills is not None and len(skills) > 0:  # type: ignore
-            search_terms.extend(skills[:5])  # type: ignore
+        # Handle override skills and user preferences intelligently
+        if request.override_skills is not None:
+            # Add override skills (search query)
+            search_terms.extend(request.override_skills[:3])  # Limit search query terms
+            
+            # Also include some user preferred skills for personalization
+            user_skills = getattr(preferences, 'preferred_skills', None)
+            if user_skills is not None and isinstance(user_skills, list) and len(user_skills) > 0:
+                # Add top user skills to maintain personalization
+                search_terms.extend(user_skills[:2])
+        else:
+            # Use only user preferences when no override
+            user_skills = getattr(preferences, 'preferred_skills', None)
+            if user_skills is not None and isinstance(user_skills, list) and len(user_skills) > 0:
+                search_terms.extend(user_skills[:5])
         
         # Job titles
-        job_titles = preferences.preferred_job_titles  # type: ignore
-        if job_titles is not None and len(job_titles) > 0:  # type: ignore
-            search_terms.extend(job_titles[:3])  # type: ignore
+        job_titles = getattr(preferences, 'preferred_job_titles', None)
+        if job_titles is not None and isinstance(job_titles, list) and len(job_titles) > 0:
+            search_terms.extend(job_titles[:2])  # Reduced to make room for other terms
         
         if search_terms:
             params["text"] = " OR ".join(search_terms)
@@ -239,28 +250,35 @@ class HeadHunterService:
             if location.lower() in self.area_mapping:
                 params["area"] = self.area_mapping[location.lower()]
         else:
-            # Default to all Kazakhstan
-            params["area"] = "40"
+            # Use user's preferred areas if available
+            preferred_areas = getattr(preferences, 'preferred_areas', None)
+            if preferred_areas is not None and len(preferred_areas) > 0:
+                # Use first preferred area or combine multiple areas
+                params["area"] = preferred_areas[0]
+            else:
+                # Default to all Kazakhstan only if user has no location preferences
+                params["area"] = "40"
         
         # Employment type
-        if preferences.employment_types is not None:  # type: ignore
+        employment_types = getattr(preferences, 'employment_types', None)
+        if employment_types is not None:
             # Map to HH employment types
             hh_employment = []
-            for emp_type in preferences.employment_types:  # type: ignore
-                if emp_type in self.employment_mapping:  # type: ignore
-                    hh_employment.append(self.employment_mapping[emp_type])  # type: ignore
+            for emp_type in employment_types:
+                if emp_type in self.employment_mapping:
+                    hh_employment.append(self.employment_mapping[emp_type])
             if hh_employment:
                 params["employment"] = ",".join(hh_employment)
         
         # Salary
-        salary_min = request.override_salary_min or preferences.preferred_salary_min  # type: ignore
-        if salary_min is not None:  # type: ignore
+        preferred_salary_min = getattr(preferences, 'preferred_salary_min', None)
+        salary_min = request.override_salary_min or preferred_salary_min
+        if salary_min is not None:
             params["salary_from"] = salary_min
         
         # Remote work
-        if request.include_remote or (
-            preferences.remote_work_preference in ["only", "prefer"]
-        ):
+        remote_work_preference = getattr(preferences, 'remote_work_preference', 'any')
+        if request.include_remote or (remote_work_preference in ["only", "prefer"]):
             # Add search for remote work
             if "text" in params:
                 params["text"] += " OR удаленная работа OR remote"
@@ -320,8 +338,9 @@ class HeadHunterService:
             "relevance_score": 0.0
         }
         
-        # Skills matching
-        if preferences.preferred_skills is not None:  # type: ignore
+        # Skills matching - improved algorithm
+        preferred_skills = getattr(preferences, 'preferred_skills', None)
+        if preferred_skills is not None:
             vacancy_text = (
                 vacancy.get("name", "") + " " + 
                 (vacancy.get("snippet", {}).get("responsibility", "") or "") + " " +
@@ -329,12 +348,15 @@ class HeadHunterService:
             ).lower()
             
             skill_matches = 0
-            for skill in preferences.preferred_skills:  # type: ignore
-                if skill.lower() in vacancy_text:
-                    skill_matches += 1
+            total_skill_weight = 0
             
-            if preferences.preferred_skills is not None and len(preferences.preferred_skills) > 0:  # type: ignore
-                scores["skills_match_score"] = skill_matches / len(preferences.preferred_skills)  # type: ignore
+            for skill in preferred_skills:
+                skill_weight = await self._calculate_skill_match_weight(skill.lower(), vacancy_text)
+                skill_matches += skill_weight
+                total_skill_weight += 1
+            
+            if len(preferred_skills) > 0:
+                scores["skills_match_score"] = min(skill_matches / total_skill_weight, 1.0)
         
         # Location matching
         vacancy_area = vacancy.get("area", {})
@@ -342,9 +364,12 @@ class HeadHunterService:
             area_id = str(vacancy_area.get("id", ""))
             area_name = vacancy_area.get("name", "").lower()
             
-            if preferences.preferred_areas is not None and area_id in preferences.preferred_areas:  # type: ignore
+            preferred_areas = getattr(preferences, 'preferred_areas', None)
+            remote_work_preference = getattr(preferences, 'remote_work_preference', 'any')
+            
+            if preferred_areas is not None and area_id in preferred_areas:
                 scores["location_match_score"] = 1.0
-            elif preferences.remote_work_preference == "only":  # type: ignore
+            elif remote_work_preference == "only":
                 # Check if it's a remote job
                 if any(word in vacancy.get("name", "").lower() for word in ["удаленн", "remote", "дистанц"]):
                     scores["location_match_score"] = 1.0
@@ -355,17 +380,18 @@ class HeadHunterService:
         
         # Salary matching
         vacancy_salary = vacancy.get("salary")
-        if vacancy_salary and preferences.preferred_salary_min is not None:  # type: ignore
+        preferred_salary_min = getattr(preferences, 'preferred_salary_min', None)
+        if vacancy_salary and preferred_salary_min is not None:
             salary_from = vacancy_salary.get("from")
             salary_to = vacancy_salary.get("to")
             
             if salary_from or salary_to:
-                user_min = preferences.preferred_salary_min  # type: ignore
-                user_max = preferences.preferred_salary_max  # type: ignore
+                user_min = preferred_salary_min
+                user_max = getattr(preferences, 'preferred_salary_max', None)
                 
                 if salary_from and salary_from >= user_min:
                     scores["salary_match_score"] = 0.8
-                    if user_max is not None and salary_from <= user_max:  # type: ignore
+                    if user_max is not None and salary_from <= user_max:
                         scores["salary_match_score"] = 1.0
                 elif salary_to and salary_to >= user_min:
                     scores["salary_match_score"] = 0.6
@@ -451,24 +477,192 @@ class HeadHunterService:
         if not text:
             return []
         
-        # Common skills and technologies (can be expanded)
+        # Comprehensive skills and technologies dictionary
         skill_keywords = [
-            "python", "java", "javascript", "react", "node.js", "sql", "html", "css",
-            "git", "docker", "kubernetes", "aws", "azure", "linux", "windows",
-            "photoshop", "illustrator", "figma", "sketch", "after effects",
-            "excel", "powerpoint", "word", "1c", "sap", "crm", "erp",
-            "маркетинг", "продажи", "менеджмент", "аналитика", "дизайн",
-            "программирование", "разработка", "тестирование", "администрирование"
+            # Programming Languages
+            "python", "java", "javascript", "typescript", "c#", "c++", "php", "ruby", "go", "rust",
+            "swift", "kotlin", "scala", "r", "matlab", "perl", "bash", "powershell",
+            
+            # Web Technologies
+            "html", "css", "react", "angular", "vue", "node.js", "express", "django", "flask",
+            "laravel", "spring", "asp.net", "jquery", "bootstrap", "sass", "less",
+            
+            # Databases
+            "sql", "mysql", "postgresql", "oracle", "mongodb", "redis", "elasticsearch",
+            "sqlite", "cassandra", "firebase",
+            
+            # Cloud & DevOps
+            "aws", "azure", "google cloud", "docker", "kubernetes", "jenkins", "gitlab",
+            "terraform", "ansible", "chef", "puppet", "vagrant",
+            
+            # Tools & Frameworks
+            "git", "svn", "jira", "confluence", "slack", "teams", "zoom", "figma", "sketch",
+            "photoshop", "illustrator", "after effects", "premiere", "indesign",
+            
+            # Operating Systems
+            "linux", "windows", "macos", "ubuntu", "centos", "redhat",
+            
+            # Office & Business
+            "excel", "powerpoint", "word", "outlook", "sharepoint", "visio", "project",
+            "1c", "sap", "crm", "erp", "salesforce", "hubspot",
+            
+            # Russian Skills
+            "программирование", "разработка", "тестирование", "администрирование",
+            "маркетинг", "продажи", "менеджмент", "аналитика", "дизайн", "копирайтинг",
+            "переводы", "преподавание", "консультирование", "проектирование",
+            "бухгалтерия", "логистика", "рекрутинг", "hr", "пиар", "реклама",
+            "фотография", "видеомонтаж", "графический дизайн", "веб-дизайн",
+            "контент-менеджмент", "smm", "seo", "контекстная реклама",
+            
+            # Soft Skills (Russian)
+            "коммуникация", "лидерство", "работа в команде", "организация",
+            "планирование", "координация", "переговоры", "презентации",
+            "решение проблем", "креативность", "инновации", "адаптивность",
+            
+            # Industry-specific
+            "медицина", "образование", "финансы", "банки", "страхование",
+            "недвижимость", "строительство", "производство", "логистика",
+            "торговля", "ритейл", "гостиничный бизнес", "туризм", "ресторанный бизнес",
+            
+            # Technical Skills (Russian)
+            "системное администрирование", "сетевое администрирование",
+            "информационная безопасность", "кибербезопасность",
+            "техническая поддержка", "helpdesk", "it поддержка",
+            "обслуживание техники", "ремонт компьютеров", "настройка оборудования",
+            
+            # Creative & Design
+            "ui/ux", "user experience", "user interface", "прототипирование",
+            "wireframing", "брендинг", "типографика", "композиция", "цветоведение",
+            
+            # Data & Analytics
+            "data science", "machine learning", "искусственный интеллект",
+            "big data", "tableau", "power bi", "google analytics", "яндекс метрика",
+            "статистика", "математическое моделирование",
+            
+            # Languages
+            "английский", "немецкий", "французский", "китайский", "корейский",
+            "японский", "испанский", "итальянский", "казахский", "узбекский",
+            
+            # Quality Assurance
+            "manual testing", "automation testing", "selenium", "cypress",
+            "postman", "jmeter", "test planning", "bug tracking",
+            
+            # Project Management
+            "agile", "scrum", "kanban", "waterfall", "pmp", "prince2",
+            "управление проектами", "координация проектов",
         ]
         
         text_lower = text.lower()
         found_skills = []
         
+        # Look for exact matches and partial matches
         for skill in skill_keywords:
-            if skill.lower() in text_lower:
+            skill_lower = skill.lower()
+            if skill_lower in text_lower:
+                found_skills.append(skill)
+            # Also check for skills as part of compound words
+            elif any(word in text_lower for word in skill_lower.split() if len(word) > 2):
                 found_skills.append(skill)
         
-        return found_skills[:10]  # Limit to 10 skills
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_skills = []
+        for skill in found_skills:
+            if skill.lower() not in seen:
+                seen.add(skill.lower())
+                unique_skills.append(skill)
+        
+        return unique_skills[:15]  # Increased limit to capture more skills
+
+    async def _calculate_skill_match_weight(self, user_skill: str, vacancy_text: str) -> float:
+        """Calculate how well a user skill matches the vacancy text"""
+        
+        # Skill synonyms and translations for better matching
+        skill_synonyms = {
+            # Programming
+            "программирование": ["программирование", "разработка", "coding", "development", "programming", "python", "java", "javascript", "c++", "c#"],
+            "веб-разработка": ["веб-разработка", "web development", "frontend", "backend", "html", "css", "javascript", "react", "angular", "vue"],
+            "разработка": ["разработка", "development", "программирование", "coding", "programming"],
+            "тестирование по": ["тестирование", "testing", "qa", "quality assurance", "автотестирование", "manual testing"],
+            "тестирование": ["тестирование", "testing", "qa", "quality assurance"],
+            
+            # Design
+            "графический дизайн": ["дизайн", "design", "графический", "graphic", "photoshop", "illustrator", "figma", "sketch"],
+            "дизайн": ["дизайн", "design", "ui", "ux", "graphic", "web design", "graphic design"],
+            "фотография": ["фотография", "photography", "photo", "фото"],
+            
+            # Data & Analytics
+            "аналитика данных": ["аналитика", "analytics", "data analysis", "sql", "python", "excel", "bi"],
+            "аналитика": ["аналитика", "analytics", "analysis", "data", "sql", "excel"],
+            "работа с базами данных": ["база данных", "database", "sql", "mysql", "postgresql", "oracle"],
+            
+            # Office & Admin
+            "работа с документами": ["документы", "documents", "word", "excel", "office", "делопроизводство"],
+            "бухгалтерия": ["бухгалтерия", "accounting", "финансы", "finance", "1c"],
+            "ввод данных": ["ввод данных", "data entry", "excel", "обработка данных"],
+            
+            # Sales & Marketing
+            "продажи": ["продажи", "sales", "менеджер по продажам", "торговый представитель"],
+            "маркетинг": ["маркетинг", "marketing", "smm", "реклама", "promotion"],
+            "интернет-маркетинг": ["интернет-маркетинг", "digital marketing", "smm", "seo", "контекстная реклама"],
+            "smm": ["smm", "social media", "социальные сети", "instagram", "facebook", "маркетинг"],
+            
+            # Education
+            "преподавание": ["преподавание", "teaching", "образование", "education", "репетитор", "tutor"],
+            "репетиторство": ["репетиторство", "tutoring", "преподавание", "обучение"],
+            
+            # Service
+            "кулинария": ["кулинария", "cooking", "повар", "chef", "кухня"],
+            "уборка": ["уборка", "cleaning", "клининг", "санитария"],
+            "обслуживание клиентов": ["клиенты", "customer service", "обслуживание", "support"],
+            "работа с клиентами": ["клиенты", "customer", "обслуживание", "support", "менеджер"],
+            
+            # Languages & Communication
+            "коммуникация": ["коммуникация", "communication", "общение", "переговоры"],
+            "английский язык": ["английский", "english", "язык", "language"],
+            "иностранные языки": ["язык", "language", "английский", "немецкий", "китайский"],
+            
+            # Soft skills
+            "работа в команде": ["команда", "team", "teamwork", "collaboration"],
+            "лидерство": ["лидерство", "leadership", "управление", "management"],
+            "организаторские способности": ["организация", "organization", "планирование", "координация"],
+            "стрессоустойчивость": ["стресс", "stress", "устойчивость", "pressure"],
+            
+            # Technical
+            "администрирование систем": ["администрирование", "admin", "системы", "linux", "windows", "сервер"],
+            "техническая поддержка": ["техподдержка", "technical support", "support", "помощь"],
+            "ремонт техники": ["ремонт", "repair", "техника", "оборудование"],
+        }
+        
+        # Direct match gets full weight
+        if user_skill in vacancy_text:
+            return 1.0
+        
+        # Check synonyms
+        synonyms = skill_synonyms.get(user_skill, [user_skill])
+        max_weight = 0.0
+        
+        for synonym in synonyms:
+            if synonym.lower() in vacancy_text:
+                # Give higher weight for exact synonym matches
+                if synonym == user_skill:
+                    max_weight = max(max_weight, 1.0)
+                else:
+                    max_weight = max(max_weight, 0.8)
+        
+        # Partial word matching for compound skills
+        words = user_skill.split()
+        if len(words) > 1:
+            word_matches = 0
+            for word in words:
+                if len(word) > 2 and word in vacancy_text:  # Skip short words
+                    word_matches += 1
+            
+            if word_matches > 0:
+                partial_weight = (word_matches / len(words)) * 0.6
+                max_weight = max(max_weight, partial_weight)
+        
+        return max_weight
 
     async def update_preferences_from_feedback(
         self, user_id: int, db: AsyncSession

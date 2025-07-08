@@ -26,6 +26,7 @@ type VacancyRecommendationsProps = {
     onSave?: (id: number) => void
     onApply?: (id: number) => void
     onViewDetails?: (id: number) => void
+    onDebugSkills?: () => void
     isLoading?: boolean
 }
 
@@ -38,6 +39,7 @@ export default function VacancyRecommendations({
     onSave,
     onApply,
     onViewDetails,
+    onDebugSkills,
     isLoading = false,
 }: VacancyRecommendationsProps) {
     const [activeTab, setActiveTab] = useState('personal')
@@ -180,6 +182,18 @@ export default function VacancyRecommendations({
                     >
                         Фильтры
                     </Button>
+
+                    {/* Debug Skills Button - Development Only */}
+                    {process.env.NODE_ENV === 'development' && (
+                        <Button
+                            variant="plain"
+                            onClick={onDebugSkills}
+                            className="text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20"
+                            title="Отладка навыков (только для разработки)"
+                        >
+                            🔍 Навыки
+                        </Button>
+                    )}
 
                     <Button
                         variant="solid"
