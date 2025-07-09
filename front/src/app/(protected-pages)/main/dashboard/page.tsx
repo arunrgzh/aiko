@@ -132,16 +132,6 @@ export default function DashboardPage() {
 
     const services = [
         {
-            title: 'Анкеты',
-            description: 'Управление профилями и резюме с ИИ-оптимизацией',
-            href: '/main/questionnaire',
-            icon: TbFileText,
-            stats: '2 активные',
-            gradient: 'from-blue-500 to-indigo-600',
-            features: ['ИИ-анализ', 'Автооптимизация', 'Экспорт PDF'],
-            badge: 'Популярно',
-        },
-        {
             title: 'Вакансии',
             description: 'Персонализированный поиск с умными рекомендациями',
             href: '/main/vacancies',
@@ -170,15 +160,6 @@ export default function DashboardPage() {
             stats: '92% заполнен',
             gradient: 'from-rose-500 to-pink-600',
             features: ['Безопасность', 'Настройки', 'Статистика'],
-        },
-        {
-            title: 'Мои отклики',
-            description: 'Отслеживание статуса заявок и собеседований',
-            href: '/main/responses',
-            icon: TbHeart,
-            stats: '3 активных',
-            gradient: 'from-orange-500 to-red-600',
-            features: ['Статус заявок', 'Календарь', 'Напоминания'],
         },
         {
             title: 'Собеседования',
