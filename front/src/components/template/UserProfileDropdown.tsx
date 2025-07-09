@@ -17,11 +17,7 @@ type DropdownList = {
 }
 
 const dropdownItemList: DropdownList[] = [
-    {
-        label: 'Account Setting',
-        path: '/main/settings',
-        icon: <PiGearDuotone />,
-    },
+    // Settings removed as per navigation update
 ]
 
 const _UserDropdown = () => {

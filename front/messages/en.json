@@ -116,14 +116,11 @@
 
     "nav": {
         "main": {
-            "all": "All",
-            "questionnaire": "Questionnaire",
+            "home": "Home",
             "vacancies": "Vacancies",
             "ai-chat": "AI Chat",
             "profile": "Profile",
-            "responses": "My Responses",
-            "interviews": "Practice Interviews",
-            "settings": "Profile Settings"
+            "interviews": "Practice Interviews"
         },
         "assistants": {
             "assistants": "Assistants",
