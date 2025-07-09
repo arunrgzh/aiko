@@ -619,14 +619,29 @@ async def debug_user_skills(
         )
         recent_recommendations = rec_result.scalars().all()
         
+        # Get search parameters that would be used
+        search_params = None
+        if preferences:
+            try:
+                from ..schemas.job import PersonalizedJobSearchRequest
+                test_request = PersonalizedJobSearchRequest(page=0, per_page=20)
+                search_params = await hh_service._build_search_params_from_user_data(
+                    current_user, preferences, db, test_request
+                )
+            except Exception as e:
+                search_params = {"error": str(e)}
+
         debug_info = {
             "user_id": current_user.id,
             "onboarding_completed": onboarding_profile.is_completed if onboarding_profile else False,
+            "onboarding_profession": getattr(onboarding_profile, 'profession', None) if onboarding_profile else None,
             "onboarding_skills": getattr(onboarding_profile, 'skills', None) if onboarding_profile else None,
+            "onboarding_preferred_cities": getattr(onboarding_profile, 'preferred_cities', None) if onboarding_profile else None,
             "preferences_exist": preferences is not None,
             "preferred_skills": getattr(preferences, 'preferred_skills', None) if preferences else None,
             "preferred_job_titles": getattr(preferences, 'preferred_job_titles', None) if preferences else None,
             "preferred_areas": getattr(preferences, 'preferred_areas', None) if preferences else None,
+            "search_parameters": search_params,
             "recent_recommendations": [
                 {
                     "id": rec.id,
@@ -647,6 +662,56 @@ async def debug_user_skills(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to get debug information"
         )
+
+@router.get("/debug/test-search")
+async def debug_test_search(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Debug endpoint to test HeadHunter API search with user's parameters"""
+    
+    try:
+        # Get or create user preferences
+        user_preferences = await hh_service._get_or_create_user_preferences(current_user, db)
+        
+        # Build search parameters
+        from ..schemas.job import PersonalizedJobSearchRequest
+        test_request = PersonalizedJobSearchRequest(page=0, per_page=10)
+        search_params = await hh_service._build_search_params_from_user_data(
+            current_user, user_preferences, db, test_request
+        )
+        
+        # Test HeadHunter API search
+        hh_vacancies = await hh_service._search_hh_api(search_params)
+        
+        return {
+            "search_parameters": search_params,
+            "hh_api_results": {
+                "total_found": len(hh_vacancies),
+                "vacancies": [
+                    {
+                        "id": v.get("id"),
+                        "name": v.get("name", "")[:100],
+                        "employer": v.get("employer", {}).get("name", ""),
+                        "area": v.get("area", {}).get("name", ""),
+                        "salary": v.get("salary"),
+                        "snippet": {
+                            "requirement": v.get("snippet", {}).get("requirement", "")[:200] if v.get("snippet") else "",
+                            "responsibility": v.get("snippet", {}).get("responsibility", "")[:200] if v.get("snippet") else ""
+                        }
+                    }
+                    for v in hh_vacancies[:5]  # Show first 5 results
+                ]
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in debug test search for user {current_user.id}: {e}")
+        return {
+            "error": str(e),
+            "search_parameters": None,
+            "hh_api_results": None
+        }
 
 async def _should_refresh_recommendations(user_id: int, db: AsyncSession) -> bool:
     """Check if user's recommendations should be refreshed"""
