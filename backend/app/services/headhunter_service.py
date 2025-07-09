@@ -192,7 +192,9 @@ class HeadHunterService:
                 preferences_data["salary_currency"] = onboarding_profile.currency
             
             if onboarding_profile.profession is not None:
-                preferences_data["preferred_job_titles"] = [onboarding_profile.profession]
+                # Don't use "безработный" as a job title - use skills instead
+                if onboarding_profile.profession.lower() not in ["безработный", "unemployed", "без работы"]:
+                    preferences_data["preferred_job_titles"] = [onboarding_profile.profession]
         
         # Create and save preferences
         preferences = UserJobPreferences(**preferences_data)
@@ -241,8 +243,16 @@ class HeadHunterService:
         if job_titles is not None and isinstance(job_titles, list) and len(job_titles) > 0:
             search_terms.extend(job_titles[:2])  # Reduced to make room for other terms
         
+        # If no search terms, create a basic search based on skills
+        if not search_terms and user_skills is not None and isinstance(user_skills, list) and len(user_skills) > 0:
+            # Use top skills for basic search
+            search_terms.extend(user_skills[:3])
+        
         if search_terms:
             params["text"] = " OR ".join(search_terms)
+        else:
+            # Fallback: search for entry-level jobs in Kazakhstan
+            params["text"] = "стажер OR начинающий OR junior OR entry level OR без опыта"
         
         # Location
         location = request.override_location
