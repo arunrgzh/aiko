@@ -94,9 +94,9 @@ export default function DashboardPage() {
             change: '+1 за неделю',
             trend: 'up',
             icon: TbFileText,
-            color: 'from-blue-500 to-cyan-500',
+            color: 'from-gray-600 to-gray-700',
             bgColor:
-                'from-blue-50 to-cyan-50 dark:from-blue-900/20 dark:to-cyan-900/20',
+                'from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-700/50',
         },
         {
             label: 'Новые вакансии',
@@ -104,9 +104,9 @@ export default function DashboardPage() {
             change: '+5 сегодня',
             trend: 'up',
             icon: TbBriefcase,
-            color: 'from-emerald-500 to-green-500',
+            color: 'from-slate-600 to-slate-700',
             bgColor:
-                'from-emerald-50 to-green-50 dark:from-emerald-900/20 dark:to-green-900/20',
+                'from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-700/50',
         },
         {
             label: 'Активные отклики',
@@ -114,9 +114,9 @@ export default function DashboardPage() {
             change: '2 просмотрено',
             trend: 'neutral',
             icon: TbHeart,
-            color: 'from-rose-500 to-pink-500',
+            color: 'from-zinc-600 to-zinc-700',
             bgColor:
-                'from-rose-50 to-pink-50 dark:from-rose-900/20 dark:to-pink-900/20',
+                'from-zinc-50 to-zinc-100 dark:from-zinc-800/50 dark:to-zinc-700/50',
         },
         {
             label: 'Рейтинг профиля',
@@ -124,9 +124,9 @@ export default function DashboardPage() {
             change: '+8% за месяц',
             trend: 'up',
             icon: TbStar,
-            color: 'from-amber-500 to-orange-500',
+            color: 'from-stone-600 to-stone-700',
             bgColor:
-                'from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20',
+                'from-stone-50 to-stone-100 dark:from-stone-800/50 dark:to-stone-700/50',
         },
     ]
 
@@ -137,7 +137,7 @@ export default function DashboardPage() {
             href: '/main/vacancies',
             icon: TbBriefcase,
             stats: '15 новых',
-            gradient: 'from-emerald-500 to-teal-600',
+            gradient: 'from-gray-600 to-gray-700',
             features: ['ИИ-подбор', 'Автосохранение', 'Уведомления'],
             badge: '5 новых',
         },
@@ -148,7 +148,7 @@ export default function DashboardPage() {
             href: '/main/ai-chat',
             icon: TbBrain,
             stats: 'Онлайн',
-            gradient: 'from-purple-500 to-violet-600',
+            gradient: 'from-slate-600 to-slate-700',
             features: ['24/7 доступен', 'Умные советы', 'История чатов'],
             badge: 'Новое',
         },
@@ -158,7 +158,7 @@ export default function DashboardPage() {
             href: '/main/profile',
             icon: TbUser,
             stats: '92% заполнен',
-            gradient: 'from-rose-500 to-pink-600',
+            gradient: 'from-zinc-600 to-zinc-700',
             features: ['Безопасность', 'Настройки', 'Статистика'],
         },
         {
@@ -167,7 +167,7 @@ export default function DashboardPage() {
             href: '/main/interviews',
             icon: TbVideo,
             stats: '2 запланировано',
-            gradient: 'from-cyan-500 to-blue-600',
+            gradient: 'from-stone-600 to-stone-700',
             features: ['ИИ-тренер', 'Запись сессий', 'Обратная связь'],
         },
     ]
@@ -178,21 +178,21 @@ export default function DashboardPage() {
             title: 'Отклик на вакансию "Frontend Developer"',
             time: '2 часа назад',
             icon: TbBriefcase,
-            color: 'text-green-600',
+            color: 'text-gray-600',
         },
         {
             type: 'ai_chat',
             title: 'Консультация с ИИ по резюме',
             time: '5 часов назад',
             icon: TbBrain,
-            color: 'text-purple-600',
+            color: 'text-gray-600',
         },
         {
             type: 'profile',
             title: 'Обновление профиля',
             time: '1 день назад',
             icon: TbUser,
-            color: 'text-blue-600',
+            color: 'text-gray-600',
         },
     ]
 
@@ -281,7 +281,7 @@ export default function DashboardPage() {
                                                 <Icon className="w-6 h-6 text-white" />
                                             </div>
                                             {stat.trend === 'up' && (
-                                                <TbTrendingUp className="w-5 h-5 text-green-500" />
+                                                <TbTrendingUp className="w-5 h-5 text-gray-600 dark:text-gray-400" />
                                             )}
                                         </div>
 
@@ -318,7 +318,7 @@ export default function DashboardPage() {
                     </p>
                 </motion.div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8 max-w-4xl mx-auto">
                     {services.map((service, index) => {
                         const Icon = service.icon
                         return (
@@ -345,7 +345,7 @@ export default function DashboardPage() {
 
                                         {/* Badge */}
                                         {service.badge && (
-                                            <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white text-xs font-bold">
+                                            <div className="absolute top-4 right-4 px-3 py-1 rounded-full bg-gray-600 text-white text-xs font-bold">
                                                 {service.badge}
                                             </div>
                                         )}
@@ -359,10 +359,10 @@ export default function DashboardPage() {
                                                     <Icon className="w-8 h-8 text-white" />
                                                 </div>
                                                 <div>
-                                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-blue-600 group-hover:to-purple-600 group-hover:bg-clip-text transition-all duration-300">
+                                                    <h3 className="text-xl font-bold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-200 transition-all duration-300">
                                                         {service.title}
                                                     </h3>
-                                                    <p className="text-sm font-medium text-green-600 dark:text-green-400">
+                                                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">
                                                         {service.stats}
                                                     </p>
                                                 </div>
@@ -379,7 +379,7 @@ export default function DashboardPage() {
                                                     (feature, idx) => (
                                                         <span
                                                             key={idx}
-                                                            className="px-3 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full group-hover:bg-blue-50 dark:group-hover:bg-blue-900/20 group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-all duration-300"
+                                                            className="px-3 py-1 text-xs font-medium bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full group-hover:bg-gray-200 dark:group-hover:bg-gray-600 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-all duration-300"
                                                         >
                                                             {feature}
                                                         </span>
@@ -390,7 +390,7 @@ export default function DashboardPage() {
                                             {/* Action button */}
                                             <Button
                                                 size="sm"
-                                                className={`w-full group-hover:bg-gradient-to-r ${service.gradient} group-hover:text-white group-hover:border-transparent group-hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2`}
+                                                className="w-full group-hover:bg-gray-700 group-hover:text-white group-hover:border-transparent group-hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
                                             >
                                                 Открыть
                                                 <TbChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
