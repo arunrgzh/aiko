@@ -50,14 +50,11 @@
 
     "nav": {
         "main": {
-            "all": "All",
-            "questionnaire": "Анкета",
+            "home": "Главная",
             "vacancies": "Вакансии",
             "ai-chat": "Чат с ИИ",
             "profile": "Профиль",
-            "responses": "Мои отклики",
-            "interviews": "Пробные собеседования",
-            "settings": "Настройки профиля"
+            "interviews": "Пробные собеседования"
         }
     },
 
