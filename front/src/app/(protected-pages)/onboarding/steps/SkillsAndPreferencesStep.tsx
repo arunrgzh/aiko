@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, ReactNode, useEffect } from 'react'
+import { useState, ReactNode, useEffect, useMemo } from 'react'
 import { Form, FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
 import Button from '@/components/ui/Button'
@@ -40,84 +40,94 @@ interface SkillsAndPreferencesStepProps {
     onPrevious: () => void
 }
 
-const popularSkills = [
-    // Технологии и IT
-    'Программирование',
-    'Веб-разработка',
-    'Тестирование ПО',
-    'Администрирование систем',
-    'Работа с базами данных',
-    'Аналитика данных',
-    'Кибербезопасность',
-    'Техническая поддержка',
-    // Искусство и дизайн
-    'Живопись',
-    'Графический дизайн',
-    'Фотография',
-    'Музыка',
-    'Вокал',
-    'Танцы',
-    'Видеомонтаж',
-    'Актерское мастерство',
-    // Образование
-    'Преподавание',
-    'Репетиторство',
-    'Разработка учебных программ',
-    'Работа с детьми',
-    // Медицина и уход
-    'Медицинский уход',
-    'Массаж',
-    'Физиотерапия',
-    'Первая помощь',
-    'Уход за пожилыми',
-    // Сервис и обслуживание
-    'Кулинария',
-    'Выпечка',
-    'Уборка',
-    'Гостиничный сервис',
-    'Официант',
-    'Бариста',
-    'Парикмахер',
-    'Маникюр/Педикюр',
-    // Производство и ремесла
-    'Столярное дело',
-    'Слесарные работы',
-    'Электромонтаж',
-    'Сварка',
-    'Шитье',
-    'Вязание',
-    'Ремонт техники',
-    // Офис и администрирование
-    'Работа с документами',
-    'Ввод данных',
-    'Бухгалтерия',
-    'Планирование',
-    'Работа с клиентами',
-    // Продажи и маркетинг
-    'Продажи',
-    'Телемаркетинг',
-    'Интернет-маркетинг',
-    'SMM',
-    'Копирайтинг',
-    // Soft skills
-    'Коммуникация',
-    'Работа в команде',
-    'Лидерство',
-    'Организаторские способности',
-    'Креативность',
-    'Стрессоустойчивость',
-    'Публичные выступления',
-    'Решение конфликтов',
-    'Эмпатия',
-    'Тайм-менеджмент',
-    // Другое
-    'Вождение',
-    'Знание иностранных языков',
-    'Работа с животными',
-    'Садоводство',
-    'Ремонт автомобилей',
-    'Другое',
-]
+const categorizedSkills = {
+    'Технологии и IT': [
+        'Программирование',
+        'Веб-разработка',
+        'Тестирование ПО',
+        'Администрирование систем',
+        'Работа с базами данных',
+        'Аналитика данных',
+        'Кибербезопасность',
+        'Техническая поддержка',
+    ],
+    'Искусство и дизайн': [
+        'Живопись',
+        'Графический дизайн',
+        'Фотография',
+        'Музыка',
+        'Вокал',
+        'Танцы',
+        'Видеомонтаж',
+        'Актерское мастерство',
+    ],
+    Образование: [
+        'Преподавание',
+        'Репетиторство',
+        'Разработка учебных программ',
+        'Работа с детьми',
+    ],
+    'Медицина и уход': [
+        'Медицинский уход',
+        'Массаж',
+        'Физиотерапия',
+        'Первая помощь',
+        'Уход за пожилыми',
+    ],
+    'Сервис и обслуживание': [
+        'Кулинария',
+        'Выпечка',
+        'Уборка',
+        'Гостиничный сервис',
+        'Официант',
+        'Бариста',
+        'Парикмахер',
+        'Маникюр/Педикюр',
+    ],
+    'Производство и ремесла': [
+        'Столярное дело',
+        'Слесарные работы',
+        'Электромонтаж',
+        'Сварка',
+        'Шитье',
+        'Вязание',
+        'Ремонт техники',
+    ],
+    'Офис и администрирование': [
+        'Работа с документами',
+        'Ввод данных',
+        'Бухгалтерия',
+        'Планирование',
+        'Работа с клиентами',
+    ],
+    'Продажи и маркетинг': [
+        'Продажи',
+        'Телемаркетинг',
+        'Интернет-маркетинг',
+        'SMM',
+        'Копирайтинг',
+    ],
+    'Soft skills': [
+        'Коммуникация',
+        'Работа в команде',
+        'Лидерство',
+        'Организаторские способности',
+        'Креативность',
+        'Стрессоустойчивость',
+        'Публичные выступления',
+        'Решение конфликтов',
+        'Эмпатия',
+        'Тайм-менеджмент',
+    ],
+    Другое: [
+        'Вождение',
+        'Знание иностранных языков',
+        'Работа с животными',
+        'Садоводство',
+        'Ремонт автомобилей',
+        'Другое',
+    ],
+}
 
 const popularJobTypes = [
     'Полная занятость',
@@ -152,7 +162,7 @@ const SkillsAndPreferencesStep = ({
     onPrevious,
 }: SkillsAndPreferencesStepProps) => {
     const [skills, setSkills] = useState<string[]>(data.skills || [])
-    const [newSkill, setNewSkill] = useState('')
+    const [searchQuery, setSearchQuery] = useState('')
     const [preferredJobTypes, setPreferredJobTypes] = useState<string[]>(
         data.preferred_job_types || [],
     )
@@ -174,14 +184,6 @@ const SkillsAndPreferencesStep = ({
         return () => clearTimeout(timeout)
     }, [skills, preferredJobTypes, preferredLocations])
 
-    const handleAddSkill = () => {
-        if (newSkill.trim() && !skills.includes(newSkill.trim())) {
-            const updatedSkills = [...skills, newSkill.trim()]
-            setSkills(updatedSkills)
-            setNewSkill('')
-        }
-    }
-
     const handleRemoveSkill = (skillToRemove: string) => {
         const updatedSkills = skills.filter((skill) => skill !== skillToRemove)
         setSkills(updatedSkills)
@@ -194,12 +196,16 @@ const SkillsAndPreferencesStep = ({
         setSkills(updatedSkills)
     }
 
-    const handleKeyPress = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter') {
-            e.preventDefault()
-            handleAddSkill()
+    const filteredSkills = useMemo(() => {
+        if (!searchQuery) {
+            return []
         }
-    }
+        const lowercasedQuery = searchQuery.toLowerCase()
+        const allSkills = Object.values(categorizedSkills).flat()
+        return allSkills.filter((skill) =>
+            skill.toLowerCase().includes(lowercasedQuery),
+        )
+    }, [searchQuery])
 
     const handleAddJobType = () => {
         if (
@@ -306,25 +312,80 @@ const SkillsAndPreferencesStep = ({
                                 </div>
                             )}
 
-                            {/* Available skills */}
-                            <div>
-                                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
-                                    Популярные навыки
-                                </h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {popularSkills.map((skill) => (
-                                        <Chip
-                                            key={skill}
-                                            selected={skills.includes(skill)}
-                                            onClick={() =>
-                                                handleSkillToggle(skill)
-                                            }
-                                        >
-                                            {skill}
-                                        </Chip>
-                                    ))}
-                                </div>
+                            {/* Search Input */}
+                            <div className="mb-4">
+                                <Input
+                                    placeholder="Начните вводить название навыка для поиска..."
+                                    value={searchQuery}
+                                    onChange={(e) =>
+                                        setSearchQuery(e.target.value)
+                                    }
+                                    className="w-full"
+                                />
                             </div>
+
+                            {/* Display Area */}
+                            {searchQuery ? (
+                                // Search Results
+                                <div>
+                                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
+                                        Результаты поиска
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {filteredSkills.length > 0 ? (
+                                            filteredSkills.map((skill) => (
+                                                <Chip
+                                                    key={skill}
+                                                    selected={skills.includes(
+                                                        skill,
+                                                    )}
+                                                    onClick={() =>
+                                                        handleSkillToggle(skill)
+                                                    }
+                                                >
+                                                    {skill}
+                                                </Chip>
+                                            ))
+                                        ) : (
+                                            <p className="text-gray-500">
+                                                Навыки не найдены.
+                                            </p>
+                                        )}
+                                    </div>
+                                </div>
+                            ) : (
+                                // Categorized Skills
+                                <div className="space-y-6">
+                                    {Object.entries(categorizedSkills).map(
+                                        ([category, categorySkills]) => (
+                                            <div key={category}>
+                                                <h4 className="text-base font-semibold text-gray-800 dark:text-gray-200 mb-3">
+                                                    {category}
+                                                </h4>
+                                                <div className="flex flex-wrap gap-2">
+                                                    {categorySkills.map(
+                                                        (skill) => (
+                                                            <Chip
+                                                                key={skill}
+                                                                selected={skills.includes(
+                                                                    skill,
+                                                                )}
+                                                                onClick={() =>
+                                                                    handleSkillToggle(
+                                                                        skill,
+                                                                    )
+                                                                }
+                                                            >
+                                                                {skill}
+                                                            </Chip>
+                                                        ),
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ),
+                                    )}
+                                </div>
+                            )}
                         </FormItem>
                     </div>
 

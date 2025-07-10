@@ -634,7 +634,7 @@ async def debug_user_skills(
         debug_info = {
             "user_id": current_user.id,
             "onboarding_completed": onboarding_profile.is_completed if onboarding_profile else False,
-            "onboarding_profession": getattr(onboarding_profile, 'profession', None) if onboarding_profile else None,
+            "onboarding_profession": getattr(onboarding_profile, 'current_position', None) if onboarding_profile else None,
             "onboarding_skills": getattr(onboarding_profile, 'skills', None) if onboarding_profile else None,
             "onboarding_preferred_cities": getattr(onboarding_profile, 'preferred_cities', None) if onboarding_profile else None,
             "preferences_exist": preferences is not None,
