@@ -107,7 +107,7 @@ export default function VacancyRecommendations({
                     <div className="space-y-4">
                         {recommendations.map((vacancy) => (
                             <VacancyCard
-                                key={`${type}-${vacancy.id}`}
+                                key={`${type}-${vacancy.hh_vacancy_id}`}
                                 vacancy={vacancy}
                                 onSave={onSave}
                                 onApply={onApply}

@@ -26,8 +26,10 @@ import ProfileService, {
     type OnboardingProfile,
     type AssessmentResult,
 } from '@/services/ProfileService'
+import { useRouter } from 'next/navigation'
 
 export default function ProfilePage() {
+    const router = useRouter()
     const [profileData, setProfileData] = useState<FullUserProfile | null>(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -107,7 +109,11 @@ export default function ProfilePage() {
                         Детальная информация о ваших навыках и предпочтениях
                     </p>
                 </div>
-                <Button variant="solid" className="flex items-center gap-2">
+                <Button
+                    variant="solid"
+                    className="flex items-center gap-2"
+                    onClick={() => router.push('/onboarding')}
+                >
                     <TbEdit className="w-4 h-4" />
                     Редактировать
                 </Button>
@@ -572,8 +578,18 @@ export default function ProfilePage() {
                         детальную информацию о ваших навыках и предпочтениях.
                     </p>
                     <div className="flex justify-center gap-4">
-                        <Button variant="solid">Пройти онбординг</Button>
-                        <Button variant="default">Пройти тест</Button>
+                        <Button
+                            variant="solid"
+                            onClick={() => router.push('/onboarding')}
+                        >
+                            Пройти онбординг
+                        </Button>
+                        <Button
+                            variant="default"
+                            onClick={() => router.push('/main/assessment')}
+                        >
+                            Пройти тест
+                        </Button>
                     </div>
                 </Card>
             )}
