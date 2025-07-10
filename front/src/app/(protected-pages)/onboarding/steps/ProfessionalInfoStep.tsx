@@ -41,45 +41,6 @@ interface ProfessionalInfoStepProps {
     onPrevious: () => void
 }
 
-const industryOptions = [
-    'Технологии',
-    'Здравоохранение',
-    'Финансы',
-    'Образование',
-    'Производство',
-    'Розничная торговля',
-    'Консалтинг',
-    'Маркетинг',
-    'Продажи',
-    'Другое',
-]
-
-const educationStatusOptions = [
-    'Среднее образование',
-    'Среднее специальное',
-    'Неоконченное высшее',
-    'Высшее образование',
-    'Магистратура',
-    'Докторантура',
-    'Курсы и сертификаты',
-    'Самообразование',
-    'Другое',
-]
-
-const learningTopicOptions = [
-    'Программирование',
-    'Дизайн',
-    'Маркетинг',
-    'Управление проектами',
-    'Иностранные языки',
-    'Бухгалтерия',
-    'Менеджмент',
-    'Продажи',
-    'Кулинария',
-    'Ремесла',
-    'Другое',
-]
-
 const ProfessionalInfoStep = ({
     data,
     onUpdate,
@@ -94,6 +55,53 @@ const ProfessionalInfoStep = ({
         wants_courses: data.wants_courses || '',
         learning_topics: data.learning_topics || [],
     })
+
+    const [employmentStatus, setEmploymentStatus] = useState<
+        'employed' | 'student' | 'unemployed' | ''
+    >('')
+    const [jobTitle, setJobTitle] = useState('')
+
+    const professionStopWords = useMemo(
+        () => ['student', 'unemployed', 'безработный', 'студент'],
+        [],
+    )
+
+    useEffect(() => {
+        const currentPosition = formData.current_position || ''
+        if (professionStopWords.includes(currentPosition.toLowerCase())) {
+            setEmploymentStatus(
+                currentPosition.toLowerCase().startsWith('student') ||
+                    currentPosition.toLowerCase().startsWith('студент')
+                    ? 'student'
+                    : 'unemployed',
+            )
+            setJobTitle('')
+        } else if (currentPosition) {
+            setEmploymentStatus('employed')
+            setJobTitle(currentPosition)
+        }
+    }, [])
+
+    const handleEmploymentStatusChange = (option: unknown) => {
+        const status =
+            (option as { value: 'employed' | 'student' | 'unemployed' })
+                ?.value || ''
+        setEmploymentStatus(status)
+        if (status === 'student' || status === 'unemployed') {
+            setJobTitle('')
+            onUpdate({ current_position: status })
+        } else if (status === 'employed') {
+            onUpdate({ current_position: jobTitle })
+        } else {
+            onUpdate({ current_position: '' })
+        }
+    }
+
+    const handleJobTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newJobTitle = e.target.value
+        setJobTitle(newJobTitle)
+        onUpdate({ current_position: newJobTitle })
+    }
 
     // Синхронизируем с родительским компонентом через useEffect
     useEffect(() => {
@@ -150,78 +158,14 @@ const ProfessionalInfoStep = ({
         [],
     )
 
-    const learningTopicOptions = useMemo(
+    const employmentStatusOptions = useMemo(
         () => [
-            // IT и технологии
-            'Программирование',
-            'Веб-разработка',
-            'Мобильная разработка',
-            'Тестирование ПО',
-            'Базы данных',
-            'Кибербезопасность',
-            'Машинное обучение',
-            'Искусственный интеллект',
-            'DevOps',
-            'UI/UX дизайн',
-            'Системное администрирование',
-
-            // Бизнес и менеджмент
-            'Управление проектами',
-            'Менеджмент',
-            'Маркетинг',
-            'Продажи',
-            'Финансы и бухгалтерия',
-            'HR и управление персоналом',
-            'Предпринимательство',
-            'Логистика',
-
-            // Творчество и дизайн
-            'Графический дизайн',
-            'Фотография',
-            'Видеомонтаж',
-            'Анимация',
-            'Иллюстрация',
-            'Музыка',
-            'Письмо и копирайтинг',
-
-            // Образование и наука
-            'Педагогика',
-            'Психология',
-            'Медицина',
-            'Юриспруденция',
-            'Экология',
-            'Химия',
-            'Физика',
-            'Математика',
-
-            // Ремесла и услуги
-            'Кулинария',
-            'Парикмахерское дело',
-            'Косметология',
-            'Строительство',
-            'Электрика',
-            'Сантехника',
-            'Автомеханика',
-            'Садоводство',
-
-            // Мягкие навыки
-            'Коммуникация',
-            'Публичные выступления',
-            'Тайм-менеджмент',
-            'Лидерство',
-            'Эмоциональный интеллект',
-            'Стрессоустойчивость',
-            'Критическое мышление',
-
-            // Языки
-            'Английский язык',
-            'Русский язык',
-            'Казахский язык',
-            'Китайский язык',
-            'Немецкий язык',
-            'Французский язык',
-
-            'Другое',
+            { value: 'employed', label: 'Работаю' },
+            { value: 'student', label: 'Студент / Учащийся' },
+            {
+                value: 'unemployed',
+                label: 'Безработный / Временно не работаю',
+            },
         ],
         [],
     )
@@ -232,21 +176,6 @@ const ProfessionalInfoStep = ({
         },
         [],
     )
-
-    const handleToggleArray = useCallback((field: string, value: string) => {
-        setFormData((prev) => {
-            const fieldKey = field as keyof typeof prev
-            const currentArray = Array.isArray(prev[fieldKey])
-                ? (prev[fieldKey] as string[])
-                : []
-
-            const updatedArray = currentArray.includes(value)
-                ? currentArray.filter((item) => item !== value)
-                : [...currentArray, value]
-
-            return { ...prev, [field]: updatedArray }
-        })
-    }, [])
 
     const handleNext = () => {
         onNext()
@@ -275,18 +204,27 @@ const ProfessionalInfoStep = ({
                             Опыт работы
                         </h3>
 
-                        <FormItem label="Текущая должность или статус">
-                            <Input
-                                value={formData.current_position}
-                                onChange={(e) =>
-                                    handleInputChange(
-                                        'current_position',
-                                        e.target.value,
-                                    )
-                                }
-                                placeholder="Например: студент, безработный, кассир, волонтёр"
+                        <FormItem label="Текущий статус">
+                            <Select
+                                value={employmentStatusOptions.find(
+                                    (option) =>
+                                        option.value === employmentStatus,
+                                )}
+                                onChange={handleEmploymentStatusChange}
+                                placeholder="Выберите ваш текущий статус"
+                                options={employmentStatusOptions}
                             />
                         </FormItem>
+
+                        {employmentStatus === 'employed' && (
+                            <FormItem label="Текущая должность">
+                                <Input
+                                    value={jobTitle}
+                                    onChange={handleJobTitleChange}
+                                    placeholder="Например: кассир, разработчик, менеджер"
+                                />
+                            </FormItem>
+                        )}
 
                         <FormItem label="Годы опыта работы">
                             <Select<{ value: number; label: string }>

@@ -9,7 +9,7 @@ class OnboardingProfileBase(BaseModel):
     workplace_preferences: Optional[str] = None
     
     # Профессиональная информация
-    profession: Optional[str] = None
+    current_position: Optional[str] = None
     experience_level: Optional[str] = None
     education_level: Optional[str] = None
     
