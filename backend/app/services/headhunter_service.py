@@ -62,6 +62,14 @@ class HeadHunterService:
             "moreThan6": "moreThan6"
         }
 
+        # Stop words for professions that shouldn't be used as job titles
+        self.profession_stop_words = [
+            "безработный", "unemployed", "без работы",
+            "студент", "student", "учащийся",
+            "школьник", "schoolboy", "schoolgirl",
+            "временно не работаю", "temporarily not working"
+        ]
+
     async def get_personalized_recommendations(
         self,
         user: User,
@@ -191,10 +199,10 @@ class HeadHunterService:
             if onboarding_profile.currency is not None:
                 preferences_data["salary_currency"] = onboarding_profile.currency
             
-            if onboarding_profile.profession is not None:
-                # Don't use "безработный" as a job title - use skills instead
-                if onboarding_profile.profession.lower() not in ["безработный", "unemployed", "без работы"]:
-                    preferences_data["preferred_job_titles"] = [onboarding_profile.profession]
+            if onboarding_profile.current_position is not None:
+                # Don't use stop words as a job title - use skills instead
+                if onboarding_profile.current_position.lower() not in self.profession_stop_words:
+                    preferences_data["preferred_job_titles"] = [onboarding_profile.current_position]
         
         # Create and save preferences
         preferences = UserJobPreferences(**preferences_data)
