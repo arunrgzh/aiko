@@ -4,7 +4,11 @@ import classNames from '@/utils/classNames'
 import NavToggle from '@/components/shared/NavToggle'
 import type { CommonProps } from '@/@types/common'
 
-const _SideNavToggle = ({ className }: CommonProps) => {
+interface SideNavToggleProps extends CommonProps {
+    toggled?: boolean
+}
+
+const _SideNavToggle = ({ className, toggled }: SideNavToggleProps) => {
     const { layout, setSideNavCollapse } = useTheme((state) => state)
 
     const sideNavCollapse = layout.sideNavCollapse
@@ -18,8 +22,12 @@ const _SideNavToggle = ({ className }: CommonProps) => {
             className={classNames('hidden lg:block', className)}
             role="button"
             onClick={onCollapse}
+            aria-label="Toggle side navigation"
         >
-            <NavToggle className="text-2xl" toggled={sideNavCollapse} />
+            <NavToggle
+                className="text-2xl"
+                toggled={toggled ?? sideNavCollapse}
+            />
         </div>
     )
 }

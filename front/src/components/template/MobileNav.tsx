@@ -21,6 +21,7 @@ type MobileNavToggleProps = {
 
 type MobileNavProps = {
     translationSetup?: boolean
+    className?: string
 }
 
 const MobileNavToggle = withHeaderItem<
@@ -29,6 +30,7 @@ const MobileNavToggle = withHeaderItem<
 
 const MobileNav = ({
     translationSetup = appConfig.activeNavTranslation,
+    className,
 }: MobileNavProps) => {
     const [isOpen, setIsOpen] = useState(false)
 
@@ -55,21 +57,33 @@ const MobileNav = ({
     return (
         <>
             <div
-                className="text-2xl block lg:hidden"
+                className={classNames(
+                    'text-2xl block lg:hidden cursor-pointer transition-colors hover:text-primary-500',
+                    className,
+                )}
                 onClick={handleOpenDrawer}
+                role="button"
+                aria-label="Toggle navigation menu"
             >
                 <MobileNavToggle toggled={isOpen} />
             </div>
             <Drawer
                 title="Navigation"
                 isOpen={isOpen}
-                bodyClass={classNames('p-0')}
-                width={330}
+                bodyClass="p-0"
+                width={300}
                 placement={direction === DIR_RTL ? 'right' : 'left'}
                 onClose={handleDrawerClose}
                 onRequestClose={handleDrawerClose}
+                headerClass="py-3 px-4"
             >
-                <Suspense fallback={<></>}>
+                <Suspense
+                    fallback={
+                        <div className="flex items-center justify-center h-full">
+                            <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary-500 border-t-transparent"></div>
+                        </div>
+                    }
+                >
                     {isOpen && (
                         <VerticalMenuContent
                             collapsed={false}
@@ -79,6 +93,7 @@ const MobileNav = ({
                             translationSetup={translationSetup}
                             direction={direction}
                             onMenuItemClick={handleDrawerClose}
+                            className="py-2"
                         />
                     )}
                 </Suspense>

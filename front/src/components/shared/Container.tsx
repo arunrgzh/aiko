@@ -19,7 +19,10 @@ const Container = (props: ContainerProps) => {
     return (
         <Component
             ref={ref}
-            className={classNames('container mx-auto', className)}
+            className={classNames(
+                'container mx-auto px-4 md:px-6 lg:px-8 max-w-[1400px]',
+                className,
+            )}
             {...rest}
         >
             {children}
