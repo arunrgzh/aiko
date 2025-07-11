@@ -15,6 +15,7 @@ import useMenuActive from '@/utils/hooks/useMenuActive'
 import useTranslation from '@/utils/hooks/useTranslation'
 import { Direction } from '@/@types/theme'
 import type { NavigationTree, TranslationFn } from '@/@types/navigation'
+import classNames from '@/utils/classNames'
 
 export interface VerticalMenuContentProps {
     collapsed?: boolean
@@ -24,6 +25,7 @@ export interface VerticalMenuContentProps {
     direction?: Direction
     translationSetup: boolean
     userAuthority: string[]
+    className?: string
 }
 
 const { MenuGroup } = Menu
@@ -39,6 +41,7 @@ const VerticalMenuContent = (props: VerticalMenuContentProps) => {
         direction = themeConfig.direction,
         translationSetup,
         userAuthority,
+        className,
     } = props
 
     const translationPlaceholder = (key: string, fallback?: string) => {
@@ -146,7 +149,7 @@ const VerticalMenuContent = (props: VerticalMenuContentProps) => {
 
     return (
         <Menu
-            className="px-4 pb-4"
+            className={classNames('px-4 pb-4', className)}
             sideCollapsed={collapsed}
             defaultActiveKeys={activedRoute?.key ? [activedRoute.key] : []}
             defaultExpandedKeys={defaulExpandKey}

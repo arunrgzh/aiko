@@ -1,45 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-// import {
-//     LAYOUT_STACKED_SIDE,
-//     LAYOUT_TOP_BAR_CLASSIC,
-//     LAYOUT_FRAMELESS_SIDE,
-//     LAYOUT_CONTENT_OVERLAY,
-//     LAYOUT_BLANK,
-// } from '@/constants/theme.constant'
-// import FrameLessSide from './components/FrameLessSide'
-// import StackedSide from './components/StackedSide'
 import TopBarClassic from './components/TopBarClassic'
-// import Blank from './components/Blank'
 import PageContainer from '@/components/template/PageContainer'
 import VirtualAssistant from '@/components/shared/VirtualAssistant'
 import queryRoute from '@/utils/queryRoute'
-// import useTheme from '@/utils/hooks/useTheme'
 import { usePathname } from 'next/navigation'
 import type { CommonProps } from '@/@types/common'
-// import type { LayoutType } from '@/@types/theme'
-
-// interface DashboardLayoutProps extends CommonProps {
-//     layoutType: LayoutType
-// }
-//
-// const Layout = ({ children, layoutType }: DashboardLayoutProps) => {
-//     switch (layoutType) {
-//         case LAYOUT_STACKED_SIDE:
-//             return <StackedSide>{children}</StackedSide>
-//         case LAYOUT_TOP_BAR_CLASSIC:
-//             return <TopBarClassic>{children}</TopBarClassic>
-//         case LAYOUT_FRAMELESS_SIDE:
-//             return <FrameLessSide>{children}</FrameLessSide>
-//         case LAYOUT_CONTENT_OVERLAY:
-//             return <ContentOverlay>{children}</ContentOverlay>
-//         case LAYOUT_BLANK:
-//             return <Blank>{children}</Blank>
-//         default:
-//             return <>{children}</>
-//     }
-// }
 
 const DashboardLayout = ({ children }: CommonProps) => {
     const pathname = usePathname()
@@ -116,10 +83,13 @@ const DashboardLayout = ({ children }: CommonProps) => {
     }
 
     return (
-        <>
+        <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
             <TopBarClassic>
-                <PageContainer className={'h-screen'} {...route?.meta}>
-                    {children}
+                <PageContainer
+                    className="flex-1 px-4 md:px-6 py-4 md:py-6 overflow-hidden"
+                    {...route?.meta}
+                >
+                    <div className="h-full overflow-auto">{children}</div>
                 </PageContainer>
             </TopBarClassic>
 
@@ -131,9 +101,10 @@ const DashboardLayout = ({ children }: CommonProps) => {
                     initialMessage={getAssistantMessage()}
                     showQuickActions={true}
                     autoShow={false}
+                    className="fixed bottom-4 right-4 z-50"
                 />
             )}
-        </>
+        </div>
     )
 }
 

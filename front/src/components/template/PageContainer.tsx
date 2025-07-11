@@ -59,8 +59,8 @@ export const PageContainerHeader = ({
     return (
         <div
             className={classNames(
-                contained && 'container mx-auto',
-                'flex items-center justify-between mb-4',
+                contained && 'container mx-auto px-4 md:px-6',
+                'flex flex-col md:flex-row md:items-center justify-between mb-4 gap-4',
                 gutterLess && 'mt-4',
                 className,
             )}
@@ -71,7 +71,9 @@ export const PageContainerHeader = ({
                     (customeHeader ? (
                         customeHeader()
                     ) : (
-                        <h3 className="font-bold">{title}</h3>
+                        <h3 className="font-bold text-xl md:text-2xl">
+                            {title}
+                        </h3>
                     ))}
                 <Suspense fallback={<></>}>
                     {title && typeof title !== 'string' && (
@@ -79,11 +81,13 @@ export const PageContainerHeader = ({
                     )}
                 </Suspense>
             </div>
-            <Suspense fallback={<></>}>
-                {extraHeader && typeof extraHeader !== 'string' && (
-                    <CustomHeader header={extraHeader} />
-                )}
-            </Suspense>
+            <div className="flex-shrink-0">
+                <Suspense fallback={<></>}>
+                    {extraHeader && typeof extraHeader !== 'string' && (
+                        <CustomHeader header={extraHeader} />
+                    )}
+                </Suspense>
+            </div>
         </div>
     )
 }
@@ -94,11 +98,11 @@ export const PageContainerBody = ({
     className,
 }: PageContainerBodyProps) => {
     return pageContainerType === 'contained' ? (
-        <Container className={classNames('h-full', className)}>
+        <Container className={classNames('h-full px-4 md:px-6', className)}>
             {children}
         </Container>
     ) : (
-        <>{children}</>
+        <div className="px-4 md:px-6">{children}</div>
     )
 }
 
@@ -110,7 +114,10 @@ export const PageContainerFooter = ({
     if (!footer) return null
 
     return (
-        <Footer className={className} pageContainerType={pageContainerType} />
+        <Footer
+            className={classNames('mt-auto', className)}
+            pageContainerType={pageContainerType}
+        />
     )
 }
 
@@ -127,7 +134,7 @@ const PageContainer = (props: PageContainerProps) => {
 
     const defaultClass = 'h-full flex flex-auto flex-col justify-between'
     const pageContainerDefaultClass =
-        'page-container relative h-full flex flex-auto flex-col'
+        'page-container relative h-full flex flex-auto flex-col overflow-hidden'
     const pageContainerGutterClass = `${PAGE_CONTAINER_GUTTER_X} ${PAGE_CONTAINER_GUTTER_Y}`
 
     return (
@@ -154,7 +161,7 @@ const PageContainer = (props: PageContainerProps) => {
                             'bg-white dark:bg-gray-900',
                     )}
                 >
-                    <main className="h-full">
+                    <main className="h-full flex flex-col">
                         <div
                             className={classNames(
                                 pageContainerDefaultClass,
@@ -162,7 +169,7 @@ const PageContainer = (props: PageContainerProps) => {
                                     pageContainerGutterClass,
                                 pageContainerType === 'contained' &&
                                     'container mx-auto',
-                                !footer && 'pb-0 sm:pb-0 md:pb-0',
+                                !footer && 'pb-0',
                             )}
                         >
                             <PageContainerHeader
@@ -171,6 +178,7 @@ const PageContainer = (props: PageContainerProps) => {
                             />
                             <PageContainerBody
                                 pageContainerType={pageContainerType}
+                                className="flex-1"
                             >
                                 {children}
                             </PageContainerBody>

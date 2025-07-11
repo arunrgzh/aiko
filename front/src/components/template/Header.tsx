@@ -24,27 +24,27 @@ const Header = (props: HeaderProps) => {
     return (
         <header
             className={classNames(
-                'header bg-white dark:bg-gray-900 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 relative z-10',
+                'header bg-white dark:bg-gray-900 backdrop-blur-sm border-b border-gray-200 dark:border-gray-800 relative z-10 w-full',
                 className,
             )}
         >
             <div
                 className={classNames(
-                    'header-wrapper flex items-center justify-between px-6',
+                    'header-wrapper flex flex-wrap items-center justify-between px-4 md:px-6',
                     container && 'container mx-auto',
                     wrapperClass,
                 )}
-                style={{ height: HEADER_HEIGHT }}
+                style={{ minHeight: HEADER_HEIGHT }}
             >
-                <div className="header-action header-action-start flex items-center gap-4">
+                <div className="header-action header-action-start flex items-center gap-2 md:gap-4">
                     {headerStart}
                 </div>
                 {headerMiddle && (
-                    <div className="header-action header-action-middle flex-1 flex items-center justify-center">
+                    <div className="header-action header-action-middle flex-1 flex items-center justify-center overflow-x-auto max-w-full">
                         {headerMiddle}
                     </div>
                 )}
-                <div className="header-action header-action-end flex items-center gap-4">
+                <div className="header-action header-action-end flex items-center gap-2 md:gap-4">
                     {headerEnd}
                 </div>
             </div>

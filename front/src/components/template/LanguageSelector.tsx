@@ -30,9 +30,15 @@ const _LanguageSelector = ({ className }: CommonProps) => {
     }
 
     const selectedLanguage = (
-        <div className={classNames(className, 'flex items-center')}>
+        <div
+            className={classNames(
+                className,
+                'flex items-center cursor-pointer',
+            )}
+        >
             <Avatar
-                size={24}
+                size={20}
+                className="w-5 h-5 md:w-6 md:h-6"
                 shape="circle"
                 src={`/img/countries/${selectLangFlag}.png`}
             />
@@ -40,24 +46,31 @@ const _LanguageSelector = ({ className }: CommonProps) => {
     )
 
     return (
-        <Dropdown renderTitle={selectedLanguage} placement="bottom-end">
+        <Dropdown
+            renderTitle={selectedLanguage}
+            placement="bottom-end"
+            menuClass="min-w-[150px] md:min-w-[180px]"
+        >
             {languageList.map((lang) => (
                 <Dropdown.Item
                     key={lang.label}
-                    className="justify-between"
+                    className="justify-between py-2 hover:bg-gray-50 dark:hover:bg-gray-700"
                     eventKey={lang.label}
                     onClick={() => handleUpdateLocale(lang.value)}
                 >
                     <span className="flex items-center">
                         <Avatar
-                            size={18}
+                            size={16}
+                            className="w-4 h-4 md:w-[18px] md:h-[18px]"
                             shape="circle"
                             src={`/img/countries/${lang.flag}.png`}
                         />
-                        <span className="ltr:ml-2 rtl:mr-2">{lang.label}</span>
+                        <span className="ltr:ml-2 rtl:mr-2 text-sm md:text-base">
+                            {lang.label}
+                        </span>
                     </span>
                     {locale === lang.value && (
-                        <HiCheck className="text-emerald-500 text-lg" />
+                        <HiCheck className="text-emerald-500 text-base md:text-lg" />
                     )}
                 </Dropdown.Item>
             ))}

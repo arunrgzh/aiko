@@ -73,7 +73,7 @@ const LayoutSwitcher = () => {
                 value={[]}
                 onChange={(val) => setLayout(val as LayoutType)}
             >
-                <div className="grid grid-cols-3 gap-4 w-full">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-4 w-full">
                     {layouts.map((layout) => (
                         <Segment.Item key={layout.value} value={layout.value}>
                             {({ onSegmentItemClick }) => {
@@ -82,16 +82,16 @@ const LayoutSwitcher = () => {
                                     <div className="text-center">
                                         <button
                                             className={classNames(
-                                                'border-2 rounded-xl overflow-hidden',
+                                                'border-2 rounded-lg md:rounded-xl overflow-hidden transition-all duration-200',
                                                 active
-                                                    ? 'border-primary dark:border-primary'
-                                                    : 'border-gray-200 dark:border-gray-700',
+                                                    ? 'border-primary dark:border-primary scale-95 md:scale-100'
+                                                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600',
                                             )}
                                             onClick={onSegmentItemClick}
                                         >
                                             {layout.svg}
                                         </button>
-                                        <div className="mt-2 font-semibold">
+                                        <div className="mt-1 md:mt-2 text-xs md:text-sm font-semibold">
                                             {layout.label}
                                         </div>
                                     </div>
