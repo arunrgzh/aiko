@@ -37,7 +37,7 @@ const Logo = (props: LogoProps) => {
                             type === 'full' ? '' : 'hidden',
                             imgClass,
                         )}
-                        src={`${LOGO_SRC_PATH}logo-full.png`}
+                        src={`${LOGO_SRC_PATH}logo-full-light.png`}
                         alt={`${APP_NAME} logo`}
                         width={width}
                         height={height}
@@ -49,7 +49,7 @@ const Logo = (props: LogoProps) => {
                             type === 'streamline' ? '' : 'hidden',
                             imgClass,
                         )}
-                        src={`${LOGO_SRC_PATH}logo-full.png`}
+                        src={`${LOGO_SRC_PATH}logo-full-light.png`}
                         alt={`${APP_NAME} logo`}
                         width={width}
                         height={height}
@@ -65,7 +65,7 @@ const Logo = (props: LogoProps) => {
                             type === 'full' ? '' : 'hidden',
                             imgClass,
                         )}
-                        src={`${LOGO_SRC_PATH}logo-full.png`}
+                        src={`${LOGO_SRC_PATH}logo-full-dark.png`}
                         alt={`${APP_NAME} logo`}
                         width={width}
                         height={height}

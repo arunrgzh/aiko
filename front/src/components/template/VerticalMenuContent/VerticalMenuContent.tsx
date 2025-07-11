@@ -52,13 +52,13 @@ const VerticalMenuContent = (props: VerticalMenuContentProps) => {
         translationSetup ? useTranslation() : translationPlaceholder
     ) as TranslationFn
 
-    const [defaulExpandKey, setDefaulExpandKey] = useState<string[]>([])
+    const [defaultExpandedKeys, setDefaultExpandedKeys] = useState<string[]>([])
 
     const { activedRoute } = useMenuActive(navigationTree, routeKey)
 
     useEffect(() => {
         if (activedRoute?.parentKey) {
-            setDefaulExpandKey([activedRoute?.parentKey])
+            setDefaultExpandedKeys([activedRoute.parentKey])
         }
     }, [activedRoute?.parentKey])
 
@@ -77,68 +77,64 @@ const VerticalMenuContent = (props: VerticalMenuContentProps) => {
             <>
                 {navTree.map((nav) => (
                     <Fragment key={nav.key}>
-                        {nav.type === NAV_ITEM_TYPE_ITEM && (
-                            <VerticalSingleMenuItem
-                                key={nav.key}
-                                currentKey={activedRoute?.key}
-                                parentKeys={defaulExpandKey}
-                                nav={nav}
-                                sideCollapsed={collapsed}
-                                direction={direction}
-                                indent={indent}
-                                renderAsIcon={cascade <= 0}
-                                showIcon={cascade <= 0}
-                                userAuthority={userAuthority}
-                                showTitle={
-                                    collapsed
-                                        ? cascade >= 1
-                                        : cascade <= MAX_CASCADE_LEVEL
-                                }
-                                t={t}
-                                onLinkClick={handleLinkClick}
+                        {nav.type === NAV_ITEM_TYPE_TITLE && (
+                            <MenuGroup
+                                label={t(nav.translateKey) || nav.title}
                             />
                         )}
-                        {nav.type === NAV_ITEM_TYPE_COLLAPSE && (
-                            <VerticalCollapsedMenuItem
-                                key={nav.key}
-                                currentKey={activedRoute?.key}
-                                parentKeys={defaulExpandKey}
-                                nav={nav}
-                                sideCollapsed={collapsed}
-                                direction={direction}
-                                indent={nextCascade >= MAX_CASCADE_LEVEL}
-                                dotIndent={nextCascade >= MAX_CASCADE_LEVEL}
-                                renderAsIcon={nextCascade <= 1}
-                                userAuthority={userAuthority}
-                                t={t}
-                                onLinkClick={onMenuItemClick}
-                            >
-                                {nav.subMenu &&
-                                    nav.subMenu.length > 0 &&
-                                    renderNavigation(
-                                        nav.subMenu,
-                                        nextCascade,
-                                        true,
-                                    )}
-                            </VerticalCollapsedMenuItem>
-                        )}
-                        {nav.type === NAV_ITEM_TYPE_TITLE && (
+                        {nav.type === NAV_ITEM_TYPE_ITEM && (
                             <AuthorityCheck
                                 userAuthority={userAuthority}
                                 authority={nav.authority}
                             >
-                                <MenuGroup
+                                <VerticalSingleMenuItem
                                     key={nav.key}
-                                    label={t(nav.translateKey) || nav.title}
+                                    nav={nav}
+                                    sideCollapsed={collapsed}
+                                    direction={direction}
+                                    indent={indent}
+                                    userAuthority={userAuthority}
+                                    currentKey={activedRoute?.key}
+                                    parentKeys={defaultExpandedKeys}
+                                    showTitle={
+                                        collapsed
+                                            ? cascade >= 1
+                                            : cascade <= MAX_CASCADE_LEVEL
+                                    }
+                                    showIcon={cascade <= 0}
+                                    renderAsIcon={cascade <= 0}
+                                    t={t}
+                                    onLinkClick={handleLinkClick}
+                                />
+                            </AuthorityCheck>
+                        )}
+                        {nav.type === NAV_ITEM_TYPE_COLLAPSE && (
+                            <AuthorityCheck
+                                userAuthority={userAuthority}
+                                authority={nav.authority}
+                            >
+                                <VerticalCollapsedMenuItem
+                                    key={nav.key}
+                                    nav={nav}
+                                    sideCollapsed={collapsed}
+                                    direction={direction}
+                                    indent={nextCascade >= MAX_CASCADE_LEVEL}
+                                    dotIndent={nextCascade >= MAX_CASCADE_LEVEL}
+                                    renderAsIcon={nextCascade <= 1}
+                                    userAuthority={userAuthority}
+                                    currentKey={activedRoute?.key}
+                                    parentKeys={defaultExpandedKeys}
+                                    t={t}
+                                    onLinkClick={onMenuItemClick}
                                 >
                                     {nav.subMenu &&
                                         nav.subMenu.length > 0 &&
                                         renderNavigation(
                                             nav.subMenu,
-                                            cascade,
-                                            false,
+                                            nextCascade,
+                                            true,
                                         )}
-                                </MenuGroup>
+                                </VerticalCollapsedMenuItem>
                             </AuthorityCheck>
                         )}
                     </Fragment>
@@ -152,7 +148,7 @@ const VerticalMenuContent = (props: VerticalMenuContentProps) => {
             className={classNames('px-4 pb-4', className)}
             sideCollapsed={collapsed}
             defaultActiveKeys={activedRoute?.key ? [activedRoute.key] : []}
-            defaultExpandedKeys={defaulExpandKey}
+            defaultExpandedKeys={defaultExpandedKeys}
             defaultCollapseActiveKeys={
                 activedRoute?.parentKey ? [activedRoute.parentKey] : []
             }

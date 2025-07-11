@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, Suspense, lazy } from 'react'
 import classNames from 'classnames'
 import Drawer from '@/components/ui/Drawer'
@@ -10,18 +12,19 @@ import useCurrentSession from '@/utils/hooks/useCurrentSession'
 import queryRoute from '@/utils/queryRoute'
 import appConfig from '@/configs/app.config'
 import { usePathname } from 'next/navigation'
+import { PiList } from 'react-icons/pi'
 
 const VerticalMenuContent = lazy(
     () => import('@/components/template/VerticalMenuContent'),
 )
 
-type MobileNavToggleProps = {
-    toggled?: boolean
-}
-
-type MobileNavProps = {
+interface MobileNavProps {
     translationSetup?: boolean
     className?: string
+}
+
+type MobileNavToggleProps = {
+    toggled?: boolean
 }
 
 const MobileNavToggle = withHeaderItem<
@@ -43,15 +46,10 @@ const MobileNav = ({
     }
 
     const pathname = usePathname()
-
     const route = queryRoute(pathname)
-
     const currentRouteKey = route?.key || ''
-
     const direction = useTheme((state) => state.direction)
-
     const { session } = useCurrentSession()
-
     const { navigationTree } = useNavigation()
 
     return (
@@ -65,22 +63,26 @@ const MobileNav = ({
                 role="button"
                 aria-label="Toggle navigation menu"
             >
-                <MobileNavToggle toggled={isOpen} />
+                <PiList className="text-2xl" />
             </div>
             <Drawer
-                title="Navigation"
+                title={
+                    <div className="flex items-center">
+                        <PiList className="text-2xl text-gray-900 dark:text-gray-100" />
+                    </div>
+                }
                 isOpen={isOpen}
                 bodyClass="p-0"
                 width={300}
                 placement={direction === DIR_RTL ? 'right' : 'left'}
                 onClose={handleDrawerClose}
                 onRequestClose={handleDrawerClose}
-                headerClass="py-3 px-4"
+                headerClass="py-3 px-4 flex items-center"
             >
                 <Suspense
                     fallback={
                         <div className="flex items-center justify-center h-full">
-                            <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary-500 border-t-transparent"></div>
+                            <div className="animate-spin rounded-full h-6 w-6 border-2 border-primary-500 border-t-transparent" />
                         </div>
                     }
                 >

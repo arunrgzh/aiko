@@ -1,102 +1,106 @@
-import Menu from '@/components/ui/Menu'
-import Dropdown from '@/components/ui/Dropdown'
-import VerticalMenuIcon from './VerticalMenuIcon'
-import AuthorityCheck from '@/components/shared/AuthorityCheck'
-import type { CommonProps } from '@/@types/common'
-import type { Direction } from '@/@types/theme'
-import type { NavigationTree, TranslationFn } from '@/@types/navigation'
+'use client'
 
-interface DefaultItemProps extends CommonProps {
+import { Menu } from '@/components/ui'
+import navigationIcon from '@/configs/navigation-icon.config'
+import { Direction } from '@/@types/theme'
+import type { NavigationTree, TranslationFn } from '@/@types/navigation'
+import classNames from '@/utils/classNames'
+import { TbChevronDown } from 'react-icons/tb'
+import { PiDotOutlineFill } from 'react-icons/pi'
+import { motion } from 'framer-motion'
+
+interface VerticalCollapsedMenuItemProps {
     nav: NavigationTree
-    onLinkClick?: (link: { key: string; title: string; path: string }) => void
-    t: TranslationFn
+    sideCollapsed?: boolean
+    direction?: Direction
     indent?: boolean
     dotIndent?: boolean
     userAuthority: string[]
-}
-
-interface CollapsedItemProps extends DefaultItemProps {
-    direction: Direction
-    renderAsIcon?: boolean
     currentKey?: string
     parentKeys?: string[]
-}
-
-interface VerticalCollapsedMenuItemProps extends CollapsedItemProps {
-    sideCollapsed?: boolean
-}
-
-const { MenuItem, MenuCollapse } = Menu
-
-const DefaultItem = ({
-    nav,
-    indent,
-    dotIndent,
-    children,
-    userAuthority,
-    t,
-}: DefaultItemProps) => {
-    return (
-        <AuthorityCheck userAuthority={userAuthority} authority={nav.authority}>
-            <MenuCollapse
-                key={nav.key}
-                label={
-                    <>
-                        <VerticalMenuIcon icon={nav.icon} />
-                        <span>{t(nav.translateKey, nav.title)}</span>
-                    </>
-                }
-                eventKey={nav.key}
-                expanded={false}
-                dotIndent={dotIndent}
-                indent={indent}
-            >
-                {children}
-            </MenuCollapse>
-        </AuthorityCheck>
-    )
-}
-
-const CollapsedItem = ({
-    nav,
-    direction,
-    children,
-    t,
-    renderAsIcon,
-    userAuthority,
-    parentKeys,
-}: CollapsedItemProps) => {
-    const menuItem = (
-        <MenuItem key={nav.key} isActive={parentKeys?.includes(nav.key)} eventKey={nav.key} className="mb-2">
-            <VerticalMenuIcon icon={nav.icon} />
-        </MenuItem>
-    )
-
-    const dropdownItem = (
-        <div key={nav.key}>{t(nav.translateKey, nav.title)}</div>
-    )
-
-    return (
-        <AuthorityCheck userAuthority={userAuthority} authority={nav.authority}>
-            <Dropdown
-                trigger="hover"
-                renderTitle={renderAsIcon ? menuItem : dropdownItem}
-                placement={direction === 'rtl' ? 'left-start' : 'right-start'}
-            >
-                {children}
-            </Dropdown>
-        </AuthorityCheck>
-    )
+    renderAsIcon?: boolean
+    t: TranslationFn
+    onLinkClick?: () => void
+    children?: React.ReactNode
 }
 
 const VerticalCollapsedMenuItem = ({
+    nav,
     sideCollapsed,
-    ...rest
+    direction,
+    indent,
+    dotIndent,
+    currentKey,
+    parentKeys = [],
+    renderAsIcon = false,
+    t,
+    onLinkClick,
+    children,
 }: VerticalCollapsedMenuItemProps) => {
-    return sideCollapsed ? (
-        <CollapsedItem {...rest} />
-    ) : (
-        <DefaultItem {...rest} />
+    const itemTitle = t(nav.translateKey) || nav.title
+    const icon = navigationIcon[nav.icon]
+    const isActive = currentKey === nav.key || parentKeys.includes(nav.key)
+
+    return (
+        <Menu.MenuCollapse
+            eventKey={nav.key}
+            expanded={parentKeys.includes(nav.key)}
+            className={classNames(
+                'flex items-center h-10 px-2 text-sm font-medium rounded-lg',
+                indent && (direction === 'rtl' ? 'mr-4' : 'ml-4'),
+                'hover:bg-gray-100 dark:hover:bg-gray-700',
+                isActive && 'bg-gray-100 dark:bg-gray-700 text-primary-500',
+            )}
+            label={
+                <div className="flex items-center w-full">
+                    {dotIndent && (
+                        <PiDotOutlineFill
+                            className={classNames(
+                                'text-3xl w-[24px]',
+                                !isActive && 'opacity-25',
+                            )}
+                        />
+                    )}
+                    {!dotIndent && icon && (
+                        <span
+                            className={classNames(
+                                'text-xl',
+                                sideCollapsed && 'mx-auto',
+                            )}
+                        >
+                            {icon}
+                        </span>
+                    )}
+                    {(!sideCollapsed || renderAsIcon) && (
+                        <span
+                            className={classNames(
+                                'flex-1 truncate',
+                                (icon || dotIndent) &&
+                                    (direction === 'rtl' ? 'mr-2' : 'ml-2'),
+                            )}
+                        >
+                            {itemTitle}
+                        </span>
+                    )}
+                    {!sideCollapsed && (
+                        <motion.span
+                            className="text-lg mt-1"
+                            initial={{ transform: 'rotate(0deg)' }}
+                            animate={{
+                                transform: parentKeys.includes(nav.key)
+                                    ? 'rotate(-180deg)'
+                                    : 'rotate(0deg)',
+                            }}
+                            transition={{ duration: 0.15 }}
+                        >
+                            <TbChevronDown />
+                        </motion.span>
+                    )}
+                </div>
+            }
+        >
+            {children}
+        </Menu.MenuCollapse>
     )
 }
 
