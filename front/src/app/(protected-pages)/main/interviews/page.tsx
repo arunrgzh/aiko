@@ -3,14 +3,23 @@
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import { TbVideo } from 'react-icons/tb'
+import Badge from '@/components/ui/Badge'
 
 export default function InterviewsPage() {
     return (
         <div className="space-y-6">
             <div>
-                <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                    Пробные собеседования
-                </h1>
+                <div className="flex items-center gap-4 mb-2">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+                        Пробные собеседования
+                    </h1>
+                    <Badge
+                        className="text-sm"
+                        innerClass="bg-gray-200 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                    >
+                        Скоро
+                    </Badge>
+                </div>
                 <p className="text-gray-600 dark:text-gray-400">
                     Тренировка навыков собеседования с ИИ
                 </p>
