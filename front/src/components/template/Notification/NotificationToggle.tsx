@@ -10,9 +10,20 @@ const NotificationToggle = ({
     dot: boolean
 }) => {
     return (
-        <div className={classNames('text-2xl', className)}>
+        <div
+            className={classNames(
+                'text-xl md:text-2xl cursor-pointer hover:text-primary-500 transition-colors',
+                className,
+            )}
+        >
             {dot ? (
-                <Badge badgeStyle={{ top: '3px', right: '6px' }}>
+                <Badge
+                    badgeStyle={{
+                        top: '2px',
+                        right: '4px',
+                    }}
+                    className="scale-75 md:scale-100 md:top-[3px] md:right-[6px]"
+                >
                     <PiBellDuotone />
                 </Badge>
             ) : (

@@ -2,6 +2,7 @@
 
 import useTheme from '@/utils/hooks/useTheme'
 import Switcher from '@/components/ui/Switcher'
+import classNames from '@/utils/classNames'
 
 const ModeSwitcher = () => {
     const mode = useTheme((state) => state.mode)
@@ -16,6 +17,7 @@ const ModeSwitcher = () => {
             <Switcher
                 defaultChecked={mode === 'dark'}
                 onChange={onSwitchChange}
+                className="scale-90 md:scale-100"
             />
         </div>
     )

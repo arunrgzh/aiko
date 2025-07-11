@@ -11,6 +11,7 @@ import queryRoute from '@/utils/queryRoute'
 import appConfig from '@/configs/app.config'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { motion } from 'framer-motion'
 
 import {
     SIDE_NAV_WIDTH,
@@ -48,25 +49,28 @@ const SideNav = ({
     mode,
 }: SideNavProps) => {
     const pathname = usePathname()
-
     const route = queryRoute(pathname)
-
     const { navigationTree } = useNavigation()
-
     const defaultMode = useTheme((state) => state.mode)
     const direction = useTheme((state) => state.direction)
     const sideNavCollapse = useTheme((state) => state.layout.sideNavCollapse)
-
     const currentRouteKey = route?.key || ''
     const { session } = useCurrentSession()
 
     return (
-        <div
-            style={sideNavCollapse ? sideNavCollapseStyle : sideNavStyle}
+        <motion.div
+            initial={false}
+            animate={{
+                width: sideNavCollapse
+                    ? SIDE_NAV_COLLAPSED_WIDTH
+                    : SIDE_NAV_WIDTH,
+                minWidth: sideNavCollapse
+                    ? SIDE_NAV_COLLAPSED_WIDTH
+                    : SIDE_NAV_WIDTH,
+            }}
             className={classNames(
-                'side-nav hidden lg:block',
+                'side-nav hidden lg:flex flex-col transition-all duration-300 ease-in-out',
                 background && 'side-nav-bg',
-                !sideNavCollapse && 'side-nav-expand',
                 className,
             )}
         >
@@ -76,19 +80,24 @@ const SideNav = ({
                 style={{ height: HEADER_HEIGHT }}
             >
                 <Logo
-                    imgClass="max-h-10"
+                    imgClass="max-h-10 w-auto"
                     mode={mode || defaultMode}
                     type={sideNavCollapse ? 'streamline' : 'full'}
                     className={classNames(
-                        sideNavCollapse && 'ltr:ml-[11.5px] ltr:mr-[11.5px]',
+                        'transition-all duration-300',
                         sideNavCollapse
                             ? SIDE_NAV_CONTENT_GUTTER
                             : LOGO_X_GUTTER,
                     )}
                 />
             </Link>
-            <div className={classNames('side-nav-content', contentClass)}>
-                <ScrollBar style={{ height: '100%' }} direction={direction}>
+            <div
+                className={classNames(
+                    'side-nav-content flex-1 h-full',
+                    contentClass,
+                )}
+            >
+                <ScrollBar autoHide direction={direction}>
                     <VerticalMenuContent
                         collapsed={sideNavCollapse}
                         navigationTree={navigationTree}
@@ -99,7 +108,7 @@ const SideNav = ({
                     />
                 </ScrollBar>
             </div>
-        </div>
+        </motion.div>
     )
 }
 

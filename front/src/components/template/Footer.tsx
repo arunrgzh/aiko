@@ -13,15 +13,15 @@ type FooterProps = {
 
 const FooterContent = () => {
     return (
-        <div className="flex items-center justify-between flex-auto w-full">
-            <span>
+        <div className="flex flex-col md:flex-row items-center justify-between flex-auto w-full gap-4 py-4 md:py-0">
+            <span className="text-center md:text-left text-sm md:text-base">
                 Copyright &copy; {`${new Date().getFullYear()}`}{' '}
                 <span className="font-semibold">{`${APP_NAME}`}</span> All
                 rights reserved.
             </span>
-            <div className="">
+            <div className="flex items-center text-sm md:text-base">
                 <Link
-                    className="text-gray"
+                    className="text-gray hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                     href="/#"
                     onClick={(e) => e.preventDefault()}
                 >
@@ -29,7 +29,7 @@ const FooterContent = () => {
                 </Link>
                 <span className="mx-2 text-muted"> | </span>
                 <Link
-                    className="text-gray"
+                    className="text-gray hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
                     href="/#"
                     onClick={(e) => e.preventDefault()}
                 >
@@ -47,7 +47,8 @@ export default function Footer({
     return (
         <footer
             className={classNames(
-                `footer flex flex-auto items-center h-16 ${PAGE_CONTAINER_GUTTER_X}`,
+                'footer flex flex-auto items-center min-h-[4rem] md:h-16',
+                PAGE_CONTAINER_GUTTER_X,
                 className,
             )}
         >

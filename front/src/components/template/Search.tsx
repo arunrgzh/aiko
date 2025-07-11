@@ -78,19 +78,19 @@ const ListItem = (props: {
         <Link href={url} onClick={onNavigate}>
             <div
                 className={classNames(
-                    'flex items-center justify-between rounded-xl p-3 cursor-pointer user-select',
+                    'flex items-center justify-between rounded-xl p-2 md:p-3 cursor-pointer user-select',
                     'hover:bg-gray-100 dark:hover:bg-gray-700',
                 )}
             >
                 <div className="flex items-center gap-2">
                     <div
                         className={classNames(
-                            'rounded-lg border-2 border-gray-200 shadow-xs text-xl group-hover:shadow-sm h-10 w-10 flex items-center justify-center bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
+                            'rounded-lg border-2 border-gray-200 shadow-xs text-lg md:text-xl group-hover:shadow-sm h-8 w-8 md:h-10 md:w-10 flex items-center justify-center bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100',
                         )}
                     >
                         {icon && navigationIcon[icon]}
                     </div>
-                    <div className="text-gray-900 dark:text-gray-300">
+                    <div className="text-sm md:text-base text-gray-900 dark:text-gray-300">
                         <Highlighter
                             autoEscape
                             highlightClassName={classNames(
@@ -172,69 +172,76 @@ const _Search = ({ className }: { className?: string }) => {
     return (
         <>
             <div
-                className={classNames(className, 'text-2xl')}
+                className={classNames(
+                    className,
+                    'text-xl md:text-2xl cursor-pointer hover:text-primary-500 transition-colors',
+                )}
                 onClick={handleSearchOpen}
             >
                 <PiMagnifyingGlassDuotone />
             </div>
             <Dialog
-                contentClassName="p-0"
+                contentClassName="p-0 w-[90vw] max-w-[800px] max-h-[90vh]"
                 isOpen={searchDialogOpen}
                 closable={false}
                 onRequestClose={handleSearchClose}
             >
-                <div>
-                    <div className="px-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-600">
-                        <div className="flex items-center">
-                            <HiOutlineSearch className="text-xl" />
+                <div className="flex flex-col h-full">
+                    <div className="px-2 md:px-4 flex items-center justify-between border-b border-gray-200 dark:border-gray-600">
+                        <div className="flex items-center flex-1">
+                            <HiOutlineSearch className="text-lg md:text-xl text-gray-400" />
                             <input
                                 ref={inputRef}
-                                className="ring-0 outline-hidden block w-full p-4 text-base bg-transparent text-gray-900 dark:text-gray-100"
+                                className="ring-0 outline-hidden block w-full py-3 md:py-4 px-2 md:px-4 text-sm md:text-base bg-transparent text-gray-900 dark:text-gray-100"
                                 placeholder="Search..."
                                 onChange={handleSearch}
                             />
                         </div>
-                        <Button size="xs" onClick={handleSearchClose}>
+                        <Button
+                            size="xs"
+                            onClick={handleSearchClose}
+                            className="ml-2"
+                        >
                             Esc
                         </Button>
                     </div>
-                    <div className="py-6 px-5">
-                        <ScrollBar className=" max-h-[350px] overflow-y-auto">
-                            {searchResult.map((result) => (
-                                <div key={result.title} className="mb-4">
-                                    <h6 className="mb-3">{result.title}</h6>
-                                    {result.data.map((data, index) => (
-                                        <ListItem
-                                            key={data.title + index}
-                                            icon={data.icon}
-                                            label={data.title}
-                                            url={data.path}
-                                            keyWord={
-                                                inputRef.current?.value || ''
-                                            }
-                                            onNavigate={handleNavigate}
-                                        />
-                                    ))}
-                                </div>
-                            ))}
-                            {searchResult.length === 0 && noResult && (
-                                <div className="my-10 text-center text-lg">
-                                    <span>No results for </span>
-                                    <span className="heading-text">
-                                        {`'`}
-                                        {inputRef.current?.value}
-                                        {`'`}
-                                    </span>
-                                </div>
-                            )}
-                        </ScrollBar>
-                    </div>
+                    <ScrollBar className="flex-1 px-2 md:px-4">
+                        {noResult ? (
+                            <div className="text-center py-10">
+                                <div className="text-6xl opacity-30">🔎</div>
+                                <h6 className="mt-4 text-sm md:text-base">
+                                    No results found!
+                                </h6>
+                            </div>
+                        ) : (
+                            <div className="py-4">
+                                {searchResult.map((result) => (
+                                    <div key={result.title} className="mb-6">
+                                        <h6 className="mb-3 text-sm md:text-base px-2 font-semibold">
+                                            {result.title}
+                                        </h6>
+                                        {result.data.map((item) => (
+                                            <ListItem
+                                                key={item.key}
+                                                icon={item.icon}
+                                                label={item.title}
+                                                url={item.path}
+                                                keyWord={
+                                                    inputRef.current?.value ||
+                                                    ''
+                                                }
+                                                onNavigate={handleNavigate}
+                                            />
+                                        ))}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </ScrollBar>
                 </div>
             </Dialog>
         </>
     )
 }
 
-const Search = withHeaderItem(_Search)
-
-export default Search
+export default withHeaderItem(_Search)

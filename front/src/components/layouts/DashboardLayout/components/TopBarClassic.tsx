@@ -27,23 +27,31 @@ const TopBarClassic = ({ children }: CommonProps) => {
                         container
                         className="shadow-sm dark:shadow-2xl"
                         headerStart={
-                            <>
-                                <MobileNav />
+                            <div className="flex items-center gap-2 md:gap-4">
+                                <MobileNav className="lg:hidden" />
                                 <HeaderLogo />
-                            </>
+                            </div>
                         }
-                        headerMiddle={<HorizontalNav navigationTree={navigation.navigationTree}  />}
+                        headerMiddle={
+                            <div className="hidden lg:block w-full max-w-[800px]">
+                                <HorizontalNav
+                                    navigationTree={navigation.navigationTree}
+                                />
+                            </div>
+                        }
                         headerEnd={
-                            <>
-                                <Search />
+                            <div className="flex items-center gap-2 md:gap-4">
+                                <Search className="hidden md:flex" />
                                 <LanguageSelector />
                                 <Notification />
                                 <SidePanel />
                                 <UserProfileDropdown hoverable={false} />
-                            </>
+                            </div>
                         }
                     />
-                    {children}
+                    <div className="flex flex-col flex-1 overflow-hidden">
+                        {children}
+                    </div>
                 </div>
             </div>
         </LayoutBase>

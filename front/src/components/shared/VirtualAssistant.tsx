@@ -22,6 +22,7 @@ interface VirtualAssistantProps {
     showQuickActions?: boolean
     autoShow?: boolean
     autoShowDelay?: number
+    className?: string
 }
 
 const VirtualAssistant = ({
@@ -31,6 +32,7 @@ const VirtualAssistant = ({
     showQuickActions = true,
     autoShow = false,
     autoShowDelay = 3000,
+    className = '',
 }: VirtualAssistantProps) => {
     const router = useRouter()
     const [isExpanded, setIsExpanded] = useState(false)
@@ -85,7 +87,7 @@ const VirtualAssistant = ({
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 0.3 }}
-                className="fixed bottom-6 right-6 z-50"
+                className={`fixed bottom-6 right-6 z-50 ${className}`}
             >
                 <motion.button
                     onClick={handleExpand}
@@ -120,7 +122,7 @@ const VirtualAssistant = ({
                 animate={{ opacity: 1, x: 0, y: 0 }}
                 exit={{ opacity: 0, x: 100, y: 20 }}
                 transition={{ duration: 0.4, ease: 'easeOut' }}
-                className="fixed bottom-6 right-6 z-50 max-w-sm"
+                className={`fixed bottom-6 right-6 z-50 max-w-sm ${className}`}
             >
                 <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden">
                     {/* Assistant Header */}

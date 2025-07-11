@@ -35,7 +35,10 @@ type NotificationList = {
     readed: boolean
 }
 
-const notificationHeight = 'h-[280px]'
+const notificationHeight = {
+    mobile: 'h-[240px]',
+    desktop: 'h-[280px]',
+}
 
 const _Notification = ({ className }: { className?: string }) => {
     const [notificationList, setNotificationList] = useState<
@@ -116,39 +119,46 @@ const _Notification = ({ className }: { className?: string }) => {
                     className={className}
                 />
             }
-            menuClass="min-w-[280px] md:min-w-[340px]"
+            menuClass="min-w-[280px] md:min-w-[340px] max-h-[90vh] md:max-h-none"
             placement={larger.md ? 'bottom-end' : 'bottom'}
             onOpen={onNotificationOpen}
         >
             <Dropdown.Item variant="header">
                 <div className="dark:border-gray-700 px-2 flex items-center justify-between mb-1">
-                    <h6>Notifications</h6>
+                    <h6 className="text-sm md:text-base">Notifications</h6>
                     <Tooltip title="Mark all as read">
                         <Button
                             variant="plain"
                             shape="circle"
                             size="sm"
-                            icon={<HiOutlineMailOpen className="text-xl" />}
+                            icon={
+                                <HiOutlineMailOpen className="text-lg md:text-xl" />
+                            }
                             onClick={onMarkAllAsRead}
                         />
                     </Tooltip>
                 </div>
             </Dropdown.Item>
             <ScrollBar
-                className={classNames('overflow-y-auto', notificationHeight)}
+                className={classNames(
+                    'overflow-y-auto',
+                    larger.md
+                        ? notificationHeight.desktop
+                        : notificationHeight.mobile,
+                )}
             >
                 {notificationList.length > 0 &&
                     notificationList.map((item, index) => (
                         <div key={item.id}>
                             <div
-                                className={`relative rounded-xl flex px-4 py-3 cursor-pointer hover:bg-gray-100 active:bg-gray-100 dark:hover:bg-gray-700`}
+                                className={`relative rounded-xl flex px-3 md:px-4 py-2 md:py-3 cursor-pointer hover:bg-gray-100 active:bg-gray-100 dark:hover:bg-gray-700`}
                                 onClick={() => onMarkAsRead(item.id)}
                             >
                                 <div>
                                     <NotificationAvatar {...item} />
                                 </div>
-                                <div className="mx-3">
-                                    <div>
+                                <div className="mx-2 md:mx-3 flex-1">
+                                    <div className="text-sm md:text-base">
                                         {item.target && (
                                             <span className="font-semibold heading-text">
                                                 {item.target}{' '}
@@ -156,10 +166,12 @@ const _Notification = ({ className }: { className?: string }) => {
                                         )}
                                         <span>{item.description}</span>
                                     </div>
-                                    <span className="text-xs">{item.date}</span>
+                                    <span className="text-xs text-gray-500 dark:text-gray-400">
+                                        {item.date}
+                                    </span>
                                 </div>
                                 <Badge
-                                    className="absolute top-4 ltr:right-4 rtl:left-4 mt-1.5"
+                                    className="absolute top-3 md:top-4 ltr:right-3 rtl:left-3 md:ltr:right-4 md:rtl:left-4"
                                     innerClass={`${
                                         item.readed
                                             ? 'bg-gray-300 dark:bg-gray-600'
@@ -168,7 +180,7 @@ const _Notification = ({ className }: { className?: string }) => {
                                 />
                             </div>
                             {!isLastChild(notificationList, index) ? (
-                                <div className="border-b border-gray-200 dark:border-gray-700 my-2" />
+                                <div className="border-b border-gray-200 dark:border-gray-700 my-1 md:my-2" />
                             ) : (
                                 ''
                             )}
@@ -178,41 +190,44 @@ const _Notification = ({ className }: { className?: string }) => {
                     <div
                         className={classNames(
                             'flex items-center justify-center',
-                            notificationHeight,
+                            larger.md
+                                ? notificationHeight.desktop
+                                : notificationHeight.mobile,
                         )}
                     >
-                        <Spinner size={40} />
+                        <Spinner size={32} className="md:w-10 md:h-10" />
                     </div>
                 )}
                 {noResult && notificationList.length === 0 && (
                     <div
                         className={classNames(
                             'flex items-center justify-center',
-                            notificationHeight,
+                            larger.md
+                                ? notificationHeight.desktop
+                                : notificationHeight.mobile,
                         )}
                     >
-                        <div className="text-center">
+                        <div className="text-center px-4">
                             <img
-                                className="mx-auto mb-2 max-w-[150px]"
+                                className="mx-auto mb-2 max-w-[120px] md:max-w-[150px]"
                                 src="/img/others/no-notification.png"
                                 alt="no-notification"
                             />
-                            <h6 className="font-semibold">No notifications!</h6>
-                            <p className="mt-1">Please Try again later</p>
+                            <h6 className="font-semibold text-sm md:text-base">
+                                No notifications!
+                            </h6>
                         </div>
                     </div>
                 )}
             </ScrollBar>
-            <Dropdown.Item variant="header">
-                <div className="pt-4">
-                    <Button
-                        block
-                        variant="solid"
-                        onClick={handleViewAllActivity}
-                    >
-                        View All Activity
-                    </Button>
-                </div>
+            <Dropdown.Item variant="header" className="justify-center">
+                <Button
+                    variant="plain"
+                    className="text-xs md:text-sm"
+                    onClick={handleViewAllActivity}
+                >
+                    View all Activity
+                </Button>
             </Dropdown.Item>
         </Dropdown>
     )
