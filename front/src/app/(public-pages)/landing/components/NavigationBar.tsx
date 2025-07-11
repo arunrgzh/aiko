@@ -86,7 +86,7 @@ const Navigation = ({ toggleMode, mode }: NavigationProps) => {
                 <Link href="/">
                     {mode === 'light' && (
                         <Image
-                            src="/img/logo/logo-full.png"
+                            src="/img/logo/logo-full-light.png"
                             width={180}
                             height={80}
                             alt="logo"
@@ -94,7 +94,7 @@ const Navigation = ({ toggleMode, mode }: NavigationProps) => {
                     )}
                     {mode === 'dark' && (
                         <Image
-                            src="/img/logo/logo-full.png"
+                            src="/img/logo/logo-full-dark.png"
                             width={180}
                             height={80}
                             alt="logo"
