@@ -33,10 +33,12 @@ export default function VacancyCard({
     onApply,
     onViewDetails,
 }: VacancyCardProps) {
-    const [isSaved, setIsSaved] = useState(vacancy.is_saved || false)
+    // Remove local isSaved state
+    // const [isSaved, setIsSaved] = useState(vacancy.is_saved || false);
+
+    const isSaved = vacancy.is_saved || false
 
     const handleSave = () => {
-        setIsSaved(!isSaved)
         onSave?.(vacancy.id)
     }
 
@@ -111,6 +113,11 @@ export default function VacancyCard({
                             shape="circle"
                             onClick={handleSave}
                             className="text-gray-400 hover:text-red-500"
+                            aria-label={
+                                isSaved
+                                    ? 'Удалить из сохраненных'
+                                    : 'Сохранить вакансию'
+                            }
                         >
                             {isSaved ? (
                                 <TbHeartFilled className="text-red-500" />

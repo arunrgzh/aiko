@@ -28,7 +28,6 @@ const HorizontalMenuContent = (props: HorizontalMenuContentProps) => {
         return fallback || key
     }
 
-
     const t = (
         translationSetup ? useTranslation() : translationPlaceholder
     ) as TranslationFn
@@ -42,7 +41,7 @@ const HorizontalMenuContent = (props: HorizontalMenuContentProps) => {
                     userAuthority={userAuthority}
                     authority={nav.authority}
                 >
-                    {nav.subMenu.length > 0  ? (
+                    {nav.subMenu.length > 0 ? (
                         <HorizontalMenuDropdown
                             dropdownLean={
                                 nav.meta?.horizontalMenu?.layout === 'default'

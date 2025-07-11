@@ -9,9 +9,9 @@ import { NavigationTree } from '@/@types/navigation'
 
 const HorizontalNav = ({
     translationSetup = appConfig.activeNavTranslation,
-    navigationTree
+    navigationTree,
 }: {
-    translationSetup?: boolean,
+    translationSetup?: boolean
     navigationTree: NavigationTree[]
 }) => {
     const pathname = usePathname()
