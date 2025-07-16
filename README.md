@@ -53,15 +53,15 @@
 
     ```env
     # Backend API URL
-    NEXT_PUBLIC_API_URL=http://localhost:8000
+    NEXT_PUBLIC_API_URL=http://REDACTED:8000
 
     # NextAuth Configuration
     NEXTAUTH_SECRET=your-nextauth-secret-key-here-make-it-long-and-random
     NEXTAUTH_URL=http://localhost:3000
 
     # Backend URL for server-side requests
-    API_URL=http://localhost:8000/
-    BACKEND_URL=http://localhost:8000
+    API_URL=http://REDACTED:8000/
+    BACKEND_URL=http://REDACTED:8000
     ```
 
 3. **Запустите фронтенд:**

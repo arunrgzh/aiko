@@ -23,5 +23,5 @@ async def root():
 if __name__ == "__main__":
     print("🧪 Starting test server on http://localhost:8001")
     print("📄 Test page: http://localhost:8001/test")
-    print("🔗 Main API: http://localhost:8000")
+    print("🔗 Main API: http://REDACTED:8000")
     uvicorn.run(static_app, host="0.0.0.0", port=8001) 
