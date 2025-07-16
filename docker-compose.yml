@@ -1,11 +1,71 @@
+version: '3.8'
+
 services:
-    ai_komekshi_frontend:
-        container_name: ai_komekshi_frontend
-        build:
-            context: .
-            dockerfile: ./Dockerfile
-        command: sh -c "npm run start -- -p $NEXT_PORT -H $NEXT_HOST"
-        restart: unless-stopped
-        env_file: .env
+    # PostgreSQL Database
+    postgres:
+        image: postgres:15
+        container_name: ai_komekshi_postgres
+        environment:
+            POSTGRES_DB: ai_komek
+            POSTGRES_USER: komek_user
+            POSTGRES_PASSWORD: REDACTED
         ports:
-            - '${NEXT_PORT}:${NEXT_PORT}'
+            - '5432:5432'
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+        restart: unless-stopped
+
+    # Redis (for caching and sessions)
+    redis:
+        image: redis:7-alpine
+        container_name: ai_komekshi_redis
+        ports:
+            - '6379:6379'
+        restart: unless-stopped
+
+    # FastAPI Backend
+    backend:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        container_name: ai_komekshi_backend
+        environment:
+            - DATABASE_URL=postgresql+asyncpg://REDACTED:REDACTED@postgres:5432/ai_komek
+            - REDIS_URL=redis://redis:6379
+            - SECRET_KEY=your-super-secret-key-change-this-in-production
+            - FRONTEND_URL=http://localhost:3000
+            - ENVIRONMENT=development
+            - HTTP_PROXY=
+            - HTTPS_PROXY=
+        ports:
+            - '8000:8000'
+        depends_on:
+            - postgres
+            - redis
+        restart: unless-stopped
+        volumes:
+            - ./backend:/app
+        command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+    # Next.js Frontend
+    frontend:
+        build:
+            context: ./front
+            dockerfile: Dockerfile
+        container_name: ai_komekshi_frontend
+        environment:
+            - API_URL=http://localhost:8000
+            - NEXTAUTH_SECRET=your-nextauth-secret-change-this-in-production
+            - NEXTAUTH_URL=http://localhost:3000
+        ports:
+            - '3000:3000'
+        depends_on:
+            - backend
+        restart: unless-stopped
+        volumes:
+            - ./front:/app
+            - /app/node_modules
+        command: npm run dev
+
+volumes:
+    postgres_data:
