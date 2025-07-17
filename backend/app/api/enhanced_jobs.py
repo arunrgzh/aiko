@@ -27,6 +27,7 @@ async def get_dual_recommendations(
     page: int = Query(0, ge=0),
     per_page: int = Query(20, ge=1, le=50),
     refresh: bool = Query(False, description="Fetch fresh recommendations from HH API"),
+    disable_filters: bool = Query(False, description="Disable strict inclusive filters for broader results"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
@@ -43,7 +44,7 @@ async def get_dual_recommendations(
         
         # Get dual recommendations from enhanced service
         dual_recommendations = await enhanced_hh_service.get_dual_recommendations(
-            current_user, db, page, per_page
+            current_user, db, page, per_page, disable_filters
         )
         
         # Convert to response format

@@ -28,12 +28,48 @@ class VacancyService {
             searchParams.append('refresh', params.refresh.toString())
         }
 
+        console.log('🔍 Requesting dual recommendations with params:', params)
+
         const response = await ApiService.fetchData<DualRecommendationResponse>(
             {
-                url: `/enhanced-jobs/dual-recommendations?${searchParams.toString()}`,
+                url: `/api/enhanced-jobs/dual-recommendations?${searchParams.toString()}`,
                 method: 'GET',
             },
         )
+
+        console.log('✅ Dual recommendations response:', {
+            totalRecommendations: response.total_recommendations,
+            personalCount:
+                response.personal_block?.recommendations?.length || 0,
+            assessmentCount:
+                response.assessment_block?.recommendations?.length || 0,
+        })
+
+        // If no recommendations found, try without strict filters
+        if (response.total_recommendations === 0) {
+            console.log(
+                '🔄 No recommendations found, trying without strict filters...',
+            )
+            searchParams.append('disable_filters', 'true')
+
+            const fallbackResponse =
+                await ApiService.fetchData<DualRecommendationResponse>({
+                    url: `/api/enhanced-jobs/dual-recommendations?${searchParams.toString()}`,
+                    method: 'GET',
+                })
+
+            console.log('🔄 Fallback response:', {
+                totalRecommendations: fallbackResponse.total_recommendations,
+                personalCount:
+                    fallbackResponse.personal_block?.recommendations?.length ||
+                    0,
+                assessmentCount:
+                    fallbackResponse.assessment_block?.recommendations
+                        ?.length || 0,
+            })
+
+            return fallbackResponse
+        }
 
         return response
     }
