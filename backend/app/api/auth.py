@@ -35,7 +35,8 @@ async def register(user_data: UserCreate, db: AsyncSession = Depends(get_db)):
         username=user_data.username,
         hashed_password=get_password_hash(user_data.password)
     )
-    
+    print(user)
+
     db.add(user)
     await db.commit()
     await db.refresh(user)
