@@ -9,29 +9,30 @@ import type { ReactNode } from 'react'
 
 export default function ProtectedLayout({ children }: { children: ReactNode }) {
     const router = useRouter()
-    const { session, status } = useCurrentSession() // status: "loading"|"authenticated"|"unauthenticated"
+    const { session } = useCurrentSession()
 
     useEffect(() => {
-        if (status === 'loading') return
+        // Wait for session to be fully loaded
+        if (!session) return
 
-        if (status === 'unauthenticated') {
+        // If no access token, redirect to sign in
+        if (!session.accessToken) {
             router.replace(appConfig.signInEntryPath)
             return
         }
 
-        if (session.user.isFirstLogin) {
+        // If first time login, redirect to onboarding immediately
+        if (session.user?.isFirstLogin) {
             router.replace(appConfig.onboardingPath)
             return
         }
-        if (session.accessToken) {
-            localStorage.setItem('access_token', session.accessToken)
-        } else {
-            router.replace(appConfig.signInEntryPath)
-            return
-        }
-    }, [status, session, router])
 
-    if (status === 'loading') {
+        // If we reach here, user is authenticated and not first login
+        localStorage.setItem('access_token', session.accessToken)
+    }, [session, router])
+
+    // Show loading while session is being fetched
+    if (!session) {
         return (
             <Container className="flex items-center justify-center h-screen w-screen">
                 <Spinner size={40} />
@@ -39,9 +40,13 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
         )
     }
 
-    // while `useEffect` is triggering `router.replace`, we can return null
-    if (status !== 'authenticated') {
-        return null
+    // Show loading while redirecting (prevents flash of content)
+    if (!session.accessToken || session.user?.isFirstLogin) {
+        return (
+            <Container className="flex items-center justify-center h-screen w-screen">
+                <Spinner size={40} />
+            </Container>
+        )
     }
 
     return <>{children}</>

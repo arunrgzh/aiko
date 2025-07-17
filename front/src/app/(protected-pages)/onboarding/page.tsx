@@ -176,43 +176,24 @@ const OnboardingPage = () => {
             session?.user?.isFirstLogin,
         )
 
-        // Проверяем, загружена ли сессия (есть ли accessToken)
-        if (session?.accessToken) {
-            // FOR TESTING: Always show assessment choice modal regardless of first login status
-            console.log(
-                'Loading onboarding data and showing choice (TESTING MODE)',
-            )
+        // Wait for session to be loaded
+        if (!session) {
+            return
+        }
+
+        // If user has access token, load onboarding data and show choice
+        if (session.accessToken) {
+            console.log('Loading onboarding data and showing choice')
             loadOnboardingData().finally(() => {
                 setLoading(false)
+                setShowAssessmentChoice(true)
             })
-
-            /* ORIGINAL PRODUCTION CODE (commented out for testing):
-            // Если пользователь уже прошел онбординг
-            if (!session.user.isFirstLogin) {
-                console.log(
-                    'Redirecting to dashboard - user already completed onboarding',
-                )
-                router.push('/main/dashboard')
-            } else {
-                // Загружаем существующие данные онбординга и показываем выбор
-                console.log('Loading onboarding data and showing choice')
-                loadOnboardingData().finally(() => {
-                    setLoading(false)
-                    setShowAssessmentChoice(true)
-                })
-            }
-            */
-        } else if (session?.user?.id) {
-            // Если есть user.id но нет accessToken, показываем онбординг
-            console.log(
-                'Showing onboarding (no accessToken but has user) - setting loading to false',
-            )
-            setLoading(false)
         } else {
-            // Если сессия еще не загружена, оставляем loading = true
-            console.log('Session not loaded yet - keeping loading true')
+            // No access token, just show onboarding form
+            console.log('No access token, showing onboarding form')
+            setLoading(false)
         }
-    }, [session, router, loadOnboardingData])
+    }, [session, loadOnboardingData])
 
     // Автоматическое сохранение данных при их изменении
     useEffect(() => {
