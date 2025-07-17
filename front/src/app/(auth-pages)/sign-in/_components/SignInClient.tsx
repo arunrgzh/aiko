@@ -40,9 +40,11 @@ const SignInClient = () => {
                 return
             }
 
-            // Fallback redirect
-            console.log('🎯 Fallback redirect to dashboard')
-            window.location.href = appConfig.authenticatedEntryPath
+            // Check if this is a first-time login to redirect to onboarding
+            // Note: We need to check the session after sign-in to get the isFirstLogin flag
+            // For now, redirect to root page which will handle the routing logic
+            console.log('🎯 Redirecting to root for smart routing')
+            window.location.href = '/'
         } catch (error) {
             console.error('Sign-in error:', error)
             setMessage('An unexpected error occurred')

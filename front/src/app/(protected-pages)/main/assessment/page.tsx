@@ -3,7 +3,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import useCurrentSession from '@/utils/hooks/useCurrentSession'
 import AssessmentQuestions from '@/components/shared/AssessmentQuestions'
 import AssessmentService from '@/services/AssessmentService'
 import { Spinner } from '@/components/ui/Spinner'
@@ -17,8 +16,7 @@ import type {
 
 const AssessmentPage = () => {
     const router = useRouter()
-    const { session } = useCurrentSession()
-    const { update: updateSession } = useSession()
+    const { data: session, status, update: updateSession } = useSession()
     const [questions, setQuestions] = useState<AssessmentQuestion[]>([])
     const [loading, setLoading] = useState(true)
     const [assessmentLoading, setAssessmentLoading] = useState(false)
@@ -28,25 +26,35 @@ const AssessmentPage = () => {
         null,
     )
     const [saving, setSaving] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     // Load assessment questions on mount
     useEffect(() => {
         const loadQuestions = async () => {
+            if (status === 'loading') return
+            if (status === 'unauthenticated') {
+                router.replace('/auth/sign-in')
+                return
+            }
+            if (!session?.accessToken) return
+
             try {
                 console.log('Loading assessment questions...')
+                setError(null)
                 const questionsData = await AssessmentService.getQuestions()
                 setQuestions(questionsData.questions)
             } catch (error) {
                 console.error('Error loading assessment questions:', error)
+                setError(
+                    'Не удалось загрузить вопросы теста. Попробуйте обновить страницу.',
+                )
             } finally {
                 setLoading(false)
             }
         }
 
-        if (session?.accessToken) {
-            loadQuestions()
-        }
-    }, [session?.accessToken])
+        loadQuestions()
+    }, [session, status, router])
 
     const handleAssessmentSubmit = useCallback(
         async (answers: AssessmentAnswer[]) => {
@@ -60,6 +68,9 @@ const AssessmentPage = () => {
                 setProfileSummary(summary)
             } catch (error) {
                 console.error('Error submitting assessment:', error)
+                setError(
+                    'Ошибка при отправке результатов теста. Попробуйте еще раз.',
+                )
             } finally {
                 setAssessmentLoading(false)
             }
@@ -89,9 +100,11 @@ const AssessmentPage = () => {
                 router.push('/main/vacancies')
             } else {
                 console.error('Error marking assessment as completed')
+                setError('Ошибка при завершении. Попробуйте еще раз.')
             }
         } catch (error) {
             console.error('Error completing assessment:', error)
+            setError('Ошибка при завершении. Попробуйте еще раз.')
         } finally {
             setSaving(false)
         }
@@ -100,12 +113,71 @@ const AssessmentPage = () => {
     const handleRetakeAssessment = useCallback(() => {
         setAssessmentResult(null)
         setProfileSummary(null)
+        setError(null)
     }, [])
 
-    if (loading) {
+    if (status === 'loading' || loading) {
         return (
             <Container className="flex items-center justify-center h-screen">
-                <Spinner size={40} />
+                <div className="text-center">
+                    <Spinner size={40} />
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">
+                        {status === 'loading'
+                            ? 'Загрузка сессии...'
+                            : 'Загрузка теста...'}
+                    </p>
+                </div>
+            </Container>
+        )
+    }
+
+    if (status === 'unauthenticated') {
+        return (
+            <Container className="flex items-center justify-center h-screen">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+                        Требуется авторизация
+                    </h1>
+                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                        Для прохождения теста необходимо войти в систему
+                    </p>
+                    <button
+                        onClick={() => router.push('/auth/sign-in')}
+                        className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                    >
+                        Войти в систему
+                    </button>
+                </div>
+            </Container>
+        )
+    }
+
+    // Show error state
+    if (error && !assessmentResult && questions.length === 0) {
+        return (
+            <Container className="py-8">
+                <div className="max-w-4xl mx-auto text-center">
+                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                        Ошибка загрузки теста
+                    </h1>
+                    <p className="text-red-600 dark:text-red-400 mb-8">
+                        {error}
+                    </p>
+                    <div className="flex justify-center space-x-4">
+                        <button
+                            onClick={() => window.location.reload()}
+                            className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+                        >
+                            Обновить страницу
+                        </button>
+                        <button
+                            onClick={() => router.push('/main/vacancies')}
+                            className="px-6 py-3 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        >
+                            Перейти к вакансиям
+                        </button>
+                    </div>
+                </div>
             </Container>
         )
     }
