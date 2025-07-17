@@ -16,8 +16,8 @@ docker-compose -f docker-compose.full.yml up -d
 
 # The application will be available at:
 # Frontend: http://localhost:3000
-# Backend API: http://REDACTED:8000
-# API Documentation: http://REDACTED:8000/docs
+# Backend API: http://localhost:8000
+# API Documentation: http://localhost:8000/docs
 ```
 
 ## 🛠️ Manual Setup
@@ -83,7 +83,7 @@ docker-compose -f docker-compose.full.yml up -d
    Create a `.env.local` file in the root directory:
 
     ```env
-    API_URL=http://REDACTED:8000
+    API_URL=http://localhost:8000
     NEXTAUTH_SECRET=your-nextauth-secret-here
     NEXTAUTH_URL=http://localhost:3000
     ```
@@ -121,7 +121,7 @@ DEBUG=True
 ### Frontend (.env.local)
 
 ```env
-API_URL=http://REDACTED:8000
+API_URL=http://localhost:8000
 NEXTAUTH_SECRET=your-nextauth-secret-here
 NEXTAUTH_URL=http://localhost:3000
 ```
@@ -189,8 +189,8 @@ npm test
 
 Once the backend is running, you can access:
 
-- **Swagger UI:** http://REDACTED:8000/docs
-- **ReDoc:** http://REDACTED:8000/redoc
+- **Swagger UI:** http://localhost:8000/docs
+- **ReDoc:** http://localhost:8000/redoc
 
 ## 🔧 Development
 
@@ -274,7 +274,7 @@ If you encounter any issues:
 1. Check the logs: `docker-compose logs`
 2. Verify all environment variables are set correctly
 3. Ensure all services are running
-4. Check the API documentation at http://REDACTED:8000/docs
+4. Check the API documentation at http://localhost:8000/docs
 
 ## 🎉 Next Steps
 

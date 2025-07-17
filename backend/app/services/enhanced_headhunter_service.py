@@ -127,9 +127,14 @@ class EnhancedHeadHunterService:
         if isinstance(onboarding_vacancies, Exception):
             logger.error(f"Error fetching onboarding recommendations: {onboarding_vacancies}")
             onboarding_vacancies = []
+        else:
+            onboarding_vacancies = onboarding_vacancies or []
+            
         if isinstance(assessment_vacancies, Exception):
             logger.error(f"Error fetching assessment recommendations: {assessment_vacancies}")
             assessment_vacancies = []
+        else:
+            assessment_vacancies = assessment_vacancies or []
         
         # Get detailed info for top vacancies
         onboarding_detailed = await self._get_detailed_vacancies(onboarding_vacancies[:10])
@@ -212,19 +217,22 @@ class EnhancedHeadHunterService:
         # Build search text from profession and skills
         search_terms = []
         
-        if onboarding_profile.profession:
-            search_terms.append(onboarding_profile.profession)
+        profession = getattr(onboarding_profile, 'profession', None)
+        if profession:
+            search_terms.append(profession)
         
-        if onboarding_profile.skills:
-            search_terms.extend(onboarding_profile.skills[:5])  # Top 5 skills
+        skills = getattr(onboarding_profile, 'skills', None)
+        if skills:
+            search_terms.extend(skills[:5])  # Top 5 skills
         
         if search_terms:
             params["text"] = " OR ".join(search_terms)
         
         # Location preferences
-        if onboarding_profile.preferred_cities:
+        preferred_cities = getattr(onboarding_profile, 'preferred_cities', None)
+        if preferred_cities:
             area_ids = []
-            for city in onboarding_profile.preferred_cities:
+            for city in preferred_cities:
                 city_lower = city.lower().replace("-", "_")
                 if city_lower in self.area_mapping:
                     area_ids.append(self.area_mapping[city_lower])
@@ -233,9 +241,10 @@ class EnhancedHeadHunterService:
                 params["area"] = ",".join(area_ids)
         
         # Employment type
-        if onboarding_profile.employment_type:
+        employment_type = getattr(onboarding_profile, 'employment_type', None)
+        if employment_type:
             hh_employment = []
-            for emp_type in onboarding_profile.employment_type:
+            for emp_type in employment_type:
                 if emp_type in self.employment_mapping:
                     hh_employment.append(self.employment_mapping[emp_type])
             if hh_employment:

@@ -10,7 +10,7 @@ type FastAPIAuthResponse = {
 }
 type AccessPayload = { sub: string; exp: number }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://REDACTED:8000'
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
     const res = await fetch(`${API_URL}/api/auth/refresh`, {
@@ -130,16 +130,21 @@ export const authOptions: NextAuthConfig = {
             session.user.id = String(token.id)
             session.accessToken = token.accessToken
             session.error = token.error
-            session.user.isFirstLogin = token.isFirstLogin
+            // FOR TESTING: Force isFirstLogin to always be true
+            session.user.isFirstLogin = true // token.isFirstLogin
             session.user.accessTokenExpires = token.accessTokenExpires
 
             // Debug logging
             if (process.env.NODE_ENV === 'development') {
-                console.log('🔍 NextAuth Session Callback:', {
-                    hasAccessToken: !!token.accessToken,
-                    tokenExpires: token.accessTokenExpires,
-                    error: token.error,
-                })
+                console.log(
+                    '🔍 NextAuth Session Callback (with isFirstLogin):',
+                    {
+                        hasAccessToken: !!token.accessToken,
+                        tokenExpires: token.accessTokenExpires,
+                        error: token.error,
+                        isFirstLogin: true, // Always true for testing
+                    },
+                )
             }
 
             return session

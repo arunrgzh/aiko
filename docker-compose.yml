@@ -54,9 +54,9 @@ services:
             dockerfile: Dockerfile
         container_name: ai_komekshi_frontend
         environment:
-            - API_URL=http://REDACTED:8000
+            - API_URL=http://localhost:8000
             - NEXTAUTH_SECRET=your-nextauth-secret-change-this-in-production
-            - NEXTAUTH_URL=http://localhost:3000
+            - NEXTAUTH_URL=http://:3000
         ports:
             - '3000:3000'
         depends_on:
