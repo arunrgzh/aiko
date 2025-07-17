@@ -17,20 +17,28 @@ export default function Page() {
             process.env.NEXT_PUBLIC_ALWAYS_SHOW_LANDING === 'true'
 
         if (alwaysShowLanding) {
-            router.push(appConfig.unAuthenticatedEntryPath)
+            router.replace(appConfig.unAuthenticatedEntryPath)
             return
         }
 
         // Smart routing based on authentication state
         if (session?.accessToken !== undefined) {
+            console.log('🏠 Root page routing - session:', {
+                hasToken: !!session.accessToken,
+                isFirstLogin: session.user?.isFirstLogin,
+            })
+
             // Check if user needs onboarding
-            if (session.user.isFirstLogin) {
-                router.push(appConfig.onboardingPath)
+            if (session.user?.isFirstLogin) {
+                console.log('🏠 Root page: Redirecting to onboarding')
+                router.replace(appConfig.onboardingPath)
             } else {
-                router.push(appConfig.authenticatedEntryPath)
+                console.log('🏠 Root page: Redirecting to dashboard')
+                router.replace(appConfig.authenticatedEntryPath)
             }
         } else {
-            router.push(appConfig.unAuthenticatedEntryPath)
+            console.log('🏠 Root page: No session, redirecting to landing')
+            router.replace(appConfig.unAuthenticatedEntryPath)
         }
     }, [session, router])
 
