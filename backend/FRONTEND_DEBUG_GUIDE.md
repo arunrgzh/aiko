@@ -6,8 +6,8 @@ Your backend is 100% working. The issue is your **frontend authentication**.
 
 Console errors show:
 
--   ❌ `GET http://REDACTED:8000/notifications/count 401 (Unauthorized)`
--   ❌ `GET http://REDACTED:8000/main/assistants/1 401 (Unauthorized)`
+-   ❌ `GET http://localhost:8000/notifications/count 401 (Unauthorized)`
+-   ❌ `GET http://localhost:8000/main/assistants/1 401 (Unauthorized)`
 
 ## Step-by-Step Fix
 
@@ -40,7 +40,7 @@ Run this in browser console on your frontend:
 ```javascript
 // Test login and token saving
 async function testLogin() {
-    const response = await fetch('http://REDACTED:8000/api/auth/login', {
+    const response = await fetch('http://localhost:8000/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -70,15 +70,12 @@ async function testProtectedEndpoint() {
         return
     }
 
-    const response = await fetch(
-        'http://REDACTED:8000/notifications/count',
-        {
-            headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        }
-    )
+    const response = await fetch('http://localhost:8000/notifications/count', {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    })
 
     console.log('Protected endpoint status:', response.status)
     if (response.ok) {
@@ -155,7 +152,7 @@ Make sure they're:
 
 1. ✅ Saving JWT token after login
 2. ✅ Including `Authorization: Bearer ${token}` in ALL API requests
-3. ✅ Using the correct backend URL (`http://REDACTED:8000`)
+3. ✅ Using the correct backend URL (`http://localhost:8000`)
 
 ### 6. **Quick Frontend Test**
 
@@ -168,7 +165,7 @@ export function AuthTest() {
         try {
             // Test login
             const loginResp = await fetch(
-                'http://REDACTED:8000/api/auth/login',
+                'http://localhost:8000/api/auth/login',
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -182,7 +179,7 @@ export function AuthTest() {
 
             // Test protected endpoint
             const protectedResp = await fetch(
-                'http://REDACTED:8000/notifications/count',
+                'http://localhost:8000/notifications/count',
                 {
                     headers: { Authorization: `Bearer ${access_token}` },
                 }
