@@ -6,7 +6,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import useCurrentSession from '@/utils/hooks/useCurrentSession'
 import OnboardingLayout from './OnboardingLayout'
 import PersonalInfoStep from './steps/PersonalInfoStep'
 import ProfessionalInfoStep from './steps/ProfessionalInfoStep'
@@ -96,7 +95,7 @@ export type OnboardingData = {
 
 const OnboardingPage = () => {
     const router = useRouter()
-    const { session } = useCurrentSession()
+    const { data: session, status } = useSession()
     const { update: updateSession } = useSession()
     const [currentStep, setCurrentStep] = useState(1)
     const [onboardingData, setOnboardingData] = useState<OnboardingData>({})
@@ -161,30 +160,24 @@ const OnboardingPage = () => {
     )
 
     useEffect(() => {
+        console.log('Onboarding useEffect - status:', status)
         console.log('Onboarding useEffect - session:', session)
-        console.log(
-            'Onboarding useEffect - session?.accessToken:',
-            session?.accessToken,
-        )
-        console.log(
-            'Onboarding useEffect - session?.user?.isFirstLogin:',
-            session?.user?.isFirstLogin,
-        )
 
-        // Wait for session to be loaded
-        if (!session) {
+        if (status === 'loading') return
+
+        if (status === 'unauthenticated') {
+            router.replace('/auth/sign-in')
             return
         }
 
-        // Session is loaded, show onboarding immediately
-        console.log('Session loaded, showing onboarding')
+        // Session is loaded
         setLoading(false)
 
-        // Load any existing onboarding data in background
-        if (session.accessToken) {
+        // Load data if authenticated
+        if (session?.accessToken) {
             loadOnboardingData()
         }
-    }, [session, loadOnboardingData])
+    }, [status, session, router, loadOnboardingData])
 
     // Автоматическое сохранение данных при их изменении
     useEffect(() => {
