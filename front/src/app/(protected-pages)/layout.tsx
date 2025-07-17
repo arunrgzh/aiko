@@ -21,22 +21,13 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
             return
         }
 
-        // If first time login, redirect to onboarding immediately
-        if (session.user?.isFirstLogin) {
-            router.replace(appConfig.onboardingPath)
-            return
+        // Store access token if authenticated (don't redirect for isFirstLogin here)
+        if (session.accessToken) {
+            localStorage.setItem('access_token', session.accessToken)
         }
-
-        // If we reach here, user is authenticated and not first login
-        localStorage.setItem('access_token', session.accessToken)
     }, [session, router])
 
-    // Show loading while session is being fetched or during redirects
-    // But allow onboarding page to render if isFirstLogin true
-    const isOnboardingPath =
-        typeof window !== 'undefined' &&
-        window.location.pathname === appConfig.onboardingPath
-
+    // Show loading while session is being fetched
     if (!session) {
         return (
             <Container className="flex items-center justify-center h-screen w-screen">
@@ -45,10 +36,8 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
         )
     }
 
-    if (
-        !session.accessToken ||
-        (session.user?.isFirstLogin && !isOnboardingPath)
-    ) {
+    // Show loading if no access token (will redirect to sign-in)
+    if (!session.accessToken) {
         return (
             <Container className="flex items-center justify-center h-screen w-screen">
                 <Spinner size={40} />

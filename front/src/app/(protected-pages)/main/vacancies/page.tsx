@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import VacancyGenerationLoader from './_components/VacancyGenerationLoader'
 import VacancyRecommendations from './_components/VacancyRecommendations'
 import AssistantSuggestion from '@/components/shared/AssistantSuggestion'
@@ -9,9 +10,12 @@ import AssessmentChoiceModal from '@/components/shared/AssessmentChoiceModal'
 import AssessmentService from '@/services/AssessmentService'
 import vacancyService from '@/services/VacancyService'
 import { JobRecommendation } from './types'
+import { Spinner } from '@/components/ui/Spinner'
+import Container from '@/components/shared/Container'
 
 export default function VacanciesPage() {
     const searchParams = useSearchParams()
+    const { data: session, status } = useSession()
     const [isLoading, setIsLoading] = useState(true)
     const [showLoader, setShowLoader] = useState(true)
     const [personalRecommendations, setPersonalRecommendations] = useState<
@@ -29,17 +33,28 @@ export default function VacanciesPage() {
     const [assessmentLoading, setAssessmentLoading] = useState(false)
 
     useEffect(() => {
-        loadPersonalizedVacancies()
+        // Wait for session to be loaded
+        if (status === 'loading') return
 
-        // Check if user just completed onboarding
-        const shouldShowAssistant = searchParams.get('showAssistant') === '1'
-        if (shouldShowAssistant) {
-            // Show assistant suggestion after a short delay
-            setTimeout(() => {
-                setShowAssistantSuggestion(true)
-            }, 2000) // 2 seconds after page load
+        if (status === 'unauthenticated') {
+            window.location.href = '/auth/sign-in'
+            return
         }
-    }, [searchParams])
+
+        if (status === 'authenticated' && session?.accessToken) {
+            loadPersonalizedVacancies()
+
+            // Check if user just completed onboarding
+            const shouldShowAssistant =
+                searchParams.get('showAssistant') === '1'
+            if (shouldShowAssistant) {
+                // Show assistant suggestion after a short delay
+                setTimeout(() => {
+                    setShowAssistantSuggestion(true)
+                }, 2000) // 2 seconds after page load
+            }
+        }
+    }, [status, session, searchParams])
 
     const loadPersonalizedVacancies = async () => {
         try {
@@ -141,7 +156,9 @@ export default function VacanciesPage() {
         }
     }
 
-    const handleSearch = async (query: string) => {
+    const handleSearch = async (
+        query: string,
+    ): Promise<JobRecommendation[]> => {
         try {
             setIsLoading(true)
             const response = await vacancyService.searchVacancies({
@@ -150,8 +167,10 @@ export default function VacanciesPage() {
             // Update recommendations with search results
             setPersonalRecommendations(response.recommendations || [])
             setAssessmentRecommendations([]) // Clear assessment recommendations during search
+            return response.recommendations || []
         } catch (err) {
             console.error('Error searching vacancies:', err)
+            return []
         } finally {
             setIsLoading(false)
         }
@@ -231,6 +250,20 @@ export default function VacanciesPage() {
             console.error('Error debugging skills:', err)
             alert('Ошибка при получении информации о навыках')
         }
+    }
+
+    // Show loading while session is loading
+    if (status === 'loading') {
+        return (
+            <Container className="flex items-center justify-center h-screen">
+                <div className="text-center">
+                    <Spinner size={40} />
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">
+                        Загрузка...
+                    </p>
+                </div>
+            </Container>
+        )
     }
 
     // Show loader during initial load or when explicitly loading

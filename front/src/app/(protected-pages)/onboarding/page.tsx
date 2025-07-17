@@ -101,6 +101,7 @@ const OnboardingPage = () => {
     const [onboardingData, setOnboardingData] = useState<OnboardingData>({})
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
+    const [completedOnboarding, setCompletedOnboarding] = useState(false)
 
     // Assessment flow state
     const [assessmentQuestions, setAssessmentQuestions] = useState<
@@ -223,6 +224,15 @@ const OnboardingPage = () => {
 
     const handleComplete = async () => {
         setSaving(true)
+        setCompletedOnboarding(true) // Mark as completed immediately to prevent re-rendering
+
+        // Add URL parameter to indicate completion is in progress
+        if (typeof window !== 'undefined') {
+            const url = new URL(window.location.href)
+            url.searchParams.set('completing', 'true')
+            window.history.replaceState({}, '', url.toString())
+        }
+
         try {
             // Sохраняем финальные данные онбординга
             const backendData = mapToBackendFormat(onboardingData)
@@ -253,17 +263,20 @@ const OnboardingPage = () => {
                     // Обновляем сессию, чтобы получить актуальный isFirstLogin: false
                     await updateSession()
                     // Небольшая задержка чтобы сессия обновилась
-                    await new Promise((resolve) => setTimeout(resolve, 500))
+                    await new Promise((resolve) => setTimeout(resolve, 1000))
                     // Перенаправляем на assessment
                     router.push('/main/assessment')
                 } else {
                     console.error('Error marking onboarding as completed')
+                    setCompletedOnboarding(false) // Reset on error
                 }
             } else {
                 console.error('Error saving final onboarding data')
+                setCompletedOnboarding(false) // Reset on error
             }
         } catch (error) {
             console.error('Error completing onboarding:', error)
+            setCompletedOnboarding(false) // Reset on error
         } finally {
             setSaving(false)
         }
@@ -396,6 +409,20 @@ const OnboardingPage = () => {
         return (
             <Container className="flex items-center justify-center h-screen">
                 <Spinner size={40} />
+            </Container>
+        )
+    }
+
+    // Show completion/redirect message when onboarding is completed
+    if (completedOnboarding) {
+        return (
+            <Container className="flex items-center justify-center h-screen">
+                <div className="text-center">
+                    <Spinner size={40} />
+                    <p className="mt-4 text-gray-600 dark:text-gray-400">
+                        Завершение настройки профиля...
+                    </p>
+                </div>
             </Container>
         )
     }
