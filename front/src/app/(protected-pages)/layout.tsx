@@ -31,7 +31,12 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
         localStorage.setItem('access_token', session.accessToken)
     }, [session, router])
 
-    // Show loading while session is being fetched
+    // Show loading while session is being fetched or during redirects
+    // But allow onboarding page to render if isFirstLogin true
+    const isOnboardingPath =
+        typeof window !== 'undefined' &&
+        window.location.pathname === appConfig.onboardingPath
+
     if (!session) {
         return (
             <Container className="flex items-center justify-center h-screen w-screen">
@@ -40,8 +45,10 @@ export default function ProtectedLayout({ children }: { children: ReactNode }) {
         )
     }
 
-    // Show loading while redirecting (prevents flash of content)
-    if (!session.accessToken || session.user?.isFirstLogin) {
+    if (
+        !session.accessToken ||
+        (session.user?.isFirstLogin && !isOnboardingPath)
+    ) {
         return (
             <Container className="flex items-center justify-center h-screen w-screen">
                 <Spinner size={40} />
