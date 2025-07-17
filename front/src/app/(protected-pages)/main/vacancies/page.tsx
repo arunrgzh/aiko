@@ -61,8 +61,12 @@ export default function VacanciesPage() {
             setIsLoading(true)
             setError(null)
 
+            console.log('🏠 Loading personalized vacancies...')
+
             // Get dual recommendations from enhanced service
             const dualResponse = await vacancyService.getDualRecommendations()
+
+            console.log('📊 Dual recommendations received:', dualResponse)
 
             // Extract recommendations from blocks
             setPersonalRecommendations(
@@ -78,6 +82,23 @@ export default function VacanciesPage() {
                 )
             } else {
                 setAssessmentRecommendations([])
+                console.log('ℹ️ No assessment recommendations:', {
+                    hasAssessmentBlock: !!dualResponse.assessment_block,
+                    userHasAssessment: dualResponse.user_has_assessment,
+                })
+            }
+
+            // If still no recommendations, debug user profile
+            if (dualResponse.total_recommendations === 0) {
+                console.log(
+                    '🔍 No recommendations found, debugging user profile...',
+                )
+                try {
+                    const debugInfo = await vacancyService.debugUserSkills()
+                    console.log('👤 User profile debug:', debugInfo)
+                } catch (debugError) {
+                    console.error('Debug error:', debugError)
+                }
             }
         } catch (err) {
             console.error('Error loading personalized vacancies:', err)
@@ -85,6 +106,7 @@ export default function VacanciesPage() {
 
             // Try fallback to legacy endpoint
             try {
+                console.log('🔄 Trying fallback to legacy endpoint...')
                 const fallbackResponse =
                     await vacancyService.getPersonalizedRecommendations()
                 setPersonalRecommendations(
@@ -92,6 +114,7 @@ export default function VacanciesPage() {
                 )
                 setAssessmentRecommendations([])
                 setError(null) // Clear error if fallback succeeds
+                console.log('✅ Fallback successful:', fallbackResponse)
             } catch (fallbackErr) {
                 console.error('Fallback also failed:', fallbackErr)
             }

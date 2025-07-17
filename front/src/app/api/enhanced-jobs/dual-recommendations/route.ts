@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
         const page = searchParams.get('page') || '1'
         const per_page = searchParams.get('per_page') || '20'
         const refresh = searchParams.get('refresh') || 'false'
+        const disable_filters = searchParams.get('disable_filters') || 'false'
 
         const url = new URL(
             `${BACKEND_URL}/api/enhanced-jobs/dual-recommendations`,
@@ -22,6 +23,9 @@ export async function GET(request: NextRequest) {
         url.searchParams.append('page', page)
         url.searchParams.append('per_page', per_page)
         url.searchParams.append('refresh', refresh)
+        url.searchParams.append('disable_filters', disable_filters)
+
+        console.log('🔍 Making request to backend:', url.toString())
 
         const response = await fetch(url.toString(), {
             method: 'GET',
@@ -38,6 +42,14 @@ export async function GET(request: NextRequest) {
         }
 
         const result = await response.json()
+        console.log('✅ Backend response:', {
+            totalRecommendations: result.total_recommendations,
+            personalCount: result.personal_block?.recommendations?.length || 0,
+            assessmentCount:
+                result.assessment_block?.recommendations?.length || 0,
+            userHasAssessment: result.user_has_assessment,
+        })
+
         return NextResponse.json(result)
     } catch (error) {
         console.error('Error fetching dual recommendations:', error)

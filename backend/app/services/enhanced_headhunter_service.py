@@ -82,7 +82,8 @@ class EnhancedHeadHunterService:
         user: User,
         db: AsyncSession,
         page: int = 0,
-        per_page: int = 20
+        per_page: int = 20,
+        disable_filters: bool = False
     ) -> Dict[str, List[EnhancedRecommendation]]:
         """
         Get dual recommendations: onboarding-based and assessment-based
@@ -99,9 +100,10 @@ class EnhancedHeadHunterService:
         onboarding_params = await self._build_onboarding_search_params(onboarding_profile, page, per_page // 2)
         assessment_params = await self._build_assessment_search_params(assessment_result, onboarding_profile, page, per_page // 2)
         
-        # Add inclusive filters to both
-        onboarding_params = self._add_inclusive_filters(onboarding_params, onboarding_profile)
-        assessment_params = self._add_inclusive_filters(assessment_params, onboarding_profile)
+        # Add inclusive filters to both (unless disabled)
+        if not disable_filters:
+            onboarding_params = self._add_inclusive_filters(onboarding_params, onboarding_profile)
+            assessment_params = self._add_inclusive_filters(assessment_params, onboarding_profile)
         
         # Log the parameters for debugging
         logger.info(f"Onboarding search params: {onboarding_params}")
