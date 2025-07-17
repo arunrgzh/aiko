@@ -146,7 +146,7 @@ async def _update_user_recommendations_async(user_id: int) -> dict:
             # Get dual recommendations
             logger.info(f"Updating recommendations for user {user_id}")
             dual_recommendations = await enhanced_hh_service.get_dual_recommendations(
-                user, db, page=0, per_page=20
+                user, db, page=0, per_page=20, disable_filters=False
             )
             
             # Deactivate old recommendations
