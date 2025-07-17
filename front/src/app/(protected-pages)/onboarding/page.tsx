@@ -15,7 +15,6 @@ import AccessibilityStep from './steps/AccessibilityStep'
 import CompletionStep from './steps/CompletionStep'
 import { Spinner } from '@/components/ui/Spinner'
 import Container from '@/components/shared/Container'
-import AssessmentChoiceModal from '@/components/shared/AssessmentChoiceModal'
 import AssessmentQuestions from '@/components/shared/AssessmentQuestions'
 import AssessmentService from '@/services/AssessmentService'
 import type {
@@ -105,10 +104,6 @@ const OnboardingPage = () => {
     const [saving, setSaving] = useState(false)
 
     // Assessment flow state
-    const [showAssessmentChoice, setShowAssessmentChoice] = useState(false)
-    const [assessmentMode, setAssessmentMode] = useState<
-        'assessment' | 'traditional' | null
-    >(null)
     const [assessmentQuestions, setAssessmentQuestions] = useState<
         AssessmentQuestion[]
     >([])
@@ -181,17 +176,13 @@ const OnboardingPage = () => {
             return
         }
 
-        // If user has access token, load onboarding data and show choice
+        // Session is loaded, show onboarding immediately
+        console.log('Session loaded, showing onboarding')
+        setLoading(false)
+
+        // Load any existing onboarding data in background
         if (session.accessToken) {
-            console.log('Loading onboarding data and showing choice')
-            loadOnboardingData().finally(() => {
-                setLoading(false)
-                setShowAssessmentChoice(true)
-            })
-        } else {
-            // No access token, just show onboarding form
-            console.log('No access token, showing onboarding form')
-            setLoading(false)
+            loadOnboardingData()
         }
     }, [session, loadOnboardingData])
 
@@ -240,7 +231,7 @@ const OnboardingPage = () => {
     const handleComplete = async () => {
         setSaving(true)
         try {
-            // Сохраняем финальные данные онбординга
+            // Sохраняем финальные данные онбординга
             const backendData = mapToBackendFormat(onboardingData)
             const response = await fetch('/api/onboarding/profile', {
                 method: 'POST',
@@ -270,10 +261,8 @@ const OnboardingPage = () => {
                     await updateSession()
                     // Небольшая задержка чтобы сессия обновилась
                     await new Promise((resolve) => setTimeout(resolve, 500))
-                    // Перенаправляем на персонализированные вакансии с флагом завершения
-                    router.push(
-                        '/main/vacancies?showAssistant=1&completedOnboarding=true',
-                    )
+                    // Перенаправляем на assessment
+                    router.push('/main/assessment')
                 } else {
                     console.error('Error marking onboarding as completed')
                 }
@@ -297,77 +286,6 @@ const OnboardingPage = () => {
     )
 
     // Assessment handlers
-    const handleChooseAssessment = useCallback(async () => {
-        console.log('🎯 Starting assessment flow...')
-        setAssessmentLoading(true)
-        try {
-            // First, save any existing onboarding data
-            if (
-                Object.keys(onboardingData).length > 0 &&
-                session?.accessToken
-            ) {
-                console.log(
-                    '💾 Saving existing onboarding data before assessment...',
-                )
-                await saveOnboardingData(onboardingData)
-                console.log('✅ Onboarding data saved')
-            }
-
-            // Choose assessment option (now with data preservation)
-            console.log('📡 Calling chooseAssessmentOption...')
-            const choiceResult = await AssessmentService.chooseAssessmentOption(
-                {
-                    take_assessment: true,
-                    skip_onboarding_data: false, // Changed to false to preserve data
-                },
-            )
-            console.log('✅ Assessment option chosen:', choiceResult)
-
-            // Load assessment questions
-            console.log('📝 Loading assessment questions...')
-            const questionsData = await AssessmentService.getQuestions()
-            console.log('✅ Questions loaded:', questionsData)
-
-            setAssessmentQuestions(questionsData.questions)
-            setAssessmentMode('assessment')
-            setShowAssessmentChoice(false)
-            console.log('🚀 Assessment mode activated!')
-        } catch (error) {
-            console.error('❌ Error starting assessment:', error)
-            // Show user-friendly error
-            alert(
-                'Произошла ошибка при загрузке теста. Пожалуйста, попробуйте еще раз.',
-            )
-        } finally {
-            setAssessmentLoading(false)
-        }
-    }, [onboardingData, saveOnboardingData, session?.accessToken])
-
-    const handleChooseTraditional = useCallback(async () => {
-        console.log('📋 Starting traditional onboarding flow...')
-        setAssessmentLoading(true)
-        try {
-            // Choose traditional onboarding
-            console.log('📡 Calling chooseAssessmentOption for traditional...')
-            const choiceResult = await AssessmentService.chooseAssessmentOption(
-                {
-                    take_assessment: false,
-                },
-            )
-            console.log('✅ Traditional option chosen:', choiceResult)
-
-            setAssessmentMode('traditional')
-            setShowAssessmentChoice(false)
-            console.log('📝 Traditional onboarding mode activated!')
-        } catch (error) {
-            console.error('❌ Error choosing traditional onboarding:', error)
-            // Show user-friendly error
-            alert('Произошла ошибка. Пожалуйста, попробуйте еще раз.')
-        } finally {
-            setAssessmentLoading(false)
-        }
-    }, [])
-
     const handleAssessmentSubmit = useCallback(
         async (answers: AssessmentAnswer[]) => {
             setAssessmentLoading(true)
@@ -419,7 +337,6 @@ const OnboardingPage = () => {
     const handleRetakeAssessment = useCallback(() => {
         setAssessmentResult(null)
         setProfileSummary(null)
-        setShowAssessmentChoice(true)
     }, [])
 
     const renderStep = () => {
@@ -477,8 +394,6 @@ const OnboardingPage = () => {
     // Debug current state
     console.log('🎨 Render state:', {
         loading,
-        showAssessmentChoice,
-        assessmentMode,
         assessmentQuestions: assessmentQuestions.length,
         assessmentResult: !!assessmentResult,
         assessmentLoading,
@@ -600,7 +515,7 @@ const OnboardingPage = () => {
     }
 
     // Show assessment questions
-    if (assessmentMode === 'assessment' && assessmentQuestions.length > 0) {
+    if (assessmentQuestions.length > 0) {
         return (
             <Container className="py-8">
                 <AssessmentQuestions
@@ -620,28 +535,8 @@ const OnboardingPage = () => {
                 totalSteps={totalSteps}
                 onStepChange={handleStepChange}
             >
-                {assessmentMode === 'assessment' ? (
-                    <Container className="flex items-center justify-center h-96">
-                        <div className="text-center">
-                            <Spinner size={40} />
-                            <p className="mt-4 text-gray-600 dark:text-gray-400">
-                                Загрузка...
-                            </p>
-                        </div>
-                    </Container>
-                ) : (
-                    renderStep()
-                )}
+                {renderStep()}
             </OnboardingLayout>
-
-            {/* Assessment Choice Modal */}
-            <AssessmentChoiceModal
-                isOpen={showAssessmentChoice}
-                onClose={() => setShowAssessmentChoice(false)}
-                onChooseAssessment={handleChooseAssessment}
-                onChooseTraditional={handleChooseTraditional}
-                loading={assessmentLoading}
-            />
         </>
     )
 }

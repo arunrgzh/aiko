@@ -14,8 +14,8 @@ sys.path.insert(0, os.path.dirname(__file__))
 def main():
     """Start the FastAPI server"""
     print("🚀 Starting AI-Komekshi Backend Server...")
-    print("📍 http://20.67.232.168:8000")
-    print("📖 API Docs: http://20.67.232.168:8000/docs")
+    print("📍 http://localhost:8000")
+    print("📖 API Docs: http://localhost:8000/docs")
     print("🔄 Auto-reload enabled for development")
     print("-" * 50)
     
