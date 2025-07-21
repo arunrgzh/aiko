@@ -96,77 +96,44 @@ class EnhancedHeadHunterService:
         onboarding_profile = await self._get_onboarding_profile(user, db)
         assessment_result = await self._get_latest_assessment(user, db)
         
-        # Build search parameters for both blocks
-        onboarding_params = await self._build_onboarding_search_params(onboarding_profile, page, per_page // 2)
-        assessment_params = await self._build_assessment_search_params(assessment_result, onboarding_profile, page, per_page // 2)
-        
-        # Add inclusive filters to both (unless disabled)
+        # Build search parameters only for onboarding block (exclude assessment as per requirements)
+        onboarding_params = await self._build_onboarding_search_params(onboarding_profile, page, per_page)
+
+        # Add inclusive filters (unless disabled)
         if not disable_filters:
             onboarding_params = self._add_inclusive_filters(onboarding_params, onboarding_profile)
-            assessment_params = self._add_inclusive_filters(assessment_params, onboarding_profile)
-        
+
         # Log the parameters for debugging
         logger.info(f"Onboarding search params: {onboarding_params}")
-        if assessment_result:
-            logger.info(f"Assessment search params: {assessment_params}")
 
-        # Search HH API in parallel
-        tasks = [self._search_hh_api(onboarding_params)]
-        if assessment_result:
-            tasks.append(self._search_hh_api(assessment_params))
-        else:
-            # Create a coroutine that returns empty list
-            async def empty_result():
-                return []
-            tasks.append(empty_result())
-        
-        onboarding_vacancies, assessment_vacancies = await asyncio.gather(
-            *tasks,
-            return_exceptions=True
-        )
-        
+        # Search HH API only for onboarding
+        onboarding_vacancies = await self._search_hh_api(onboarding_params)
+
         # Handle potential errors
         if isinstance(onboarding_vacancies, Exception):
             logger.error(f"Error fetching onboarding recommendations: {onboarding_vacancies}")
             onboarding_vacancies = []
         else:
             onboarding_vacancies = onboarding_vacancies or []
-            
-        if isinstance(assessment_vacancies, Exception):
-            logger.error(f"Error fetching assessment recommendations: {assessment_vacancies}")
-            assessment_vacancies = []
-        else:
-            assessment_vacancies = assessment_vacancies or []
-        
+
         # Get detailed info for top vacancies
         onboarding_detailed = await self._get_detailed_vacancies(onboarding_vacancies[:10])
-        assessment_detailed = await self._get_detailed_vacancies(assessment_vacancies[:10])
-        
+
         # Score and create recommendations
         personal_recommendations = []
-        assessment_recommendations = []
-        
+        assessment_recommendations = []  # Empty as per requirements - do not use assessment
+
         # Process onboarding-based recommendations
         for vacancy in onboarding_detailed:
             scores = await self._calculate_recommendation_scores(vacancy, onboarding_profile, assessment_result)
             recommendation = EnhancedRecommendation(vacancy, scores, "onboarding", accept_handicapped_filter=True)
             personal_recommendations.append(recommendation)
-        
-        # Process assessment-based recommendations
-        if assessment_result:
-            for vacancy in assessment_detailed:
-                # Skip if already in personal recommendations
-                if vacancy["id"] not in [r.hh_vacancy_id for r in personal_recommendations]:
-                    scores = await self._calculate_assessment_scores(vacancy, assessment_result, onboarding_profile)
-                    recommendation = EnhancedRecommendation(vacancy, scores, "assessment", accept_handicapped_filter=True)
-                    assessment_recommendations.append(recommendation)
-        
+
         # Sort by relevance
         personal_recommendations.sort(key=lambda x: x.scores["relevance_score"], reverse=True)
-        assessment_recommendations.sort(key=lambda x: x.scores["relevance_score"], reverse=True)
-        
-        logger.info(f"Generated {len(personal_recommendations)} personal and {len(assessment_recommendations)} assessment recommendations for user {user.id}")
-        
+
+        logger.info(f"Generated {len(personal_recommendations)} personal recommendations for user {user.id} (assessment excluded)")
+
         return {
             "personal": personal_recommendations,
             "assessment": assessment_recommendations
@@ -176,16 +143,10 @@ class EnhancedHeadHunterService:
         """Add mandatory inclusive filters to search parameters"""
         
         # NOTE: HeadHunter Kazakhstan has very few jobs explicitly marked as accepting 
-        # people with disabilities (~79 out of 2000+ jobs). To ensure users get 
-        # sufficient recommendations while still promoting inclusive hiring, we use 
-        # a hybrid approach:
+        # people with disabilities (~79 out of 2000+ jobs). We now use a more flexible approach:
         
-        # Apply strict accessibility filter - this will ensure only jobs that explicitly 
-        # accept people with disabilities are shown (reduces from ~2000 to ~79 jobs)
-        params["accept_handicapped"] = "true"
-        
-        # Also add the label filter as backup
-        params["label"] = "accept_handicapped"
+        # Only apply strict accessibility filter if specifically requested
+        # For now, we'll make this less restrictive to ensure users get recommendations
         
         # Ensure Kazakhstan area if not specified
         if "area" not in params:
@@ -196,6 +157,11 @@ class EnhancedHeadHunterService:
         
         # Allow jobs without salary info to increase diversity
         params["only_with_salary"] = "false"
+        
+        # Add accessibility preference as a search term instead of strict filter
+        # This way we prioritize inclusive jobs but don't exclude others
+        if "text" in params:
+            params["text"] += " OR инклюзивная OR доступная среда"
         
         return params
 
@@ -214,37 +180,92 @@ class EnhancedHeadHunterService:
         }
         
         if not onboarding_profile:
+            logger.warning("No onboarding profile found, using default search")
+            params["text"] = "работа OR вакансия OR специалист OR стажер"
+            params["area"] = "40"  # Kazakhstan
             return params
         
         # Build search text from profession and skills
         search_terms = []
         
+        # Add profession if available and meaningful
         profession = getattr(onboarding_profile, 'profession', None)
-        if profession:
-            search_terms.append(profession)
+        if profession and profession.strip():
+            # Clean up profession - remove common stop words
+            stop_words = ["работник", "сотрудник", "человек", "специалист по"]
+            profession_clean = profession.strip()
+            for stop_word in stop_words:
+                profession_clean = profession_clean.replace(stop_word, "").strip()
+            
+            if profession_clean and len(profession_clean) > 2:
+                search_terms.append(profession_clean)
         
+        # Skill to job category mapping for broader search
+        skill_job_mapping = {
+            "преподавание": ["учитель", "преподаватель", "педагог", "образование", "обучение"],
+            "репетиторство": ["репетитор", "учитель", "преподаватель", "образование"],
+            "продажи": ["менеджер по продажам", "продавец", "консультант", "торговля"],
+            "маркетинг": ["маркетолог", "реклама", "продвижение", "SMM"],
+            "программирование": ["программист", "разработчик", "IT", "developer"],
+            "дизайн": ["дизайнер", "графический дизайнер", "креатив"],
+            "менеджмент": ["менеджер", "руководитель", "управление"],
+            "бухгалтерия": ["бухгалтер", "финансы", "учет"],
+            "юриспруденция": ["юрист", "правовой", "юридический"],
+        }
+        
+        # Add skills with broader job categories
         skills = getattr(onboarding_profile, 'skills', None)
-        if skills:
-            search_terms.extend(skills[:5])  # Top 5 skills
+        if skills and isinstance(skills, list):
+            for skill in skills:
+                if skill and len(skill.strip()) > 2:
+                    skill_lower = skill.lower().strip()
+                    search_terms.append(skill)  # Add original skill
+                    
+                    # Add broader job categories for this skill
+                    for key, job_categories in skill_job_mapping.items():
+                        if key in skill_lower:
+                            search_terms.extend(job_categories[:3])  # Add top 3 related jobs
+                            break
+        
+        # Add current position if different from profession
+        current_position = getattr(onboarding_profile, 'current_position', None)
+        if current_position and current_position.strip() and current_position != profession:
+            current_clean = current_position.strip()
+            if len(current_clean) > 2 and current_clean.lower() not in ["безработный", "студент", "не работаю"]:
+                search_terms.append(current_clean)
+        
+        # Remove duplicates and ensure we have search terms
+        search_terms = list(set(search_terms))
         
         if search_terms:
-            params["text"] = " OR ".join(search_terms)
+            # Limit to reasonable number of terms to avoid too complex queries
+            params["text"] = " OR ".join(search_terms[:15])
+        else:
+            logger.warning("No meaningful search terms from onboarding, using fallback")
+            params["text"] = "работа OR вакансия OR специалист OR стажер"
         
-        # Location preferences
+        # Location preferences - make more flexible
         preferred_cities = getattr(onboarding_profile, 'preferred_cities', None)
-        if preferred_cities:
+        if preferred_cities and isinstance(preferred_cities, list):
             area_ids = []
             for city in preferred_cities:
-                city_lower = city.lower().replace("-", "_")
+                city_lower = city.lower().replace("-", "_").replace(" ", "_")
                 if city_lower in self.area_mapping:
                     area_ids.append(self.area_mapping[city_lower])
             
             if area_ids:
+                # If specific city has few jobs, also include broader area
+                if len(area_ids) == 1 and area_ids[0] in ["161", "153", "145"]:  # Smaller cities
+                    area_ids.append("40")  # Add all Kazakhstan as fallback
                 params["area"] = ",".join(area_ids)
+            else:
+                params["area"] = "40"  # Default to Kazakhstan
+        else:
+            params["area"] = "40"  # Default to Kazakhstan
         
         # Employment type
         employment_type = getattr(onboarding_profile, 'employment_type', None)
-        if employment_type:
+        if employment_type and isinstance(employment_type, list):
             hh_employment = []
             for emp_type in employment_type:
                 if emp_type in self.employment_mapping:
@@ -252,16 +273,19 @@ class EnhancedHeadHunterService:
             if hh_employment:
                 params["employment"] = ",".join(hh_employment)
         
-        # Salary
+        # Salary (make it less restrictive)
         min_salary = getattr(onboarding_profile, 'min_salary', None)
-        if min_salary:
-            params["salary"] = min_salary
+        if min_salary and min_salary > 0:
+            # Reduce salary requirement by 30% to get more results
+            adjusted_salary = int(min_salary * 0.7)
+            params["salary"] = adjusted_salary
         
         # Experience level
         experience_level = getattr(onboarding_profile, 'experience_level', None)
         if experience_level and experience_level in self.experience_mapping:
             params["experience"] = self.experience_mapping[experience_level]
         
+        logger.info(f"Built onboarding search params: {params}")
         return params
 
     async def _build_assessment_search_params(
@@ -327,8 +351,16 @@ class EnhancedHeadHunterService:
 
     async def _search_hh_api(self, params: Dict[str, Any]) -> List[Dict[str, Any]]:
         """Search HeadHunter API with given parameters"""
+        
+        # Ensure we have minimum search criteria
         if not params.get("text") and not params.get("area"):
-            return [] # Avoid empty searches
+            logger.warning("No search text or area provided, using fallback search")
+            params["text"] = "работа OR вакансия OR специалист"
+            params["area"] = "40"  # Kazakhstan
+        
+        # Ensure we have an area even if no text
+        if not params.get("area"):
+            params["area"] = "40"  # Kazakhstan
 
         async with httpx.AsyncClient() as client:
             try:
@@ -347,6 +379,29 @@ class EnhancedHeadHunterService:
                     data = response.json()
                     vacancies = data.get("items", [])
                     logger.info(f"HH API returned {len(vacancies)} vacancies for params: {params}")
+                    
+                    # If no results and we have restrictive filters, try broader search
+                    if len(vacancies) == 0 and (params.get("accept_handicapped") or params.get("label")):
+                        logger.info("No results with inclusive filters, trying broader search...")
+                        
+                        # Create params without restrictive filters
+                        broader_params = params.copy()
+                        broader_params.pop("accept_handicapped", None)
+                        broader_params.pop("label", None)
+                        
+                        # Try again with broader search
+                        broader_response = await client.get(
+                            self.base_url + "/vacancies",
+                            params=broader_params,
+                            headers=self.headers,
+                            timeout=self.timeout
+                        )
+                        
+                        if broader_response.status_code == 200:
+                            broader_data = broader_response.json()
+                            vacancies = broader_data.get("items", [])
+                            logger.info(f"Broader search returned {len(vacancies)} vacancies")
+                    
                     return vacancies
                 else:
                     logger.error(f"HH API error: {response.status_code} - {response.text}")

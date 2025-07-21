@@ -316,6 +316,67 @@ export default function ProfilePage() {
             {/* Onboarding Profile Data */}
             {onboarding_profile && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Personal Information */}
+                    {(onboarding_profile.first_name || onboarding_profile.last_name || onboarding_profile.phone || onboarding_profile.date_of_birth || onboarding_profile.gender) && (
+                        <Card className="p-6">
+                            <div className="flex items-center gap-3 mb-6">
+                                <TbUser className="w-6 h-6 text-green-600" />
+                                <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                                    Личная информация
+                                </h2>
+                            </div>
+                            <div className="space-y-4">
+                                {(onboarding_profile.first_name || onboarding_profile.last_name) && (
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                            Имя
+                                        </label>
+                                        <p className="text-gray-900 dark:text-gray-100">
+                                            {[onboarding_profile.first_name, onboarding_profile.last_name].filter(Boolean).join(' ')}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {onboarding_profile.phone && (
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                            Телефон
+                                        </label>
+                                        <p className="text-gray-900 dark:text-gray-100">
+                                            {onboarding_profile.phone}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {onboarding_profile.date_of_birth && (
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                            Дата рождения
+                                        </label>
+                                        <p className="text-gray-900 dark:text-gray-100">
+                                            {onboarding_profile.date_of_birth}
+                                        </p>
+                                    </div>
+                                )}
+
+                                {onboarding_profile.gender && (
+                                    <div>
+                                        <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                                            Пол
+                                        </label>
+                                        <p className="text-gray-900 dark:text-gray-100">
+                                            {onboarding_profile.gender === 'male' ? 'Мужской' : 
+                                             onboarding_profile.gender === 'female' ? 'Женский' : 
+                                             onboarding_profile.gender === 'other' ? 'Другое' : 
+                                             onboarding_profile.gender === 'prefer_not_to_say' ? 'Предпочитаю не указывать' : 
+                                             onboarding_profile.gender}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        </Card>
+                    )}
+
                     {/* Professional Information */}
                     <Card className="p-6">
                         <div className="flex items-center gap-3 mb-6">
@@ -324,37 +385,44 @@ export default function ProfilePage() {
                                 Профессиональная информация
                             </h2>
                         </div>
-
                         <div className="space-y-4">
-                            {onboarding_profile.profession && (
+                            {(onboarding_profile.profession || onboarding_profile.desired_field) && (
                                 <div>
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        Профессия
+                                        Профессия/Желаемая область
                                     </label>
-                                    <p className="text-gray-900 dark:text-gray-100 font-medium">
-                                        {onboarding_profile.profession}
+                                    <p className="text-gray-900 dark:text-gray-100">
+                                        {onboarding_profile.profession || onboarding_profile.desired_field}
                                     </p>
                                 </div>
                             )}
 
-                            {onboarding_profile.experience_level && (
+                            {onboarding_profile.industry && (
                                 <div>
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        Уровень опыта
+                                        Отрасль
                                     </label>
                                     <p className="text-gray-900 dark:text-gray-100">
-                                        {onboarding_profile.experience_level}
+                                        {onboarding_profile.industry}
                                     </p>
                                 </div>
                             )}
 
-                            {onboarding_profile.education_level && (
+                            {formatSalary(
+                                onboarding_profile.min_salary,
+                                onboarding_profile.max_salary,
+                                onboarding_profile.currency,
+                            ) !== 'Не указано' && (
                                 <div>
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        Образование
+                                        Желаемая зарплата
                                     </label>
                                     <p className="text-gray-900 dark:text-gray-100">
-                                        {onboarding_profile.education_level}
+                                        {formatSalary(
+                                            onboarding_profile.min_salary,
+                                            onboarding_profile.max_salary,
+                                            onboarding_profile.currency,
+                                        )}
                                     </p>
                                 </div>
                             )}

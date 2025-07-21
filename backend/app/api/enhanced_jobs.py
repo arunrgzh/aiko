@@ -262,6 +262,68 @@ async def get_task_status(
             detail="Failed to get task status"
         )
 
+@router.get("/debug/search-test")
+async def debug_search_test(
+    disable_filters: bool = Query(False, description="Disable filters for testing"),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Debug endpoint to test search parameters and HH API calls
+    """
+    
+    try:
+        logger.info(f"Debug search test for user {current_user.id}")
+        
+        # Get user's onboarding profile
+        onboarding_profile = await enhanced_hh_service._get_onboarding_profile(current_user, db)
+        
+        # Build search parameters
+        search_params = await enhanced_hh_service._build_onboarding_search_params(
+            onboarding_profile, 0, 10
+        )
+        
+        # Add filters unless disabled
+        if not disable_filters:
+            search_params = enhanced_hh_service._add_inclusive_filters(search_params, onboarding_profile)
+        
+        # Test HH API search
+        vacancies = await enhanced_hh_service._search_hh_api(search_params)
+        
+        return {
+            "user_id": current_user.id,
+            "onboarding_profile_exists": onboarding_profile is not None,
+            "onboarding_data": {
+                "profession": getattr(onboarding_profile, 'profession', None) if onboarding_profile else None,
+                "skills": getattr(onboarding_profile, 'skills', None) if onboarding_profile else None,
+                "preferred_cities": getattr(onboarding_profile, 'preferred_cities', None) if onboarding_profile else None,
+                "current_position": getattr(onboarding_profile, 'current_position', None) if onboarding_profile else None,
+            },
+            "search_parameters": search_params,
+            "hh_api_results": {
+                "total_found": len(vacancies),
+                "vacancies_preview": [
+                    {
+                        "id": v.get("id"),
+                        "name": v.get("name", "")[:100],
+                        "employer": v.get("employer", {}).get("name", "") if v.get("employer") else "",
+                        "area": v.get("area", {}).get("name", "") if v.get("area") else "",
+                        "salary": v.get("salary"),
+                    }
+                    for v in vacancies[:5]  # Show first 5 results
+                ]
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error in debug search test for user {current_user.id}: {e}")
+        return {
+            "error": str(e),
+            "user_id": current_user.id,
+            "search_parameters": None,
+            "hh_api_results": None
+        }
+
 # Helper functions
 
 async def _convert_to_job_response(

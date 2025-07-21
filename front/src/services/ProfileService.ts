@@ -3,24 +3,80 @@ import ApiService from './ApiService'
 export interface OnboardingProfile {
     id: number
     user_id: number
-    disability_type?: string
+    
+    // Персональная информация
+    first_name?: string
+    last_name?: string
+    phone?: string
+    date_of_birth?: string
+    gender?: string
+    disability_type?: string[]
     disability_description?: string
-    workplace_preferences?: string
-    profession?: string
-    experience_level?: string
-    education_level?: string
+    
+    // Условия работы и предпочтения рабочего места
+    work_conditions?: string[]
+    workplace_preferences?: string[]
+    workplace_other?: string
+    
+    // Навыки и опыт
     skills?: string[]
+    skills_other?: string
+    desired_field?: string
+    desired_field_other?: string
+    extra_skills?: string
+    certifications?: string
+    
+    // Образование и обучение
+    education_status?: string
+    education_level?: string
+    wants_courses?: string
+    learning_topics?: string[]
+    learning_topics_other?: string
+    
+    // Профессиональная информация
+    profession?: string
+    current_position?: string
+    years_of_experience?: number
+    experience_level?: string
+    industry?: string
+    
+    // Рабочие предпочтения
+    preferred_work_time?: string
     work_format?: string[]
     employment_type?: string[]
+    preferred_job_types?: string[]
+    
+    // Условия работы и зарплата
     min_salary?: number
     max_salary?: number
     currency?: string
     preferred_cities?: string[]
+    preferred_locations?: string[]
+    
+    // Адаптации и доступность
+    important_adaptations?: string[]
+    adaptations_other?: string
     accessibility_adaptations?: string[]
-    platform_features?: string[]
-    feedback_preference?: string
+    accessibility_issues?: string[]
+    accessibility_issues_other?: string
     accessibility_notes?: string
+    
+    // Ожидания от платформы
+    platform_features?: string[]
+    platform_features_other?: string
+    feedback_preference?: string
+    feedback?: string
+    
+    // Категории работы и особенности
+    suitable_job_categories?: string[]
+    job_features?: string[]
+    
+    // Личная информация и ссылки
     bio?: string
+    linkedin_url?: string
+    portfolio_url?: string
+    
+    // Статус
     is_completed: boolean
     created_at: string
     updated_at?: string
