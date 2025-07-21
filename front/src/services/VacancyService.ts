@@ -28,7 +28,10 @@ class VacancyService {
             searchParams.append('refresh', params.refresh.toString())
         }
 
-        console.log('🔍 Requesting dual recommendations with params:', params)
+        console.log(
+            '🔍 Requesting personal recommendations with params:',
+            params,
+        )
 
         const response = await ApiService.fetchData<DualRecommendationResponse>(
             {
@@ -37,12 +40,10 @@ class VacancyService {
             },
         )
 
-        console.log('✅ Dual recommendations response:', {
+        console.log('✅ Personal recommendations response:', {
             totalRecommendations: response.total_recommendations,
             personalCount:
                 response.personal_block?.recommendations?.length || 0,
-            assessmentCount:
-                response.assessment_block?.recommendations?.length || 0,
         })
 
         // If no recommendations found, try without strict filters
@@ -63,9 +64,6 @@ class VacancyService {
                 personalCount:
                     fallbackResponse.personal_block?.recommendations?.length ||
                     0,
-                assessmentCount:
-                    fallbackResponse.assessment_block?.recommendations
-                        ?.length || 0,
             })
 
             return fallbackResponse
@@ -98,7 +96,7 @@ class VacancyService {
             recommendations: JobRecommendation[]
             total: number
         }>({
-            url: `/jobs/recommendations?${searchParams.toString()}`,
+            url: `/api/jobs/recommendations?${searchParams.toString()}`,
             method: 'GET',
         })
 
@@ -112,7 +110,7 @@ class VacancyService {
         searchParams: VacancySearchParams,
     ): Promise<JobSearchResponse> {
         const response = await ApiService.fetchData<JobSearchResponse>({
-            url: '/jobs/search',
+            url: '/api/jobs/search',
             method: 'POST',
             data: {
                 page: searchParams.page || 0,
@@ -145,7 +143,7 @@ class VacancyService {
             page: number
             per_page: number
         }>({
-            url: '/headhunter/search',
+            url: '/api/hh/search',
             method: 'POST',
             data: { params },
         })
@@ -168,7 +166,7 @@ class VacancyService {
             alternate_url: string
             has_contacts: boolean
         }>({
-            url: `/enhanced-jobs/vacancy/${vacancyId}`,
+            url: `/api/hh/vacancy/${vacancyId}`,
             method: 'GET',
         })
 
@@ -180,7 +178,7 @@ class VacancyService {
      */
     async saveJobRecommendation(jobId: number, saved: boolean): Promise<void> {
         await ApiService.fetchData<void>({
-            url: `/jobs/recommendations/${jobId}/save`,
+            url: `/api/jobs/recommendations/${jobId}/save`,
             method: 'POST',
             data: { saved },
         })
@@ -197,7 +195,7 @@ class VacancyService {
         },
     ): Promise<void> {
         await ApiService.fetchData<void>({
-            url: `/jobs/recommendations/${jobId}/apply`,
+            url: `/api/jobs/recommendations/${jobId}/apply`,
             method: 'POST',
             data: applicationData || {},
         })
@@ -208,7 +206,7 @@ class VacancyService {
      */
     async getJobDetails(jobId: number): Promise<JobRecommendation> {
         const response = await ApiService.fetchData<JobRecommendation>({
-            url: `/jobs/recommendations/${jobId}`,
+            url: `/api/jobs/recommendations/${jobId}`,
             method: 'GET',
         })
 
@@ -232,7 +230,7 @@ class VacancyService {
         },
     ): Promise<void> {
         await ApiService.fetchData<void>({
-            url: `/jobs/recommendations/${jobId}/feedback`,
+            url: `/api/jobs/recommendations/${jobId}/feedback`,
             method: 'POST',
             data: feedback,
         })
@@ -269,7 +267,7 @@ class VacancyService {
             page: number
             per_page: number
         }>({
-            url: `/jobs/saved?${searchParams.toString()}`,
+            url: `/api/jobs/saved?${searchParams.toString()}`,
             method: 'GET',
         })
 
@@ -291,7 +289,7 @@ class VacancyService {
             | 'rejected',
     ): Promise<void> {
         await ApiService.fetchData<void>({
-            url: `/jobs/saved/${jobId}/status`,
+            url: `/api/jobs/saved/${jobId}/status`,
             method: 'PATCH',
             data: { status },
         })
@@ -316,7 +314,7 @@ class VacancyService {
             top_skills: string[]
             application_success_rate: number
         }>({
-            url: '/jobs/analytics',
+            url: '/api/jobs/analytics',
             method: 'GET',
         })
 
@@ -338,7 +336,7 @@ class VacancyService {
             task_id: string
             user_id: number
         }>({
-            url: '/enhanced-jobs/trigger-update',
+            url: '/api/enhanced-jobs/trigger-update',
             method: 'POST',
         })
 
@@ -380,7 +378,7 @@ class VacancyService {
                 relevance_score: number
             }>
         }>({
-            url: '/jobs/debug/skills',
+            url: '/api/jobs/debug/skills',
             method: 'GET',
         })
 
