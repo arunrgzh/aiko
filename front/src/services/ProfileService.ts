@@ -130,7 +130,7 @@ class ProfileService {
     async getOnboardingProfile(): Promise<OnboardingProfile | null> {
         try {
             return await ApiService.fetchDataWithAxios<OnboardingProfile>({
-                url: '/onboarding/profile',
+                url: '/api/onboarding/profile',
                 method: 'get',
             })
         } catch (error) {
@@ -142,7 +142,7 @@ class ProfileService {
     async getAssessmentResults(): Promise<AssessmentResult[]> {
         try {
             return await ApiService.fetchDataWithAxios<AssessmentResult[]>({
-                url: '/assessment/results',
+                url: '/api/assessment/results',
                 method: 'get',
             })
         } catch (error) {
@@ -154,7 +154,7 @@ class ProfileService {
     async getProfileSummary(): Promise<ProfileSummary | null> {
         try {
             return await ApiService.fetchDataWithAxios<ProfileSummary>({
-                url: '/assessment/profile-summary',
+                url: '/api/assessment/profile-summary',
                 method: 'get',
             })
         } catch (error) {
