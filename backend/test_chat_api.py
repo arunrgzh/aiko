@@ -6,7 +6,7 @@ Test script to specifically test the chat API functionality
 import requests
 import json
 
-BASE_URL = "http://localhost:8000"
+BASE_URL = "http://REDACTED:8000"
 
 def test_chat_flow():
     """Test complete chat flow"""
@@ -113,7 +113,7 @@ def test_cors():
     print(f"CORS headers: {dict(response.headers)}")
     
     # Test with Origin header
-    headers = {"Origin": "http://localhost:3000"}
+    headers = {"Origin": "http://REDACTED:3000"}
     response = requests.get(f"{BASE_URL}/health", headers=headers)
     print(f"GET with Origin status: {response.status_code}")
     print(f"Access-Control headers: {[k for k in response.headers.keys() if 'access-control' in k.lower()]}")
