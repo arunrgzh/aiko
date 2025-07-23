@@ -25,10 +25,10 @@ Make sure your frontend is calling the correct backend URL:
 
 ```javascript
 // ✅ Correct URLs
-const API_BASE = 'http://REDACTED:8000'
+const API_BASE = 'http://localhost:8000'
 
 // Frontend should call:
-POST http://REDACTED:8000/main/assistants/1/chat
+POST http://localhost:8000/main/assistants/1/chat
 ```
 
 ### 2. **Fix Authentication Headers**
@@ -125,7 +125,7 @@ async function testChatAPI() {
     try {
         // 1. Login first
         const loginResponse = await fetch(
-            'http://REDACTED:8000/api/auth/login',
+            'http://localhost:8000/api/auth/login',
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -142,7 +142,7 @@ async function testChatAPI() {
 
         // 2. Test chat
         const chatResponse = await fetch(
-            'http://REDACTED:8000/main/assistants/1/chat',
+            'http://localhost:8000/main/assistants/1/chat',
             {
                 method: 'POST',
                 headers: {
@@ -248,12 +248,12 @@ const sendMessage = useCallback(
 
 ```javascript
 // Make sure your frontend has correct API URL
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://REDACTED:8000'
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'
 ```
 
 ### Fix #2: CORS Check
 
-If you see CORS errors, the backend already has CORS enabled for `REDACTED:3000`.
+If you see CORS errors, the backend already has CORS enabled for `localhost:3000`.
 
 ### Fix #3: Authentication
 
