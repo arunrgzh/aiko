@@ -270,8 +270,8 @@ params = {
 
 ```env
 # Celery
-CELERY_BROKER_URL=redis://REDACTED:6379/0
-CELERY_RESULT_BACKEND=redis://REDACTED:6379/0
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/0
 
 # HeadHunter API
 HH_API_BASE_URL=https://api.hh.kz
@@ -305,7 +305,7 @@ redis-cli ping
 # Flower UI
 celery -A celery_app flower
 
-# Доступ: http://REDACTED:5555
+# Доступ: http://localhost:5555
 ```
 
 ### Метрики
@@ -350,11 +350,11 @@ celery -A celery_app flower
 
 ```bash
 # Тест API
-curl -X GET "http://REDACTED:8000/api/enhanced-jobs/dual-recommendations" \
+curl -X GET "http://localhost:8000/api/enhanced-jobs/dual-recommendations" \
      -H "Authorization: Bearer YOUR_TOKEN"
 
 # Тест задач
-curl -X POST "http://REDACTED:8000/api/enhanced-jobs/trigger-update" \
+curl -X POST "http://localhost:8000/api/enhanced-jobs/trigger-update" \
      -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
