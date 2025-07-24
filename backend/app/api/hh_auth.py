@@ -66,7 +66,7 @@ async def get_auth_url():
     # For now, return a placeholder
     return {
         "message": "Configure HeadHunter OAuth app first",
-        "redirect_uri": "http://localhost:8000/api/auth/hh/callback",
+        "redirect_uri": "http://REDACTED:8000/api/auth/hh/callback",
         "steps": [
             "1. Register at https://dev.hh.ru/",
             "2. Create OAuth app",

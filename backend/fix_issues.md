@@ -118,13 +118,13 @@ Make sure your `.env` file has:
 ```env
 DATABASE_URL=sqlite+aiosqlite:///./ai_komek.db
 SECRET_KEY=your-secret-key-here-change-this-in-production
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://REDACTED:3000
 ```
 
 ## Next Steps
 
 1. **Start the server**: `python start_server.py`
-2. **Test in browser**: Go to http://localhost:8000/docs
+2. **Test in browser**: Go to http://REDACTED:8000/docs
 3. **Register a user** via Swagger UI or API call
 4. **Test protected endpoints** with the JWT token
 

@@ -5,7 +5,7 @@ from your_app.models.assessment import AssessmentQuestion  # adjust import to yo
 from your_app.database import Base                      # adjust import to your project structure
 
 # 1. Set your database URL
-DATABASE_URL = "postgresql+asyncpg://komek_user:REDACTED@localhost:5432/ai_komek"
+DATABASE_URL = "postgresql+asyncpg://REDACTED:REDACTED@REDACTED:5432/ai_komek"
 
 # 2. Define the new block of questions
 QUESTIONS = [
