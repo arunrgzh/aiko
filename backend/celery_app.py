@@ -17,8 +17,8 @@ celery_app = Celery('ai_komek_jobs')
 # Configuration
 celery_app.conf.update(
     # Broker settings
-    broker_url=os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/0'),
-    result_backend=os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0'),
+    broker_url=os.getenv('CELERY_BROKER_URL', 'redis://REDACTED:6379/0'),
+    result_backend=os.getenv('CELERY_RESULT_BACKEND', 'redis://REDACTED:6379/0'),
     
     # Task settings
     task_serializer='json',

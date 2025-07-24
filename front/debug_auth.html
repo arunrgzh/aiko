@@ -25,7 +25,7 @@
                 try {
                     // Login directly
                     const loginResp = await fetch(
-                        'http://localhost:8000/api/auth/login',
+                        'http://REDACTED:8000/api/auth/login',
                         {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
@@ -46,7 +46,7 @@
 
                     // Test assistants
                     const assistantsResp = await fetch(
-                        'http://localhost:8000/main/assistants/',
+                        'http://REDACTED:8000/main/assistants/',
                         {
                             headers: { Authorization: `Bearer ${token}` },
                         },
