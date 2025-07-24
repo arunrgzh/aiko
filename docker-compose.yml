@@ -30,11 +30,11 @@ services:
             dockerfile: Dockerfile
         container_name: ai_komekshi_backend
         environment:
-            - DATABASE_URL=postgresql+asyncpg://komek_user:REDACTED@localhost:5432/ai_komek
+            - DATABASE_URL=postgresql+asyncpg://komek_user:REDACTED@postgres:5432/ai_komek
             - REDIS_URL=redis://redis:6379
             - SECRET_KEY=your-super-secret-key-change-this-in-production
-            - FRONTEND_URL=http://localhost:3000
-            - ENVIRONMENT=development
+            - FRONTEND_URL=http://REDACTED:3000
+            - ENVIRONMENT=production
             - HTTP_PROXY=
             - HTTPS_PROXY=
         ports:
@@ -45,7 +45,7 @@ services:
         restart: unless-stopped
         volumes:
             - ./backend:/app
-        command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+        command: uvicorn app.main:app --host 0.0.0.0 --port 8000
 
     # Next.js Frontend
     frontend:
@@ -54,9 +54,9 @@ services:
             dockerfile: Dockerfile
         container_name: ai_komekshi_frontend
         environment:
-            - API_URL=http://localhost:8000
+            - API_URL=http://REDACTED:8000
             - NEXTAUTH_SECRET=your-nextauth-secret-change-this-in-production
-            - NEXTAUTH_URL=http://localhost:3000
+            - NEXTAUTH_URL=http://REDACTED:3000
         ports:
             - '3000:3000'
         depends_on:
@@ -65,7 +65,7 @@ services:
         volumes:
             - ./front:/app
             - /app/node_modules
-        command: npm run dev
+        command: npm run start
 
 volumes:
     postgres_data:
