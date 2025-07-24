@@ -43,7 +43,7 @@ if onboarding_profile.profession is not None:
 
 ### 1. Debug HTML Tool (`front/debug_vacancies.html`)
 
-Navigate to: `http://localhost:3000/debug_vacancies.html`
+Navigate to: `http://20.67.232.168:3000/debug_vacancies.html`
 
 This tool provides:
 

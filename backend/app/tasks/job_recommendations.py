@@ -21,8 +21,8 @@ logger = logging.getLogger(__name__)
 # Initialize Celery
 celery_app = Celery(
     'job_recommendations',
-    broker='redis://localhost:6379/0',
-    backend='redis://localhost:6379/0'
+    broker='redis://20.67.232.168:6379/0',
+    backend='redis://20.67.232.168:6379/0'
 )
 
 # Configure Celery
