@@ -182,7 +182,7 @@ class EnhancedHeadHunterService:
         if not onboarding_profile:
             logger.warning("No onboarding profile found, using default search")
             params["text"] = "работа OR вакансия OR специалист OR стажер"
-            params["area"] = "40"  # Kazakhstan
+            params["area"] = ["40"]  # Kazakhstan
             return params
         
         # Build search text from profession and skills
@@ -257,11 +257,13 @@ class EnhancedHeadHunterService:
                 # If specific city has few jobs, also include broader area
                 if len(area_ids) == 1 and area_ids[0] in ["161", "153", "145"]:  # Smaller cities
                     area_ids.append("40")  # Add all Kazakhstan as fallback
-                params["area"] = ",".join(area_ids)
+                params["area"] = area_ids  # Pass as a list
             else:
-                params["area"] = "40"  # Default to Kazakhstan
+                params["area"] = ["40"]  # Default to Kazakhstan as a list
+
         else:
-            params["area"] = "40"  # Default to Kazakhstan
+            params["area"] = ["40"]  # Default to Kazakhstan as a list
+
         
         # Employment type
         employment_type = getattr(onboarding_profile, 'employment_type', None)
