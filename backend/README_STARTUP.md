@@ -52,10 +52,10 @@ python run.py
 
 Once the server is running, you can access:
 
--   **Swagger UI**: http://REDACTED:8000/docs
--   **ReDoc**: http://REDACTED:8000/redoc
--   **OpenAPI JSON**: http://REDACTED:8000/openapi.json
--   **Health Check**: http://REDACTED:8000/health
+-   **Swagger UI**: http://localhost:8000/docs
+-   **ReDoc**: http://localhost:8000/redoc
+-   **OpenAPI JSON**: http://localhost:8000/openapi.json
+-   **Health Check**: http://localhost:8000/health
 
 ## Common Issues and Solutions
 
@@ -128,7 +128,7 @@ Make sure your `.env` file includes:
 ```env
 DATABASE_URL=sqlite+aiosqlite:///./ai_komek.db
 SECRET_KEY=your-secret-key-here
-FRONTEND_URL=http://REDACTED:3000
+FRONTEND_URL=http://localhost:3000
 AZURE_OPENAI_API_KEY=your-key
 AZURE_OPENAI_BASE_URL=https://your-resource.openai.azure.com/
 AZURE_OPENAI_API_VERSION=2024-02-15-preview

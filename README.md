@@ -26,7 +26,7 @@
     REFRESH_TOKEN_EXPIRE_DAYS=7
 
     # Frontend
-    FRONTEND_URL=http://REDACTED:3000
+    FRONTEND_URL=http://localhost:3000
 
     # Environment
     ENVIRONMENT=development
@@ -53,15 +53,15 @@
 
     ```env
     # Backend API URL
-    NEXT_PUBLIC_API_URL=http://REDACTED:8000
+    NEXT_PUBLIC_API_URL=http://localhost:8000
 
     # NextAuth Configuration
     NEXTAUTH_SECRET=your-nextauth-secret-key-here-make-it-long-and-random
-    NEXTAUTH_URL=http://REDACTED:3000
+    NEXTAUTH_URL=http://localhost:3000
 
     # Backend URL for server-side requests
-    API_URL=http://REDACTED:8000/
-    BACKEND_URL=http://REDACTED:8000
+    API_URL=http://localhost:8000/
+    BACKEND_URL=http://localhost:8000
     ```
 
 3. **Запустите фронтенд:**
@@ -71,10 +71,10 @@
 
 ### Доступ к чат-боту
 
-1. Откройте http://REDACTED:3000
+1. Откройте http://localhost:3000
 2. Зарегистрируйтесь или войдите в систему
 3. Перейдите в раздел "Чат с ИИ" или напрямую по адресу:
-   http://REDACTED:3000/assistants/1/main/testing
+   http://localhost:3000/assistants/1/main/testing
 
 ## 🤖 Возможности чат-бота
 
