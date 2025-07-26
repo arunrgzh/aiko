@@ -6,4 +6,5 @@ export const dateLocales: {
     zh: () => import('dayjs/locale/zh'),
     ar: () => import('dayjs/locale/ar'),
     ru: () => import('dayjs/locale/ru'),
+    kz: () => import('dayjs/locale/kk'),
 }

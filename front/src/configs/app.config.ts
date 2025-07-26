@@ -16,7 +16,7 @@ const appConfig: AppConfig = {
     unAuthenticatedEntryPath: '/landing',
     signInEntryPath: '/sign-in',
     onboardingPath: '/onboarding',
-    locale: 'ru',
+    locale: 'kz',
     activeNavTranslation: true,
 }
 
