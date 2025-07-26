@@ -11,6 +11,8 @@ import Link from 'next/link'
 import type { Mode } from '@/@types/theme'
 import { useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
+import LanguageSelector from '@/components/template/LanguageSelector' 
+
 
 type NavigationProps = {
     toggleMode: () => void

@@ -11,11 +11,9 @@ import { useLocale } from 'next-intl'
 import type { CommonProps } from '@/@types/common'
 
 const languageList = [
-    { label: 'English', value: 'en', flag: 'US' },
-    { label: 'Chinese', value: 'zh', flag: 'CN' },
-    { label: 'Espanol', value: 'es', flag: 'ES' },
-    { label: 'Arabic', value: 'ar', flag: 'SA' },
+    { label: 'Kazakh', value: 'kz', flag: 'KZ' },
     { label: 'Russian', value: 'ru', flag: 'RU' },
+    { label: 'English', value: 'en', flag: 'US' },
 ]
 
 const _LanguageSelector = ({ className }: CommonProps) => {
