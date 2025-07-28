@@ -351,30 +351,15 @@
         "debug": {
             "skills": "Debug Skills"
         },
-        "recommendations": {
-            "personal": {
-                "title": "Personal Recommendations",
-                "description": "Vacancies based on your skills and preferences",
-                "empty": "Personal recommendations not found"
-            },
-            "assessment": {
-                "title": "Assessment-based Recommendations",
-                "description": "Recommendations based on professional assessment results",
-                "empty": "Assessment recommendations not found"
-            },
-            "search": {
-                "title": "Search Results: '{{query}}'",
-                "description": "Found {{count}} vacancies",
-                "empty": "Search results not found"
-            }
+        "assessment": {
+            "title": "Assessment-based Recommendations",
+            "description": "Recommendations based on professional assessment results",
+            "empty": "Assessment recommendations not found"
         },
         "empty": {
             "title": "No Recommendations Found",
             "description": "Currently there are no suitable vacancies for you",
             "tryAgain": "Try Again"
-        },
-        "loading": {
-            "text": "Loading..."
         },
         "loader": {
             "title": "Selecting Personalized Vacancies",
@@ -408,6 +393,13 @@
                 "excellentFit": "Excellent Fit",
                 "saved": "Saved"
             },
+            "personal": {
+                "title": "Personal Recommendations",
+                "description": "Vacancies based on your skills and preferences",
+                "empty": "Personal recommendations not found",
+                "notFound": "Recommendations not found",
+                "tryAgain": "Try updating your profile or expanding search criteria"
+            },
             "tabs": {
                 "personal": "Personal ({{count}})",
                 "assessment": "By Assessment ({{count}})"
@@ -418,12 +410,6 @@
                 "placeholder": "Search vacancies...",
                 "notFound": "Nothing found",
                 "tryAgain": "Try changing your search query"
-            },
-            "personal": {
-                "title": "Personal Recommendations",
-                "description": "Vacancies selected based on your skills and preferences",
-                "notFound": "Recommendations not found",
-                "tryAgain": "Try updating your profile or expanding search criteria"
             },
             "assessment": {
                 "title": "Assessment-Based Recommendations",
@@ -447,8 +433,8 @@
             },
             "timeAgo": {
                 "justNow": "Just now",
-                "hoursAgo": "{hours}h ago",
-                "daysAgo": "{days}d ago"
+                "hoursAgo": "{count}h ago",
+                "daysAgo": "{count}d ago"
             },
             "actions": {
                 "saved": "Saved",
@@ -586,20 +572,6 @@
         "buttons": {
             "login": "Login",
             "toggleTheme": "Toggle theme"
-        }
-    },
-    "landing": {
-        "hero": {
-            "title": "AI-Komekshi - your personal job search assistant.",
-            "subtitle": "Find your dream job with the help of artificial intelligence. Our platform analyzes your skills, experience, and preferences to match you with the perfect opportunities.",
-            "cta": "Get Started",
-            "learnMore": "Learn More"
-        },
-        "footer": {
-            "title": "Test it right now.",
-            "subtitle": "Talk to our bot right here...",
-            "cta": "Start Now",
-            "copyright": "Copyright © 2025 AI Komekshi. All rights reserved."
         }
     },
     "profile": {

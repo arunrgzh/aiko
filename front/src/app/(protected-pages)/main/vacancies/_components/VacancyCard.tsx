@@ -11,7 +11,7 @@ import {
     TbExternalLink,
     TbSend,
     TbMapPin,
-    TbCurrencyDollar,
+    TbCurrencyTenge,
     TbClock,
     TbBriefcase,
     TbTarget,
@@ -132,10 +132,7 @@ export default function VacancyCard({
 
                     {/* Location */}
                     {vacancy.area_name && (
-                        <Badge
-                            variant="outline"
-                            className="text-gray-600 dark:text-gray-400"
-                        >
+                        <Badge className="text-gray-600 dark:text-gray-400">
                             <TbMapPin className="w-3 h-3 mr-1" />
                             {vacancy.area_name}
                         </Badge>
@@ -143,10 +140,7 @@ export default function VacancyCard({
 
                     {/* Employment Type */}
                     {vacancy.employment_type && (
-                        <Badge
-                            variant="outline"
-                            className="text-gray-600 dark:text-gray-400"
-                        >
+                        <Badge className="text-gray-600 dark:text-gray-400">
                             <TbBriefcase className="w-3 h-3 mr-1" />
                             {vacancy.employment_type}
                         </Badge>
@@ -154,10 +148,7 @@ export default function VacancyCard({
 
                     {/* Experience */}
                     {vacancy.experience_required && (
-                        <Badge
-                            variant="outline"
-                            className="text-gray-600 dark:text-gray-400"
-                        >
+                        <Badge className="text-gray-600 dark:text-gray-400">
                             <TbTrendingUp className="w-3 h-3 mr-1" />
                             {vacancy.experience_required}
                         </Badge>
@@ -167,7 +158,7 @@ export default function VacancyCard({
                 {/* Salary */}
                 {formatSalary() && (
                     <div className="flex items-center text-green-600 dark:text-green-400">
-                        <TbCurrencyDollar className="w-4 h-4 mr-1" />
+                        <TbCurrencyTenge className="w-4 h-4 mr-1" />
                         <span className="font-medium">{formatSalary()}</span>
                     </div>
                 )}

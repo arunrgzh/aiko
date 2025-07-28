@@ -1,7 +1,14 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { Card, Badge, Button, Spinner, Alert, Modal } from '@/components/ui'
+import {
+    Card,
+    Badge,
+    Button,
+    Spinner,
+    Alert,
+    Dialog,
+} from '@/components/ui/index'
 import {
     BriefcaseIcon,
     MapPinIcon,
@@ -276,7 +283,7 @@ const DualJobRecommendations: React.FC = () => {
                 {/* Actions */}
                 <div className="flex justify-between items-center pt-3 border-t">
                     <Button
-                        variant="outline"
+                        variant="default"
                         size="sm"
                         onClick={() => handleVacancyClick(job.hh_vacancy_id)}
                         disabled={loadingVacancy}
@@ -290,7 +297,7 @@ const DualJobRecommendations: React.FC = () => {
                     </Button>
 
                     <div className="flex space-x-2">
-                        <Button variant="outline" size="sm">
+                        <Button variant="default" size="sm">
                             Сохранить
                         </Button>
                         <Button size="sm">Откликнуться</Button>
@@ -346,7 +353,7 @@ const DualJobRecommendations: React.FC = () => {
             >
                 {error}
                 <Button
-                    variant="outline"
+                    variant="default"
                     size="sm"
                     onClick={fetchRecommendations}
                     className="mt-3"
@@ -397,7 +404,7 @@ const DualJobRecommendations: React.FC = () => {
                                 сильных сторон
                             </p>
                             <Button
-                                variant="outline"
+                                variant="default"
                                 size="sm"
                                 className="mt-3"
                             >
@@ -409,65 +416,65 @@ const DualJobRecommendations: React.FC = () => {
             )}
 
             {/* Vacancy details modal */}
-            <Modal
-                isOpen={vacancyModalOpen}
-                onClose={() => setVacancyModalOpen(false)}
-                title="Детали вакансии"
-                size="lg"
-            >
-                {selectedVacancy && (
-                    <div className="space-y-4">
-                        {/* Vacancy details content */}
-                        <div className="prose max-w-none">
-                            <h3>{selectedVacancy.vacancy?.name}</h3>
-                            <p>
-                                <strong>Компания:</strong>{' '}
-                                {selectedVacancy.vacancy?.employer?.name}
-                            </p>
+            <Dialog open={vacancyModalOpen} onOpenChange={setVacancyModalOpen}>
+                <Dialog.Content className="max-w-4xl">
+                    <Dialog.Header>
+                        <Dialog.Title>Детали вакансии</Dialog.Title>
+                    </Dialog.Header>
+                    {selectedVacancy && (
+                        <div className="space-y-4">
+                            {/* Vacancy details content */}
+                            <div className="prose max-w-none">
+                                <h3>{selectedVacancy.vacancy?.name}</h3>
+                                <p>
+                                    <strong>Компания:</strong>{' '}
+                                    {selectedVacancy.vacancy?.employer?.name}
+                                </p>
 
-                            {selectedVacancy.vacancy?.description && (
-                                <div
-                                    dangerouslySetInnerHTML={{
-                                        __html: selectedVacancy.vacancy
-                                            .description,
-                                    }}
-                                />
-                            )}
-                        </div>
-
-                        {/* Action buttons */}
-                        <div className="flex justify-between pt-4 border-t">
-                            <Button
-                                variant="outline"
-                                onClick={() => setVacancyModalOpen(false)}
-                            >
-                                Закрыть
-                            </Button>
-
-                            <div className="flex space-x-3">
-                                {selectedVacancy.has_contacts && (
-                                    <Button variant="outline">
-                                        Показать контакты
-                                    </Button>
+                                {selectedVacancy.vacancy?.description && (
+                                    <div
+                                        dangerouslySetInnerHTML={{
+                                            __html: selectedVacancy.vacancy
+                                                .description,
+                                        }}
+                                    />
                                 )}
+                            </div>
 
+                            {/* Action buttons */}
+                            <div className="flex justify-between pt-4 border-t">
                                 <Button
-                                    onClick={() =>
-                                        window.open(
-                                            selectedVacancy.alternate_url,
-                                            '_blank',
-                                        )
-                                    }
-                                    className="flex items-center space-x-2"
+                                    variant="default"
+                                    onClick={() => setVacancyModalOpen(false)}
                                 >
-                                    <ExternalLinkIcon className="h-4 w-4" />
-                                    <span>Откликнуться на hh.ru</span>
+                                    Закрыть
                                 </Button>
+
+                                <div className="flex space-x-3">
+                                    {selectedVacancy.has_contacts && (
+                                        <Button variant="default">
+                                            Показать контакты
+                                        </Button>
+                                    )}
+
+                                    <Button
+                                        onClick={() =>
+                                            window.open(
+                                                selectedVacancy.alternate_url,
+                                                '_blank',
+                                            )
+                                        }
+                                        className="flex items-center space-x-2"
+                                    >
+                                        <ExternalLinkIcon className="h-4 w-4" />
+                                        <span>Откликнуться на hh.ru</span>
+                                    </Button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                )}
-            </Modal>
+                    )}
+                </Dialog.Content>
+            </Dialog>
 
             {/* Summary footer */}
             <div className="bg-gray-50 rounded-lg p-6 text-center">
@@ -483,7 +490,7 @@ const DualJobRecommendations: React.FC = () => {
                     )}
                 </p>
                 <Button
-                    variant="outline"
+                    variant="default"
                     size="sm"
                     onClick={fetchRecommendations}
                     className="mt-3"

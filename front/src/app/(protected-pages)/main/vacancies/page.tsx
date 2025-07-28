@@ -44,7 +44,10 @@ export default function VacanciesPage() {
         }
 
         if (status === 'authenticated' && session?.accessToken) {
-            loadPersonalizedVacancies()
+            // Add a small delay to ensure session is fully propagated
+            const timer = setTimeout(() => {
+                loadPersonalizedVacancies()
+            }, 100)
 
             // Check if user just completed onboarding
             const shouldShowAssistant =
@@ -55,6 +58,8 @@ export default function VacanciesPage() {
                     setShowAssistantSuggestion(true)
                 }, 2000) // 2 seconds after page load
             }
+
+            return () => clearTimeout(timer)
         }
     }, [status, session, searchParams])
 
@@ -62,6 +67,13 @@ export default function VacanciesPage() {
         try {
             setIsLoading(true)
             setError(null)
+
+            // Double-check session is available
+            if (!session?.accessToken) {
+                console.warn('⚠️ No access token available, skipping API call')
+                setError('Authentication required')
+                return
+            }
 
             console.log('🏠 Loading personalized vacancies...')
 
