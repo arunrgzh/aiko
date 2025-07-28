@@ -340,6 +340,42 @@
     },
 
     "vacancies": {
+        "search": {
+            "placeholder": "Search vacancies..."
+        },
+        "actions": {
+            "filter": "Filters",
+            "refresh": "Refresh",
+            "detailedMatchingScores": "Detailed matching scores"
+        },
+        "debug": {
+            "skills": "Debug Skills"
+        },
+        "recommendations": {
+            "personal": {
+                "title": "Personal Recommendations",
+                "description": "Vacancies based on your skills and preferences",
+                "empty": "Personal recommendations not found"
+            },
+            "assessment": {
+                "title": "Assessment-based Recommendations",
+                "description": "Recommendations based on professional assessment results",
+                "empty": "Assessment recommendations not found"
+            },
+            "search": {
+                "title": "Search Results: '{{query}}'",
+                "description": "Found {{count}} vacancies",
+                "empty": "Search results not found"
+            }
+        },
+        "empty": {
+            "title": "No Recommendations Found",
+            "description": "Currently there are no suitable vacancies for you",
+            "tryAgain": "Try Again"
+        },
+        "loading": {
+            "text": "Loading..."
+        },
         "loader": {
             "title": "Selecting Personalized Vacancies",
             "subtitle": "Analyzing your data to find suitable job offers",
@@ -593,6 +629,7 @@
             "experience": "Experience",
             "industry": "Industry",
             "salaryExpectations": "Salary Expectations",
+            "skills": "Skills",
             "notSpecified": "Not specified",
             "years": "years"
         },
@@ -609,6 +646,8 @@
             "workFormat": "Work Format",
             "employmentType": "Employment Type",
             "workLocations": "Preferred Locations",
+            "salaryExpectations": "Salary Expectations",
+            "preferredCities": "Preferred Cities",
             "notSpecified": "Not specified"
         },
         "accessibility": {
@@ -616,6 +655,8 @@
             "needs": "Accessibility Needs",
             "adaptations": "Required Adaptations",
             "notes": "Additional Notes",
+            "disabilityType": "Disability Type",
+            "workplacePreferences": "Workplace Preferences",
             "none": "None specified"
         },
         "bio": {

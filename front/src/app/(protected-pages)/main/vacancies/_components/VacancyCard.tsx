@@ -219,7 +219,7 @@ export default function VacancyCard({
                         size="sm"
                         variant="solid"
                         onClick={() => onApply?.(vacancy.id)}
-                        className="flex-1"
+                        className="flex-1 h-9"
                         icon={<TbSend />}
                     >
                         {t('card.actions.apply')}
@@ -229,6 +229,7 @@ export default function VacancyCard({
                         size="sm"
                         variant="plain"
                         onClick={() => onViewDetails?.(vacancy.id)}
+                        className="flex-1"
                         icon={<TbExternalLink />}
                     >
                         {t('card.actions.viewDetails')}
@@ -240,7 +241,7 @@ export default function VacancyCard({
                     Object.keys(vacancy.detailed_scores).length > 0 && (
                         <details className="mt-4">
                             <summary className="text-xs text-gray-500 cursor-pointer">
-                                Detailed matching scores
+                                {t('card.actions.detailedMatchingScores')}
                             </summary>
                             <div className="mt-2 space-y-1">
                                 {Object.entries(vacancy.detailed_scores).map(

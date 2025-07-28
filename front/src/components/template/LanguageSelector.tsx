@@ -6,8 +6,8 @@ import Dropdown from '@/components/ui/Dropdown'
 import classNames from 'classnames'
 import withHeaderItem from '@/utils/hoc/withHeaderItem'
 import { HiCheck } from 'react-icons/hi'
-import { setLocale } from '@/server/actions/locale'
 import { useLocale } from 'next-intl'
+import { useRouter, usePathname } from 'next/navigation'
 import type { CommonProps } from '@/@types/common'
 
 const languageList = [
@@ -18,13 +18,28 @@ const languageList = [
 
 const _LanguageSelector = ({ className }: CommonProps) => {
     const locale = useLocale()
+    const router = useRouter()
+    const pathname = usePathname()
 
     const selectLangFlag = useMemo(() => {
         return languageList.find((lang) => lang.value === locale)?.flag
     }, [locale])
 
-    const handleUpdateLocale = async (locale: string) => {
-        await setLocale(locale)
+    const handleUpdateLocale = async (newLocale: string) => {
+        // Set cookie on client side
+        if (typeof window !== 'undefined') {
+            document.cookie = `locale=${newLocale}; path=/; max-age=${60 * 60 * 24 * 365}` // 1 year
+        }
+
+        // Navigate to the same page with new locale
+        const currentPath = pathname
+        const newPath = currentPath.replace(`/${locale}`, `/${newLocale}`)
+        router.push(newPath)
+
+        // Force page reload to ensure locale change takes effect
+        setTimeout(() => {
+            window.location.reload()
+        }, 100)
     }
 
     const selectedLanguage = (
