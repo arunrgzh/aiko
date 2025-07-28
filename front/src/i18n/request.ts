@@ -1,8 +1,14 @@
 import { getRequestConfig } from 'next-intl/server'
-import { getLocale } from '@/server/actions/locale'
+import { cookies } from 'next/headers'
+import appConfig from '@/configs/app.config'
+import { COOKIES_KEY } from '@/constants/app.constant'
 
 export default getRequestConfig(async () => {
-    const locale = await getLocale()
+    // Read locale directly from cookies instead of using server action
+    const cookieStore = await cookies()
+    const locale =
+        cookieStore.get(COOKIES_KEY.LOCALE)?.value || appConfig.locale
+
     return {
         locale,
         messages: (await import(`../../messages/${locale}.json`)).default,

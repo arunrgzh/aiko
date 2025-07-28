@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect } from 'react'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Tabs from '@/components/ui/Tabs'
@@ -20,7 +20,7 @@ import {
 } from 'react-icons/tb'
 import VacancyCard from './VacancyCard'
 import { JobRecommendation } from '../types'
-import { useTranslations } from 'next-intl';
+import { useTranslations } from 'next-intl'
 
 type VacancyRecommendationsProps = {
     personalRecommendations: JobRecommendation[]
@@ -47,7 +47,7 @@ export default function VacancyRecommendations({
     onDebugSkills,
     isLoading = false,
 }: VacancyRecommendationsProps) {
-    const t = useTranslations();
+    const t = useTranslations('vacancies')
     const [personalRecommendations, setPersonalRecommendations] =
         useState(initialPersonal)
     const [assessmentRecommendations, setAssessmentRecommendations] =
@@ -96,37 +96,73 @@ export default function VacancyRecommendations({
         }
     }
 
-    const handleSave = (id: number) => {
-        setPersonalRecommendations((recs) =>
-            recs.map((vacancy) =>
-                vacancy.id === id
-                    ? { ...vacancy, is_saved: !vacancy.is_saved }
-                    : vacancy,
-            ),
-        )
-        setAssessmentRecommendations((recs) =>
-            recs.map((vacancy) =>
-                vacancy.id === id
-                    ? { ...vacancy, is_saved: !vacancy.is_saved }
-                    : vacancy,
-            ),
-        )
-        onSave?.(id)
-    }
+    // Update local state when props change
+    useEffect(() => {
+        setPersonalRecommendations(initialPersonal)
+    }, [initialPersonal])
 
-    const recommendationsToShow = useMemo(() => {
-        if (searchQuery.trim() !== '') {
+    useEffect(() => {
+        setAssessmentRecommendations(initialAssessment)
+    }, [initialAssessment])
+
+    const allRecommendations = useMemo(() => {
+        if (searchQuery.trim()) {
             return searchResults
         }
-        return activeTab === 'personal'
-            ? personalRecommendations
-            : assessmentRecommendations
+        return [...personalRecommendations, ...assessmentRecommendations]
     }, [
         searchQuery,
         searchResults,
-        activeTab,
         personalRecommendations,
         assessmentRecommendations,
+    ])
+
+    const hasPersonalRecommendations = personalRecommendations.length > 0
+    const hasAssessmentRecommendations = assessmentRecommendations.length > 0
+    const hasSearchResults = searchQuery.trim() && searchResults.length > 0
+
+    const tabs = useMemo(() => {
+        const tabList = []
+
+        if (hasPersonalRecommendations || !hasAssessmentRecommendations) {
+            tabList.push({
+                key: 'personal',
+                label: t('recommendations.personal.title'),
+                count: personalRecommendations.length,
+                icon: <TbUser className="w-4 h-4" />,
+            })
+        }
+
+        if (hasAssessmentRecommendations) {
+            tabList.push({
+                key: 'assessment',
+                label: t('recommendations.assessment.title'),
+                count: assessmentRecommendations.length,
+                icon: <TbBrain className="w-4 h-4" />,
+            })
+        }
+
+        if (hasSearchResults) {
+            tabList.push({
+                key: 'search',
+                label: t('recommendations.search.title', {
+                    query: searchQuery,
+                }),
+                count: searchResults.length,
+                icon: <TbSearch className="w-4 h-4" />,
+            })
+        }
+
+        return tabList
+    }, [
+        hasPersonalRecommendations,
+        hasAssessmentRecommendations,
+        hasSearchResults,
+        personalRecommendations.length,
+        assessmentRecommendations.length,
+        searchResults.length,
+        searchQuery,
+        t,
     ])
 
     const renderRecommendationBlock = (
@@ -135,16 +171,18 @@ export default function VacancyRecommendations({
     ) => {
         const isSearchMode = type === 'search'
         const title = isSearchMode
-            ? t('vacancies.recommendations.search.title', { query: searchQuery })
+            ? t('recommendations.search.title', { query: searchQuery })
             : type === 'personal'
-              ? t('vacancies.recommendations.personal.title')
-              : t('vacancies.recommendations.assessment.title')
+              ? t('recommendations.personal.title')
+              : t('recommendations.assessment.title')
 
         const description = isSearchMode
-            ? t('vacancies.recommendations.search.description', { count: recommendations.length })
+            ? t('recommendations.search.description', {
+                  count: recommendations.length,
+              })
             : type === 'personal'
-              ? t('vacancies.recommendations.personal.description')
-              : t('vacancies.recommendations.assessment.description')
+              ? t('recommendations.personal.description')
+              : t('recommendations.assessment.description')
 
         const icon = isSearchMode ? (
             <TbSearch />
@@ -155,215 +193,188 @@ export default function VacancyRecommendations({
         )
 
         return (
-            <div className="mb-6">
-                <div className="flex items-center space-x-3 mb-4">
-                    <div className="text-blue-600 dark:text-blue-400 text-xl">{icon}</div>
-                    <div>
-                        <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{title}</h2>
-                        <p className="text-gray-600 dark:text-gray-400">{description}</p>
+            <div key={type} className="space-y-4">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-10 h-10 bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 rounded-lg">
+                            {icon}
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                                {title}
+                            </h3>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
+                                {description}
+                            </p>
+                        </div>
                     </div>
+                    {type === 'personal' && onDebugSkills && (
+                        <Button
+                            size="sm"
+                            variant="default"
+                            onClick={onDebugSkills}
+                            className="text-xs"
+                        >
+                            {t('debug.skills')}
+                        </Button>
+                    )}
                 </div>
-                {isSearching ? (
-                    <div className="flex justify-center items-center h-48">
-                        <Spinner size={40} />
+
+                {recommendations.length === 0 ? (
+                    <div className="text-center py-8">
+                        <div className="text-gray-400 dark:text-gray-500 mb-2">
+                            {type === 'search' ? (
+                                <TbSearch className="w-12 h-12 mx-auto" />
+                            ) : type === 'personal' ? (
+                                <TbUser className="w-12 h-12 mx-auto" />
+                            ) : (
+                                <TbBrain className="w-12 h-12 mx-auto" />
+                            )}
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-400">
+                            {type === 'search'
+                                ? t('recommendations.search.empty')
+                                : type === 'personal'
+                                  ? t('recommendations.personal.empty')
+                                  : t('recommendations.assessment.empty')}
+                        </p>
                     </div>
-                ) : recommendations.length > 0 ? (
-                    <div className="space-y-4">
+                ) : (
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 items-stretch auto-rows-fr">
                         {recommendations.map((vacancy) => (
                             <VacancyCard
                                 key={vacancy.id}
                                 vacancy={vacancy}
-                                onSave={handleSave}
+                                onSave={onSave}
                                 onApply={onApply}
                                 onViewDetails={onViewDetails}
                             />
                         ))}
                     </div>
-                ) : (
-                    <Card className="p-8 text-center mb-6 border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
-                        <div className="w-16 h-16 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <TbSearch className="text-gray-400 text-2xl" />
-                        </div>
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-                            {isSearchMode
-                                ? t('vacancies.recommendations.search.notFound')
-                                : type === 'personal'
-                                  ? t('vacancies.recommendations.personal.notFound')
-                                  : t('vacancies.recommendations.assessment.notFound')}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-400 mb-4">
-                            {isSearchMode
-                                ? t('vacancies.recommendations.search.tryAgain')
-                                : type === 'personal'
-                                  ? t('vacancies.recommendations.personal.tryAgain')
-                                  : t('vacancies.recommendations.assessment.tryAgain')}
-                        </p>
-                        {!isSearchMode && (
-                            <Button
-                                variant="plain"
-                                onClick={onRefresh}
-                                icon={<TbRefresh />}
-                            >
-                                {t('vacancies.recommendations.refresh')}
-                            </Button>
-                        )}
-                    </Card>
                 )}
             </div>
         )
     }
 
-    const isSearchActive = searchQuery.trim() !== ''
-
     return (
         <div className="space-y-6">
-            {/* Top Controls */}
-            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                        {t('vacancies.recommendations.title')}
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-400">
-                        {t('vacancies.recommendations.subtitle')}
-                    </p>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                    {/* Search */}
-                    <Input
-                        className="w-full lg:w-80"
-                        prefix={<TbSearch className="text-lg text-gray-400" />}
-                        placeholder={t('vacancies.recommendations.search.placeholder')}
-                        value={searchQuery}
-                        onChange={handleSearchChange}
-                        onKeyDown={handleKeyDown}
-                        suffix={searchQuery && <Button size="xs" variant="plain" icon={<TbX />} onClick={clearSearch} />}
-                    />
-
-                    <Button
-                        variant="plain"
-                        onClick={onFilter}
-                        icon={<TbFilter />}
-                    >
-                        {t('vacancies.recommendations.filter')}
-                    </Button>
-
-                    {/* Debug Skills Button - Development Only */}
-                    {process.env.NODE_ENV === 'development' && (
-                        <Button
-                            variant="plain"
-                            onClick={onDebugSkills}
-                            className="text-orange-600 hover:bg-orange-50 dark:text-orange-400 dark:hover:bg-orange-900/20"
-                            title={t('vacancies.recommendations.debugSkills')}
-                        >
-                            🔍 {t('vacancies.recommendations.debugSkills')}
-                        </Button>
-                    )}
-
-                    <Button
-                        className="w-full lg:w-auto"
-                        variant="solid"
-                        onClick={onRefresh}
-                        loading={isLoading && !isSearching}
-                        icon={<TbRefresh />}
-                    >
-                        {t('vacancies.recommendations.refresh')}
-                    </Button>
-                </div>
-            </div>
-
-            {/* Statistics Cards */}
-            {!isSearchActive && (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Card className="p-6">
-                        <div className="flex items-center space-x-3">
-                            <div className="p-3 bg-blue-100 dark:bg-blue-900/20 rounded-lg">
-                                <TbTrendingUp className="text-blue-600 dark:text-blue-400 text-xl" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                                    {[...personalRecommendations, ...assessmentRecommendations].length}
-                                </p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    {t('vacancies.recommendations.stats.total')}
-                                </p>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <Card className="p-6">
-                        <div className="flex items-center space-x-3">
-                            <div className="p-3 bg-green-100 dark:bg-green-900/20 rounded-lg">
-                                <TbUser className="text-green-600 dark:text-green-400 text-xl" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                                    {
-                                        personalRecommendations.filter(
-                                            (v) => v.relevance_score >= 0.8,
-                                        ).length
-                                    }
-                                </p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    {t('vacancies.recommendations.stats.excellentFit')}
-                                </p>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <Card className="p-6">
-                        <div className="flex items-center space-x-3">
-                            <div className="p-3 bg-red-100 dark:bg-red-900/20 rounded-lg">
-                                <TbHeart className="text-red-600 dark:text-red-400 text-xl" />
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                                    {
-                                        [
-                                            ...personalRecommendations,
-                                            ...assessmentRecommendations,
-                                        ].filter((v) => v.is_saved).length
-                                    }
-                                </p>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    {t('vacancies.recommendations.stats.saved')}
-                                </p>
-                            </div>
-                        </div>
-                    </Card>
-                </div>
-            )}
-
-            {isSearchActive ? (
-                renderRecommendationBlock(searchResults, 'search')
-            ) : (
-                <>
-                    <Tabs
-                        value={activeTab}
-                        onChange={(val) => setActiveTab(val)}
-                    >
-                        <Tabs.TabList>
-                            <Tabs.TabNav value="personal">
-                                {t('vacancies.recommendations.tabs.personal', { count: personalRecommendations.length })}
-                            </Tabs.TabNav>
-                            <Tabs.TabNav value="assessment">
-                                {t('vacancies.recommendations.tabs.assessment', { count: assessmentRecommendations.length })}
-                            </Tabs.TabNav>
-                        </Tabs.TabList>
-                    </Tabs>
-                    <div className="mt-6">
-                        {activeTab === 'personal' &&
-                            renderRecommendationBlock(
-                                personalRecommendations,
-                                'personal',
+            {/* Header with search and actions */}
+            <Card className="p-6">
+                <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
+                    <div className="flex-1 max-w-md">
+                        <div className="relative">
+                            <TbSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                            <Input
+                                placeholder={t('search.placeholder')}
+                                value={searchQuery}
+                                onChange={handleSearchChange}
+                                onKeyDown={handleKeyDown}
+                                className="pl-10 pr-10"
+                            />
+                            {searchQuery && (
+                                <button
+                                    onClick={clearSearch}
+                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                >
+                                    <TbX className="w-4 h-4" />
+                                </button>
                             )}
-                        {activeTab === 'assessment' &&
-                            renderRecommendationBlock(
-                                assessmentRecommendations,
-                                'assessment',
-                            )}
+                        </div>
                     </div>
-                </>
+
+                    <div className="flex gap-2">
+                        {onFilter && (
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={onFilter}
+                                icon={<TbFilter className="w-4 h-4" />}
+                            >
+                                {t('actions.filter')}
+                            </Button>
+                        )}
+                        {onRefresh && (
+                            <Button
+                                variant="default"
+                                size="sm"
+                                onClick={onRefresh}
+                                icon={<TbRefresh className="w-4 h-4" />}
+                                disabled={isLoading}
+                            >
+                                {t('actions.refresh')}
+                            </Button>
+                        )}
+                    </div>
+                </div>
+            </Card>
+
+            {/* Results */}
+            {isLoading ? (
+                <Card className="p-8">
+                    <div className="text-center">
+                        <Spinner size={40} />
+                        <p className="mt-4 text-gray-600 dark:text-gray-400">
+                            {t('loading.text')}
+                        </p>
+                    </div>
+                </Card>
+            ) : (
+                <div className="space-y-6">
+                    {tabs.length > 1 ? (
+                        <Tabs
+                            value={activeTab}
+                            onChange={setActiveTab}
+                            items={tabs}
+                        />
+                    ) : null}
+
+                    {activeTab === 'personal' &&
+                        hasPersonalRecommendations &&
+                        renderRecommendationBlock(
+                            personalRecommendations,
+                            'personal',
+                        )}
+
+                    {activeTab === 'assessment' &&
+                        hasAssessmentRecommendations &&
+                        renderRecommendationBlock(
+                            assessmentRecommendations,
+                            'assessment',
+                        )}
+
+                    {activeTab === 'search' &&
+                        hasSearchResults &&
+                        renderRecommendationBlock(searchResults, 'search')}
+
+                    {!hasPersonalRecommendations &&
+                        !hasAssessmentRecommendations &&
+                        !hasSearchResults && (
+                            <Card className="p-8">
+                                <div className="text-center">
+                                    <div className="text-gray-400 dark:text-gray-500 mb-4">
+                                        <TbTrendingUp className="w-16 h-16 mx-auto" />
+                                    </div>
+                                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                                        {t('empty.title')}
+                                    </h3>
+                                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                                        {t('empty.description')}
+                                    </p>
+                                    {onRefresh && (
+                                        <Button
+                                            variant="solid"
+                                            onClick={onRefresh}
+                                            icon={
+                                                <TbRefresh className="w-4 h-4" />
+                                            }
+                                        >
+                                            {t('empty.tryAgain')}
+                                        </Button>
+                                    )}
+                                </div>
+                            </Card>
+                        )}
+                </div>
             )}
         </div>
     )

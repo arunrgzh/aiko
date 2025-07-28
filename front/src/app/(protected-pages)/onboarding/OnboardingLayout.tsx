@@ -4,7 +4,7 @@ import { ReactNode, memo } from 'react'
 import { Progress } from '@/components/ui/Progress'
 import { motion } from 'framer-motion'
 import Container from '@/components/shared/Container'
-import LanguageSelector from '@/components/template/LanguageSelector';
+import LanguageSelector from '@/components/template/LanguageSelector'
 
 interface OnboardingLayoutProps {
     children: ReactNode
@@ -38,6 +38,11 @@ const OnboardingLayout = memo(
 
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-900 dark:to-gray-800">
+                {/* Language Selector positioned in top right */}
+                <div className="fixed top-4 right-4 z-50 bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg border border-gray-200 dark:border-gray-700">
+                    <LanguageSelector />
+                </div>
+
                 <Container>
                     <div className="w-full max-w-3xl mx-auto bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-0 md:p-0 border border-gray-100 dark:border-gray-800 mt-8 mb-8 relative">
                         {/* Step number in top right */}
@@ -54,7 +59,6 @@ const OnboardingLayout = memo(
                             <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">
                                 Давайте настроим ваш профиль
                             </p>
-                            <LanguageSelector className="ml-auto" />
                             {/* Progress Bar */}
                             <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden mb-6">
                                 <div
