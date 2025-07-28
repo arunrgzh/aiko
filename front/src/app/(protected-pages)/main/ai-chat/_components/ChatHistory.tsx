@@ -1,6 +1,7 @@
 'use client'
 
 import { Fragment, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import ScrollBar from '@/components/ui/ScrollBar'
 import Button from '@/components/ui/Button'
 import Dialog from '@/components/ui/Dialog'
@@ -18,6 +19,7 @@ const INITIAL_DISPLAY_COUNT = 3
 const ChatHistory = ({ queryText = '', onClick }: ChatHistoryProps) => {
     const [isExpanded, setIsExpanded] = useState(false)
     const [showDeleteAllDialog, setShowDeleteAllDialog] = useState(false)
+    const t = useTranslations('aiChat')
 
     const {
         chatHistory,
@@ -84,7 +86,7 @@ const ChatHistory = ({ queryText = '', onClick }: ChatHistoryProps) => {
                                 onClick={() => setShowDeleteAllDialog(true)}
                                 className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
                             >
-                                Delete All
+                                {t('history.deleteAll')}
                             </Button>
                         </div>
                     )}
@@ -116,16 +118,17 @@ const ChatHistory = ({ queryText = '', onClick }: ChatHistoryProps) => {
                                 {isExpanded ? (
                                     <>
                                         <TbChevronUp className="text-lg" />
-                                        <span>Show Less</span>
+                                        <span>{t('history.showLess')}</span>
                                     </>
                                 ) : (
                                     <>
                                         <TbChevronDown className="text-lg" />
                                         <span>
-                                            Show{' '}
-                                            {filteredChatHistory.length -
-                                                INITIAL_DISPLAY_COUNT}{' '}
-                                            More
+                                            {t('history.showMore', {
+                                                count:
+                                                    filteredChatHistory.length -
+                                                    INITIAL_DISPLAY_COUNT,
+                                            })}
                                         </span>
                                     </>
                                 )}
@@ -136,7 +139,7 @@ const ChatHistory = ({ queryText = '', onClick }: ChatHistoryProps) => {
                     {/* Empty State */}
                     {filteredChatHistory.length === 0 && queryText && (
                         <div className="text-center text-gray-500 dark:text-gray-400 py-4">
-                            No chats found matching &quot;{queryText}&quot;
+                            {t('history.noChatsFound', { query: queryText })}
                         </div>
                     )}
                 </div>
@@ -150,25 +153,24 @@ const ChatHistory = ({ queryText = '', onClick }: ChatHistoryProps) => {
             >
                 <div className="p-6">
                     <h3 className="text-lg font-semibold mb-4">
-                        Delete All Chats
+                        {t('history.deleteAllTitle')}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-300 mb-6">
-                        Are you sure you want to delete all chat history? This
-                        action cannot be undone.
+                        {t('history.deleteAllMessage')}
                     </p>
                     <div className="flex justify-end gap-3">
                         <Button
                             variant="plain"
                             onClick={() => setShowDeleteAllDialog(false)}
                         >
-                            Cancel
+                            {t('feedback.cancel')}
                         </Button>
                         <Button
                             variant="solid"
                             color="red-600"
                             onClick={handleDeleteAll}
                         >
-                            Delete All
+                            {t('history.deleteAll')}
                         </Button>
                     </div>
                 </div>

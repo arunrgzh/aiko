@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import { motion, AnimatePresence } from 'framer-motion'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
@@ -26,6 +27,18 @@ import {
     TbAward,
     TbEye,
 } from 'react-icons/tb'
+
+interface DashboardStats {
+    totalVacancies: number
+    activeVacancies: number
+    closedVacancies: number
+    totalResponses: number
+    pendingResponses: number
+    interviewsScheduled: number
+    offersExtended: number
+    hires: number
+    activityData: Array<{ month: string; activity: number }>
+}
 
 // Floating particles component
 const FloatingParticles = () => {
@@ -57,41 +70,37 @@ const FloatingParticles = () => {
 }
 
 // Time-based greeting
-const getGreeting = () => {
-    const hour = new Date().getHours()
-    if (hour < 12)
-        return {
-            text: 'Доброе утро',
-            emoji: '🌅',
-            color: 'from-yellow-400 to-orange-500',
-        }
-    if (hour < 17)
-        return {
-            text: 'Добрый день',
-            emoji: '☀️',
-            color: 'from-blue-400 to-cyan-500',
-        }
-    return {
-        text: 'Добрый вечер',
-        emoji: '🌙',
-        color: 'from-purple-400 to-pink-500',
+const getGreeting = (
+    t: (key: string, options?: object) => string,
+    hour: number,
+    username: string,
+) => {
+    if (hour < 12) {
+        return `${t('greeting.morning')} ${username}!`
+    } else if (hour < 18) {
+        return `${t('greeting.afternoon')} ${username}!`
+    } else {
+        return `${t('greeting.evening')} ${username}!`
     }
 }
 
 export default function DashboardPage() {
+    const t = useTranslations('dashboard')
     const [mounted, setMounted] = useState(false)
-    const [greeting, setGreeting] = useState(getGreeting())
+    const [greeting, setGreeting] = useState('')
+    const [stats, setStats] = useState<DashboardStats | null>(null)
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
         setMounted(true)
-        setGreeting(getGreeting())
-    }, [])
+        setGreeting(getGreeting(t, new Date().getHours(), 'User'))
+    }, [t])
 
     const quickStats = [
         {
-            label: 'Активные анкеты',
+            label: t('stats.activeProfiles'),
             value: '2',
-            change: '+1 за неделю',
+            change: t('stats.activeProfilesChange'),
             trend: 'up',
             icon: TbFileText,
             color: 'from-gray-600 to-gray-700',
@@ -99,9 +108,9 @@ export default function DashboardPage() {
                 'from-gray-50 to-gray-100 dark:from-gray-800/50 dark:to-gray-700/50',
         },
         {
-            label: 'Новые вакансии',
+            label: t('stats.newVacancies'),
             value: '15',
-            change: '+5 сегодня',
+            change: t('stats.newVacanciesChange'),
             trend: 'up',
             icon: TbBriefcase,
             color: 'from-slate-600 to-slate-700',
@@ -109,9 +118,9 @@ export default function DashboardPage() {
                 'from-slate-50 to-slate-100 dark:from-slate-800/50 dark:to-slate-700/50',
         },
         {
-            label: 'Активные отклики',
+            label: t('stats.activeResponses'),
             value: '3',
-            change: '2 просмотрено',
+            change: t('stats.activeResponsesChange'),
             trend: 'neutral',
             icon: TbHeart,
             color: 'from-zinc-600 to-zinc-700',
@@ -119,9 +128,9 @@ export default function DashboardPage() {
                 'from-zinc-50 to-zinc-100 dark:from-zinc-800/50 dark:to-zinc-700/50',
         },
         {
-            label: 'Рейтинг профиля',
+            label: t('stats.profileRating'),
             value: '92%',
-            change: '+8% за месяц',
+            change: t('stats.profileRatingChange'),
             trend: 'up',
             icon: TbStar,
             color: 'from-stone-600 to-stone-700',
@@ -132,65 +141,80 @@ export default function DashboardPage() {
 
     const services = [
         {
-            title: 'Вакансии',
-            description: 'Персонализированный поиск с умными рекомендациями',
+            title: t('services.vacancies.title'),
+            description: t('services.vacancies.description'),
             href: '/main/vacancies',
             icon: TbBriefcase,
-            stats: '15 новых',
+            stats: t('services.vacancies.stats'),
             gradient: 'from-gray-600 to-gray-700',
-            features: ['ИИ-подбор', 'Автосохранение', 'Уведомления'],
-            badge: '5 новых',
+            features: [
+                t('services.vacancies.features.0'),
+                t('services.vacancies.features.1'),
+                t('services.vacancies.features.2'),
+            ],
+            badge: t('services.vacancies.badge'),
         },
         {
-            title: 'ИИ Помощник',
-            description:
-                'Персональный консультант по карьере и трудоустройству',
+            title: t('services.aiAssistant.title'),
+            description: t('services.aiAssistant.description'),
             href: '/main/ai-chat',
             icon: TbBrain,
-            stats: 'Онлайн',
+            stats: t('services.aiAssistant.stats'),
             gradient: 'from-slate-600 to-slate-700',
-            features: ['24/7 доступен', 'Умные советы', 'История чатов'],
-            badge: 'Новое',
+            features: [
+                t('services.aiAssistant.features.0'),
+                t('services.aiAssistant.features.1'),
+                t('services.aiAssistant.features.2'),
+            ],
+            badge: t('services.aiAssistant.badge'),
         },
         {
-            title: 'Профиль',
-            description: 'Настройка аккаунта и персональных предпочтений',
+            title: t('services.profile.title'),
+            description: t('services.profile.description'),
             href: '/main/profile',
             icon: TbUser,
-            stats: '92% заполнен',
+            stats: t('services.profile.stats'),
             gradient: 'from-zinc-600 to-zinc-700',
-            features: ['Безопасность', 'Настройки', 'Статистика'],
+            features: [
+                t('services.profile.features.0'),
+                t('services.profile.features.1'),
+                t('services.profile.features.2'),
+            ],
         },
         {
-            title: 'Собеседования',
-            description: 'Подготовка и проведение виртуальных собеседований',
+            title: t('services.interviews.title'),
+            description: t('services.interviews.description'),
             href: '/main/interviews',
             icon: TbVideo,
-            stats: '2 запланировано',
+            stats: t('services.interviews.stats'),
             gradient: 'from-stone-600 to-stone-700',
-            features: ['ИИ-тренер', 'Запись сессий', 'Обратная связь'],
+            features: [
+                t('services.interviews.features.0'),
+                t('services.interviews.features.1'),
+                t('services.interviews.features.2'),
+            ],
         },
     ]
 
     const recentActivity = [
         {
             type: 'application',
-            title: 'Отклик на вакансию "Frontend Developer"',
-            time: '2 часа назад',
+            title: t('recentActivity.application.title'),
+            time: t('recentActivity.application.time'),
             icon: TbBriefcase,
             color: 'text-gray-600',
         },
         {
             type: 'ai_chat',
-            title: 'Консультация с ИИ по резюме',
-            time: '5 часов назад',
+            title: t('recentActivity.aiChat.title'),
+            time: t('recentActivity.aiChat.time'),
             icon: TbBrain,
             color: 'text-gray-600',
         },
         {
             type: 'profile',
-            title: 'Обновление профиля',
-            time: '1 день назад',
+            title: t('recentActivity.profile.title'),
+            time: t('recentActivity.profile.time'),
             icon: TbUser,
             color: 'text-gray-600',
         },
@@ -219,12 +243,7 @@ export default function DashboardPage() {
                             transition={{ duration: 0.5, delay: 0.2 }}
                             className="inline-flex items-center gap-3 px-6 py-3 rounded-full bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 shadow-xl mb-6"
                         >
-                            <span className="text-2xl">{greeting.emoji}</span>
-                            <span
-                                className={`font-semibold bg-gradient-to-r ${greeting.color} bg-clip-text text-transparent`}
-                            >
-                                {greeting.text}!
-                            </span>
+                            <span className="text-2xl">{greeting}</span>
                         </motion.div>
 
                         <motion.h1
@@ -233,10 +252,7 @@ export default function DashboardPage() {
                             transition={{ duration: 0.6, delay: 0.3 }}
                             className="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 dark:from-white dark:via-blue-300 dark:to-purple-300 bg-clip-text text-transparent mb-4"
                         >
-                            Добро пожаловать в{' '}
-                            <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                                AI-Komekshi
-                            </span>
+                            {t('welcome')}
                         </motion.h1>
 
                         <motion.p
@@ -245,8 +261,7 @@ export default function DashboardPage() {
                             transition={{ duration: 0.6, delay: 0.4 }}
                             className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed"
                         >
-                            Ваш персональный ИИ-помощник готов помочь найти
-                            идеальную работу
+                            {t('subtitle')}
                         </motion.p>
                     </div>
 
@@ -288,7 +303,7 @@ export default function DashboardPage() {
                                         <div className="text-3xl font-bold text-gray-900 dark:text-white mb-1">
                                             {stat.value}
                                         </div>
-                                        <div className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                                        <div className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">
                                             {stat.label}
                                         </div>
                                         <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -311,10 +326,10 @@ export default function DashboardPage() {
                     className="text-center mb-12"
                 >
                     <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-5 pt-20">
-                        Выберите нужный сервис
+                        {t('services.title')}
                     </h2>
                     <p className="text-lg text-gray-600 dark:text-gray-300">
-                        Комплексные инструменты для успешного поиска работы
+                        {t('services.subtitle')}
                     </p>
                 </motion.div>
 
@@ -392,7 +407,7 @@ export default function DashboardPage() {
                                                 size="sm"
                                                 className="w-full group-hover:bg-gray-700 group-hover:text-white group-hover:border-transparent group-hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2"
                                             >
-                                                Открыть
+                                                {t('services.action')}
                                                 <TbChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
                                             </Button>
                                         </div>
@@ -412,7 +427,7 @@ export default function DashboardPage() {
                 >
                     <div className="max-w-4xl mx-auto">
                         <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">
-                            Последняя активность
+                            {t('recentActivity.title')}
                         </h3>
 
                         <div className="space-y-4">

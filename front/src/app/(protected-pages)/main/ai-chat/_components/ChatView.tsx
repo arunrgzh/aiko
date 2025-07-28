@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useEffect, useMemo } from 'react'
+import { useTranslations } from 'next-intl'
 import Card from '@/components/ui/Card'
 import ChatBox from '@/components/view/ChatBox'
 import ChatLandingView from './ChatLandingView'
@@ -19,6 +20,7 @@ const ChatView = () => {
     const { selectedConversation, chatHistory, isTyping } =
         useGenerativeChatStore()
     const { handleSend } = useChatSend()
+    const t = useTranslations('aiChat')
 
     const scrollToBottom = () => {
         if (scrollRef.current) {
@@ -59,7 +61,7 @@ const ChatView = () => {
         } catch (error) {
             console.error('Error handling file message:', error)
             // Fallback to text-only message
-            await handleSend(value || 'Ошибка при обработке файлов')
+            await handleSend(value || t('errors.fileProcessingError'))
         }
     }
 
@@ -69,7 +71,7 @@ const ChatView = () => {
             <ChatBox
                 ref={scrollRef}
                 messageList={messageList}
-                placeholder="Введите ваш вопрос здесь"
+                placeholder={t('placeholder')}
                 showMessageList={Boolean(selectedConversation)}
                 showAvatar={true}
                 avatarGap={true}
@@ -79,7 +81,7 @@ const ChatView = () => {
                     isTyping
                         ? {
                               id: 'ai',
-                              name: 'AI Помощник',
+                              name: t('aiAssistantName'),
                               avatarImageUrl: '/img/thumbs/ai.jpg',
                           }
                         : false

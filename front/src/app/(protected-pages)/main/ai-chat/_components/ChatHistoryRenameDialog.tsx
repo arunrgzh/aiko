@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import Dialog from '@/components/ui/Dialog'
 import { Form, FormItem } from '@/components/ui/Form'
 import Input from '@/components/ui/Input'
@@ -15,13 +16,14 @@ type FormSchema = {
     title: string
 }
 
-const validationSchema: ZodType<FormSchema> = z.object({
-    title: z.string().min(1, 'Please do not leave testing title blank!'),
-})
-
 const ChatHistoryRenameDialog = () => {
     const { renameDialog, setRenameDialog, setChatHistoryName } =
         useGenerativeChatStore()
+    const t = useTranslations('aiChat')
+
+    const validationSchema: ZodType<FormSchema> = z.object({
+        title: z.string().min(1, 'Please do not leave testing title blank!'),
+    })
 
     const {
         control,
@@ -66,11 +68,11 @@ const ChatHistoryRenameDialog = () => {
             onClose={handleDialogClose}
             onRequestClose={handleDialogClose}
         >
-            <h5>Rename chat</h5>
+            <h5>{t('history.renameChat')}</h5>
             <div className="mt-8">
                 <Form onSubmit={handleSubmit(onFormSubmit)}>
                     <FormItem
-                        label="Chat title"
+                        label={t('history.chatTitle')}
                         invalid={Boolean(errors.title)}
                         errorMessage={errors.title?.message}
                     >
@@ -80,7 +82,7 @@ const ChatHistoryRenameDialog = () => {
                             rules={{ required: true }}
                             render={({ field }) => (
                                 <Input
-                                    placeholder="Rename chat"
+                                    placeholder={t('history.renamePlaceholder')}
                                     type="text"
                                     autoComplete="off"
                                     {...field}
@@ -90,10 +92,10 @@ const ChatHistoryRenameDialog = () => {
                     </FormItem>
                     <div className="flex justify-end gap-2">
                         <Button type="button" onClick={handleDialogClose}>
-                            Cancel
+                            {t('feedback.cancel')}
                         </Button>
                         <Button variant="solid" type="submit">
-                            Rename
+                            {t('history.rename')}
                         </Button>
                     </div>
                 </Form>

@@ -1,6 +1,7 @@
 'use client'
 
 import useChatSend from '../_hooks/useChatSend'
+import { useTranslations } from 'next-intl'
 import {
     PiLightbulbDuotone,
     PiBookOpenTextDuotone,
@@ -18,45 +19,46 @@ const suggeustionIcon: Record<PromptType, ReactNode> = {
     coding: <PiCodeDuotone className="text-indigo-500" />,
 }
 
-const promptSuggestion: {
-    title: string
-    prompt: string
-    type: PromptType
-}[] = [
-    {
-        title: 'Помогите мне подготовить резюме с учетом моих особенностей',
-        prompt: `Я хочу составить эффективное резюме, которое подчеркнет мои сильные стороны и навыки. Учтите, что у меня есть инвалидность, и я хочу правильно представить свой опыт работодателям.`,
-        type: 'writing',
-    },
-    {
-        title: 'Найдите подходящие вакансии для людей с инвалидностью',
-        prompt: `Помогите мне найти работодателей и вакансии, которые открыты для найма людей с инвалидностью. Расскажите о программах трудоустройства и квотах.`,
-        type: 'guide',
-    },
-    {
-        title: 'Подготовьте меня к собеседованию',
-        prompt: `Дайте советы по подготовке к собеседованию. Как рассказать о своих способностях, как обсудить необходимые адаптации рабочего места, и как произвести положительное впечатление.`,
-        type: 'idea',
-    },
-    {
-        title: 'Какие профессии подходят для моих навыков?',
-        prompt: `Помогите определить карьерные возможности и профессии, которые подходят для людей с различными типами инвалидности. Расскажите о дистанционной работе и гибких вариантах трудоустройства.`,
-        type: 'coding',
-    },
-]
-
 const ChatLandingView = () => {
     const { handleSend } = useChatSend()
+    const t = useTranslations('aiChat')
+
+    const promptSuggestion: {
+        title: string
+        prompt: string
+        type: PromptType
+    }[] = [
+        {
+            title: t('suggestions.resume.title'),
+            prompt: t('suggestions.resume.prompt'),
+            type: 'writing',
+        },
+        {
+            title: t('suggestions.vacancies.title'),
+            prompt: t('suggestions.vacancies.prompt'),
+            type: 'guide',
+        },
+        {
+            title: t('suggestions.interview.title'),
+            prompt: t('suggestions.interview.prompt'),
+            type: 'idea',
+        },
+        {
+            title: t('suggestions.careers.title'),
+            prompt: t('suggestions.careers.prompt'),
+            type: 'coding',
+        },
+    ]
 
     return (
         <div className="max-w-[900px] w-full mx-auto mt-20 mb-16 px-4">
             <div>
                 <div className="heading-text text-4xl leading-snug mb-12">
                     <span className="font-semibold bg-linear-to-r from-indigo-500 to-red-400 bg-clip-text text-transparent text-5xl">
-                        Привет!
+                        {t('greeting')}
                     </span>
                     <br />
-                    <span>Как я могу помочь вам найти работу сегодня?</span>
+                    <span>{t('subtitle')}</span>
                 </div>
                 <div className="mt-8 mb-12 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                     {promptSuggestion.map((suggestion) => (
