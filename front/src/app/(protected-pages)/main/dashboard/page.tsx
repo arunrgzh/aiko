@@ -71,7 +71,7 @@ const FloatingParticles = () => {
 
 // Time-based greeting
 const getGreeting = (
-    t: (key: string, options?: object) => string,
+    t: (key: string, values?: any) => string,
     hour: number,
     username: string,
 ) => {
