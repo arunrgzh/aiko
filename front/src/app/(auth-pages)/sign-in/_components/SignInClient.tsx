@@ -6,6 +6,7 @@ import SignIn from '@/components/auth/SignIn'
 import { signIn } from '@/auth'
 import { useSearchParams } from 'next/navigation'
 import { REDIRECT_URL_KEY } from '@/constants/app.constant'
+import { useTranslations } from 'next-intl'
 import type {
     OnSignInPayload,
     OnOauthSignInPayload,
@@ -16,6 +17,8 @@ import { onSignInWithCredentials } from '@/server/actions/auth/handleSignIn'
 const SignInClient = () => {
     const searchParams = useSearchParams()
     const callbackUrl = searchParams.get(REDIRECT_URL_KEY)
+    const t = useTranslations('auth.signIn')
+
     const handleSignIn = async ({
         values,
         setSubmitting,
@@ -47,7 +50,7 @@ const SignInClient = () => {
             window.location.href = '/'
         } catch (error) {
             console.error('Sign-in error:', error)
-            setMessage('An unexpected error occurred')
+            setMessage(t('errors.unexpectedError'))
             setSubmitting(false)
         }
     }

@@ -7,6 +7,7 @@ import OauthSignIn from './OauthSignIn'
 import ActionLink from '@/components/shared/ActionLink'
 import useTimeOutMessage from '@/utils/hooks/useTimeOutMessage'
 import useTheme from '@/utils/hooks/useTheme'
+import { useTranslations } from 'next-intl'
 import type { OnSignIn } from './SignInForm'
 import type { OnOauthSignIn } from './OauthSignIn'
 
@@ -24,7 +25,7 @@ const SignIn = ({
     onOauthSignIn,
 }: SignInProps) => {
     const [message, setMessage] = useTimeOutMessage()
-
+    const t = useTranslations('auth.signIn')
     const mode = useTheme((state) => state.mode)
 
     return (
@@ -38,10 +39,8 @@ const SignIn = ({
                 />
             </div>
             <div className="mb-10">
-                <h2 className="mb-2">Welcome back!</h2>
-                <p className="font-semibold heading-text">
-                    Please enter your credentials to sign in!
-                </p>
+                <h2 className="mb-2">{t('title')}</h2>
+                <p className="font-semibold heading-text">{t('subtitle')}</p>
             </div>
             {message && (
                 <Alert showIcon className="mb-4" type="danger">
@@ -57,34 +56,24 @@ const SignIn = ({
                             className="font-semibold heading-text mt-2 underline"
                             themeColor={false}
                         >
-                            Forgot password
+                            {t('forgotPassword')}
                         </ActionLink>
                     </div>
                 }
                 onSignIn={onSignIn}
             />
-            <div className="mt-8">
-                <div className="flex items-center gap-2 mb-6">
-                    <div className="border-t border-gray-200 dark:border-gray-800 flex-1 mt-[1px]" />
-                    <p className="font-semibold heading-text">
-                        or countinue with
-                    </p>
-                    <div className="border-t border-gray-200 dark:border-gray-800 flex-1 mt-[1px]" />
-                </div>
-                <OauthSignIn
-                    setMessage={setMessage}
-                    onOauthSignIn={onOauthSignIn}
-                />
+            <div className="mt-6">
+                <OauthSignIn onOauthSignIn={onOauthSignIn} />
             </div>
             <div>
-                <div className="mt-6 text-center">
-                    <span>{`Don't have an account yet?`} </span>
+                <div className="mt-8 text-center">
+                    <span>{t('dontHaveAccount')} </span>
                     <ActionLink
                         href={signUpUrl}
                         className="heading-text font-bold"
                         themeColor={false}
                     >
-                        Sign up
+                        {t('signUp')}
                     </ActionLink>
                 </div>
             </div>
