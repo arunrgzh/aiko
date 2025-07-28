@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { useTranslations } from 'next-intl'
 import Dropdown from '@/components/ui/Dropdown'
 import classNames from 'classnames'
 import { TbDots, TbArchive, TbPencil, TbTrash } from 'react-icons/tb'
@@ -20,8 +21,8 @@ type ChatHistoryItemProps = {
 
 const ChatHistoryItem = (props: ChatHistoryItemProps) => {
     const [dropdownOpen, setDropdownOpen] = useState(false)
-
     const dropdownRef = useRef<DropdownRef>(null)
+    const t = useTranslations('aiChat')
 
     const {
         title,
@@ -90,22 +91,24 @@ const ChatHistoryItem = (props: ChatHistoryItemProps) => {
                         onClick={(e) => handleCallback(e, onRename)}
                     >
                         <TbPencil className="text-xl" />
-                        <span>Rename</span>
+                        <span>{t('history.rename')}</span>
                     </Dropdown.Item>
                     <Dropdown.Item
-                        eventKey="rename"
+                        eventKey="archive"
                         onClick={(e) => handleCallback(e, onArchive)}
                     >
                         <TbArchive className="text-xl" />
-                        <span>Archive</span>
+                        <span>{t('history.archive')}</span>
                     </Dropdown.Item>
                     <Dropdown.Item
                         className="text-error"
-                        eventKey="rename"
+                        eventKey="delete"
                         onClick={(e) => handleCallback(e, onDelete)}
                     >
                         <TbTrash className="text-xl text-error" />
-                        <span className="text-error">Deleted</span>
+                        <span className="text-error">
+                            {t('history.delete')}
+                        </span>
                     </Dropdown.Item>
                 </Dropdown>
             </div>

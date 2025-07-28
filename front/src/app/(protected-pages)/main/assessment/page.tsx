@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { useTranslations } from 'next-intl'
 import AssessmentQuestions from '@/components/shared/AssessmentQuestions'
 import AssessmentService from '@/services/AssessmentService'
 import { Spinner } from '@/components/ui/Spinner'
@@ -17,6 +18,7 @@ import type {
 const AssessmentPage = () => {
     const router = useRouter()
     const { data: session, status, update: updateSession } = useSession()
+    const t = useTranslations('assessment')
     const [questions, setQuestions] = useState<AssessmentQuestion[]>([])
     const [loading, setLoading] = useState(true)
     const [assessmentLoading, setAssessmentLoading] = useState(false)

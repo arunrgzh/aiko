@@ -1,40 +1,42 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations, TFunction } from 'next-intl';
 import Card from '@/components/ui/Card'
 import Spinner from '@/components/ui/Spinner'
 import { TbBrain, TbSearch, TbTarget, TbUserCheck } from 'react-icons/tb'
 
-const steps = [
-    {
-        icon: <TbUserCheck className="text-2xl" />,
-        title: 'Анализируем ваш профиль',
-        description: 'Изучаем ваши навыки и предпочтения',
-        duration: 2000,
-    },
-    {
-        icon: <TbBrain className="text-2xl" />,
-        title: 'Применяем ИИ-алгоритмы',
-        description: 'Сопоставляем с результатами тестирования',
-        duration: 3000,
-    },
-    {
-        icon: <TbSearch className="text-2xl" />,
-        title: 'Ищем вакансии',
-        description: 'Парсим актуальные предложения работы',
-        duration: 2500,
-    },
-    {
-        icon: <TbTarget className="text-2xl" />,
-        title: 'Персонализируем результаты',
-        description: 'Подбираем наиболее подходящие вакансии',
-        duration: 2000,
-    },
-]
-
 export default function VacancyGenerationLoader() {
+    const { t }: { t: any } = useTranslations();
     const [currentStep, setCurrentStep] = useState(0)
     const [isCompleted, setIsCompleted] = useState(false)
+
+    const steps = [
+        {
+            icon: <TbUserCheck className="text-2xl" />,
+            title: t('vacancies.loader.steps.analyzeProfile.title'),
+            description: t('vacancies.loader.steps.analyzeProfile.description'),
+            duration: 2000,
+        },
+        {
+            icon: <TbBrain className="text-2xl" />,
+            title: t('vacancies.loader.steps.applyAI.title'),
+            description: t('vacancies.loader.steps.applyAI.description'),
+            duration: 3000,
+        },
+        {
+            icon: <TbSearch className="text-2xl" />,
+            title: t('vacancies.loader.steps.searchVacancies.title'),
+            description: t('vacancies.loader.steps.searchVacancies.description'),
+            duration: 2500,
+        },
+        {
+            icon: <TbTarget className="text-2xl" />,
+            title: t('vacancies.loader.steps.personalizeResults.title'),
+            description: t('vacancies.loader.steps.personalizeResults.description'),
+            duration: 2000,
+        },
+    ]
 
     useEffect(() => {
         if (currentStep < steps.length) {
@@ -61,11 +63,10 @@ export default function VacancyGenerationLoader() {
                         </div>
                     </div>
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                        Подбираем персонализированные вакансии
+                        {t('vacancies.loader.title')}
                     </h1>
                     <p className="text-gray-600 dark:text-gray-400">
-                        Анализируем ваши данные и находим подходящие предложения
-                        работы
+                        {t('vacancies.loader.subtitle')}
                     </p>
                 </div>
 
@@ -137,14 +138,14 @@ export default function VacancyGenerationLoader() {
                             <div className="text-2xl">✓</div>
                         </div>
                         <p className="text-green-700 dark:text-green-300 font-medium">
-                            Готово! Загружаем ваши рекомендации...
+                            {t('vacancies.loader.completed')}
                         </p>
                     </div>
                 )}
 
                 <div className="mt-8">
                     <div className="flex justify-between text-sm text-gray-500 dark:text-gray-400 mb-2">
-                        <span>Прогресс</span>
+                        <span>{t('vacancies.loader.progress')}</span>
                         <span>
                             {Math.round(
                                 ((currentStep + 1) / steps.length) * 100,
