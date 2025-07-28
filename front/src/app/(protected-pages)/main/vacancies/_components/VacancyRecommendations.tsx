@@ -241,9 +241,9 @@ export default function VacancyRecommendations({
                     </div>
                 ) : (
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 items-stretch auto-rows-fr">
-                        {recommendations.map((vacancy) => (
+                        {recommendations.map((vacancy, index) => (
                             <VacancyCard
-                                key={vacancy.id}
+                                key={`${type}-${vacancy.id}-${index}`}
                                 vacancy={vacancy}
                                 onSave={onSave}
                                 onApply={onApply}
@@ -321,11 +321,25 @@ export default function VacancyRecommendations({
             ) : (
                 <div className="space-y-6">
                     {tabs.length > 1 ? (
-                        <Tabs
-                            value={activeTab}
-                            onChange={setActiveTab}
-                            items={tabs}
-                        />
+                        <div className="flex space-x-1 border-b border-gray-200 dark:border-gray-700">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.key}
+                                    onClick={() => setActiveTab(tab.key)}
+                                    className={`flex items-center space-x-2 px-4 py-2 text-sm font-medium rounded-t-lg transition-colors ${
+                                        activeTab === tab.key
+                                            ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border-b-2 border-blue-600'
+                                            : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100'
+                                    }`}
+                                >
+                                    {tab.icon}
+                                    <span>{tab.label}</span>
+                                    <Badge className="ml-1 text-xs">
+                                        {tab.count}
+                                    </Badge>
+                                </button>
+                            ))}
+                        </div>
                     ) : null}
 
                     {activeTab === 'personal' &&
