@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json()
 
     const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL || 'http://REDACTED:8000'}/questionnaire_botconfig/botconfig/config/`,
+        `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/questionnaire_botconfig/botconfig/config/`,
         {
             method: 'POST',
             headers: {
