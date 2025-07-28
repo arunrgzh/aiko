@@ -5,10 +5,12 @@ import { motion } from 'framer-motion'
 import { MODE_DARK, MODE_LIGHT } from '@/constants/theme.constant'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useTranslations } from 'next-intl'
 import type { Mode } from '@/@types/theme'
 
 const LandingFooter = ({ mode }: { mode: Mode }) => {
     // const year = new Date().getFullYear()
+    const t = useTranslations('landing.footer')
 
     const router = useRouter()
 
@@ -34,15 +36,13 @@ const LandingFooter = ({ mode }: { mode: Mode }) => {
                             }}
                             className="relative flex flex-col gap-4 items-center justify-center py-20 px-8 text-center"
                         >
-                            <h2 className="text-5xl">
-                                Протестируйте прямо сейчас.
-                            </h2>
+                            <h2 className="text-5xl">{t('title')}</h2>
                             <p className="mt-4 max-w-[400px] mx-auto">
-                                Поговорите с нашим ботом прямо здесь...
+                                {t('subtitle')}
                             </p>
                             <div className="mt-6">
                                 <Button variant="solid" onClick={handleSignIn}>
-                                    Начать сейчас
+                                    {t('cta')}
                                 </Button>
                             </div>
                         </motion.div>
@@ -62,9 +62,7 @@ const LandingFooter = ({ mode }: { mode: Mode }) => {
                                 alt="logo"
                             />
                         </Link>
-                        <p className="text-center">
-                            Copyright © 2025 AI Komekshi. All rights reserved.
-                        </p>
+                        <p className="text-center">{t('copyright')}</p>
                     </div>
                 </div>
             </Container>

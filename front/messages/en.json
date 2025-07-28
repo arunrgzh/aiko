@@ -10,7 +10,7 @@
         "title": "Welcome to AI-Komekshi - your personal job search assistant.",
         "title_part_highlight": "AI-Komekshi",
 
-        "subtitle": "Build smart chatbots for WhatsApp, Telegram, Instagram, and other messengers - with CRM integration and full business automation.",
+        "subtitle": "Find your dream job with the help of artificial intelligence. Our platform analyzes your skills, experience, and preferences to match you with the perfect opportunities.",
 
         "button": {
             "create": "Create",
@@ -33,67 +33,43 @@
         },
 
         "audience": {
-            "title": "Who It's For...",
-            "sub": "Suitable for any business",
+            "title": "Who It's For",
+            "sub": "Our platform is designed for everyone who wants to find their dream job",
             "users": {
-                "e-commerce": "Online Stores",
-                "e-commerce-sub": "Auto-replies, recommendations, and 24/7 support",
-                "edu": "Online Courses and Schools",
-                "edu-sub": "A bot consultant for programs and schedules",
-                "tourism": "Hotels and Tourism",
-                "tourism-sub": "Booking, reminders, and FAQ support",
-                "freelancers": "Freelancers",
-                "freelancers-sub": "Client onboarding via messengers",
-                "techsupport": "Technical Support",
-                "tech-sub": "24/7 auto-replies, fast query routing, FAQs",
-                "services": "Business Services (lawyers, accountants, etc.)",
-                "services-sub": "Initial consultations, lead collection, and client filtering",
-                "assitant": "AI Sales Assistant",
-                "assitant-sub": "Automatically identifies interest, handles objections, and guides to payment",
-                "clinics": "Medical Clinics",
-                "clinics-sub": "Online booking and consultation via messengers"
+                "disability": "People with Disabilities",
+                "disability-sub": "Specialized support for inclusive employment",
+                "hr": "HR Professionals",
+                "hr-sub": "Streamlined recruitment and candidate management",
+                "edu": "Educational Institutions",
+                "edu-sub": "Career guidance and student placement support"
             }
         },
 
         "features": {
-            "title": "All in One Place",
-            "sub": "We create chatbots and assistants precisely tailored to your business - from online stores to service industries and sales automation.",
-            "lang": {
-                "title": "Multilingual by Default",
-                "lang": "Multilingual by Default",
-                "sub": "Your bot speaks the client's language - automatically. Add support for Russian, English, Kazakh, and more right out of the box. The virtual assistant detects the language and adjusts responses accordingly."
-            },
-            "dashboard": {
-                "dashboard": "Analytics and Management in One Place",
-                "sub": "Monitor, improve, manage. The dashboard shows how many clients are chatting, where drop-offs happen, how many leads are closed - all in real time.",
-                "one": "Track key metrics without delays",
-                "two": "React quickly to bottlenecks in the sales funnel",
-                "three": "Optimize processes using up-to-date data"
-            },
-            "responsive": {
-                "title": "Works on Any Device",
-                "sub": "Manage bots from your phone, tablet, or laptop. Setup, replies, and script editing - all available online through the browser. No app installations or special access required.",
-                "one": "Manage bots from any browser without installing software.",
-                "two": "Edit scripts in real-time from any device.",
-                "three": "Access settings in one click, wherever you are."
+            "title": "Key Features",
+            "sub": "Everything you need for successful job search"
+        },
+
+        "demos": {
+            "title": "Platform Demo",
+            "sub": "See how our platform works in action",
+            "button": {
+                "try-demo": "Try Demo"
             }
         },
 
-        "opport": {
-            "nav": {
-                "create-bot": "Bot Builder",
-                "payment": "Payment",
-                "analytic": "Analytics",
-                "marketing": "Marketing",
-                "ai": "AI",
-                "tech-supp": "Tech Support",
-                "project": "Project"
-            }
+        "hero": {
+            "title": "AI-Powered Job Search Assistant",
+            "subtitle": "Find your dream job with the help of artificial intelligence. Our platform analyzes your skills, experience, and preferences to match you with the perfect opportunities.",
+            "cta": "Get Started",
+            "learnMore": "Learn More"
         },
 
         "footer": {
-            "titile": "Try It Now.",
-            "sub": "Chat with our bot right here..."
+            "title": "Test it right now.",
+            "subtitle": "Talk to our bot right here...",
+            "cta": "Start Now",
+            "copyright": "Copyright © 2025 AI Komekshi. All rights reserved."
         }
     },
 
@@ -111,6 +87,27 @@
         },
         "button": {
             "try-demo": "Try Demo"
+        }
+    },
+
+    "features": {
+        "title": "Everything in One Place",
+        "sub": "AI Komekshi - a personalized assistant that helps you find jobs, learn and develop. Get personalized employment and training recommendations, generate job applications, take practice interviews and get AI feedback.",
+        "lang": {
+            "lang": "Multilingual by Default",
+            "sub": "Your AI assistant automatically detects the client's language and adjusts responses. Support for Russian, English, Kazakh and other languages - everything from the start, without additional settings."
+        },
+        "dashboard": {
+            "dashboard": "Analytics and Management in One Place",
+            "sub": "Get a complete picture of your career path and learning progress. Monitor the results of applications, courses and tests in real time, optimizing the process with current data.",
+            "one": "Track job search and learning progress in real time.",
+            "two": "Get recommendations and feedback to improve results."
+        },
+        "responsive": {
+            "title": "Works on Any Device",
+            "sub": "Manage your job search from your phone, tablet or laptop. Setup, responses and script editing - all available online through the browser. No app installations or special access required.",
+            "one": "Manage job search from any browser without installing software.",
+            "two": "Edit applications in real time from any device."
         }
     },
 
@@ -410,16 +407,16 @@
             "relevance": {
                 "excellent": "Excellent match",
                 "good": "Good match",
-                "fair": "Might be suitable"
+                "fair": "Fair match"
             },
             "timeAgo": {
                 "justNow": "Just now",
-                "hoursAgo": "{{count}}h ago",
-                "daysAgo": "{{count}}d ago"
+                "hoursAgo": "{hours}h ago",
+                "daysAgo": "{days}d ago"
             },
             "actions": {
-                "save": "Save",
                 "saved": "Saved",
+                "save": "Save",
                 "apply": "Apply",
                 "viewDetails": "View Details"
             }
@@ -430,7 +427,143 @@
             "tryAgain": "Try again"
         },
         "assistant": {
-            "suggestion": "Now that your profile is set up, would you like to take a quick test for more accurate recommendations?"
+            "suggestion": "I can help you find the perfect job. Let me analyze your profile and suggest relevant vacancies."
+        }
+    },
+    "interviews": {
+        "title": "Practice Interviews",
+        "subtitle": "Interview skills training with AI",
+        "comingSoon": "Coming Soon",
+        "practiceInterview": {
+            "title": "Practice Interview",
+            "description": "Practice answering questions before a real interview",
+            "startButton": "Start Interview"
+        },
+        "history": {
+            "title": "Interview History",
+            "technicalInterview": "Technical Interview",
+            "behavioralInterview": "Behavioral Interview",
+            "excellent": "Excellent",
+            "good": "Good"
+        }
+    },
+    "auth": {
+        "signIn": {
+            "title": "Welcome back!",
+            "subtitle": "Please enter your credentials to sign in!",
+            "forgotPassword": "Forgot password",
+            "dontHaveAccount": "Don't have an account?",
+            "signUp": "Sign up",
+            "form": {
+                "username": "Username",
+                "usernamePlaceholder": "Username",
+                "usernameError": "Please enter your username",
+                "password": "Password",
+                "passwordPlaceholder": "Password",
+                "passwordError": "Please enter your password",
+                "signInButton": "Sign In"
+            },
+            "oauth": {
+                "or": "or continue with",
+                "google": "Google"
+            },
+            "errors": {
+                "invalidCredentials": "Invalid username or password",
+                "generalError": "An error occurred during sign in",
+                "unexpectedError": "An unexpected error occurred"
+            }
+        },
+        "signUp": {
+            "title": "Sign Up",
+            "subtitle": "And lets get started with your free trial",
+            "alreadyHaveAccount": "Already have an account?",
+            "signIn": "Sign in",
+            "form": {
+                "username": "Username",
+                "usernamePlaceholder": "Username",
+                "usernameError": "Please enter your username",
+                "email": "Email",
+                "emailPlaceholder": "Email",
+                "emailError": "Please enter a valid email",
+                "password": "Password",
+                "passwordPlaceholder": "Password",
+                "passwordError": "Please enter your password",
+                "confirmPassword": "Confirm Password",
+                "confirmPasswordPlaceholder": "Confirm Password",
+                "confirmPasswordError": "Please confirm your password",
+                "passwordMismatch": "Passwords do not match",
+                "signUpButton": "Sign Up"
+            },
+            "success": {
+                "title": "Account created!",
+                "message": "You can now sign in from our sign in page"
+            },
+            "errors": {
+                "generalError": "An unexpected error occurred during sign up"
+            }
+        },
+        "forgotPassword": {
+            "title": "Forgot Password",
+            "subtitle": "Please enter your email to receive a verification code",
+            "emailSent": {
+                "title": "Check your email",
+                "message": "We have sent a password recovery to your email"
+            },
+            "form": {
+                "email": "Email",
+                "emailPlaceholder": "Email",
+                "emailError": "Please enter a valid email",
+                "submit": "Submit",
+                "submitting": "Submitting..."
+            },
+            "continue": "Continue",
+            "success": {
+                "title": "Email sent!",
+                "message": "We have sent you an email to reset your password"
+            }
+        },
+        "resetPassword": {
+            "title": "Set new password",
+            "subtitle": "Your new password must different to previous password",
+            "resetComplete": {
+                "title": "Reset done",
+                "message": "Your password has been successfully reset"
+            },
+            "form": {
+                "password": "Password",
+                "passwordPlaceholder": "Password",
+                "passwordError": "Please enter your password",
+                "confirmPassword": "Confirm Password",
+                "confirmPasswordPlaceholder": "Confirm Password",
+                "confirmPasswordError": "Please confirm your password",
+                "passwordMismatch": "Passwords do not match",
+                "submit": "Submit",
+                "submitting": "Submitting..."
+            },
+            "continue": "Continue"
+        }
+    },
+    "navigation": {
+        "drawer": {
+            "title": "Navigation"
+        },
+        "buttons": {
+            "login": "Login",
+            "toggleTheme": "Toggle theme"
+        }
+    },
+    "landing": {
+        "hero": {
+            "title": "AI-Komekshi - your personal job search assistant.",
+            "subtitle": "Find your dream job with the help of artificial intelligence. Our platform analyzes your skills, experience, and preferences to match you with the perfect opportunities.",
+            "cta": "Get Started",
+            "learnMore": "Learn More"
+        },
+        "footer": {
+            "title": "Test it right now.",
+            "subtitle": "Talk to our bot right here...",
+            "cta": "Start Now",
+            "copyright": "Copyright © 2025 AI Komekshi. All rights reserved."
         }
     },
     "profile": {

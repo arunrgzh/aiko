@@ -6,6 +6,7 @@ import SignUpForm from './SignUpForm'
 import ActionLink from '@/components/shared/ActionLink'
 import useTimeOutMessage from '@/utils/hooks/useTimeOutMessage'
 import useTheme from '@/utils/hooks/useTheme'
+import { useTranslations } from 'next-intl'
 import type { OnSignUp } from './SignUpForm'
 
 type SignUpProps = {
@@ -15,6 +16,7 @@ type SignUpProps = {
 
 export const SignUp = ({ onSignUp, signInUrl = '/sign-in' }: SignUpProps) => {
     const [message, setMessage] = useTimeOutMessage()
+    const t = useTranslations('auth.signUp')
 
     const mode = useTheme((state) => state.mode)
 
@@ -29,10 +31,8 @@ export const SignUp = ({ onSignUp, signInUrl = '/sign-in' }: SignUpProps) => {
                 />
             </div>
             <div className="mb-8">
-                <h3 className="mb-1">Sign Up</h3>
-                <p className="font-semibold heading-text">
-                    And lets get started with your free trial
-                </p>
+                <h3 className="mb-1">{t('title')}</h3>
+                <p className="font-semibold heading-text">{t('subtitle')}</p>
             </div>
             {message && (
                 <Alert showIcon className="mb-4" type="danger">
@@ -42,13 +42,13 @@ export const SignUp = ({ onSignUp, signInUrl = '/sign-in' }: SignUpProps) => {
             <SignUpForm onSignUp={onSignUp} setMessage={setMessage} />
             <div>
                 <div className="mt-6 text-center">
-                    <span>Already have an account? </span>
+                    <span>{t('alreadyHaveAccount')} </span>
                     <ActionLink
                         href={signInUrl}
                         className="heading-text font-bold"
                         themeColor={false}
                     >
-                        Sign in
+                        {t('signIn')}
                     </ActionLink>
                 </div>
             </div>

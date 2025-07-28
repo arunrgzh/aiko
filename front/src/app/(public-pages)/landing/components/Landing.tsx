@@ -7,6 +7,7 @@ import Demos from './Demos'
 import TechStack from './TechStack'
 import OtherFeatures from './OtherFeatures'
 import LandingFooter from './LandingFooter'
+import LanguageSelector from '@/components/template/LanguageSelector'
 import useTheme from '@/utils/hooks/useTheme'
 import { MODE_DARK, MODE_LIGHT } from '@/constants/theme.constant'
 // import Components from './Components'
@@ -24,6 +25,12 @@ const Landing = () => {
     return (
         <main className="px-4 lg:px-0 text-base bg-white dark:bg-gray-900">
             <NavigationBar toggleMode={toggleMode} mode={mode} />
+
+            {/* Language Selector positioned in top right, above navigation */}
+            <div className="fixed top-4 right-4 z-50 bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg border border-gray-200 dark:border-gray-700">
+                <LanguageSelector />
+            </div>
+
             <div className="relative">
                 <div
                     style={{

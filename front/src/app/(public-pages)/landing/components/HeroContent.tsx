@@ -10,7 +10,7 @@ import { useTranslations } from 'next-intl'
 const HeroContent = ({ mode }: { mode: Mode }) => {
     const router = useRouter()
 
-    const t = useTranslations('landing')
+    const t = useTranslations('landing.hero')
 
     const handleSignIn = () => {
         router.push('/sign-in')
@@ -24,7 +24,7 @@ const HeroContent = ({ mode }: { mode: Mode }) => {
                         wordClassName="text-2xl md:text-4xl lg:text-6xl  max-w-7xl mx-auto text-center mt-6 relative z-10"
                         words={t('title')}
                         wordsCallbackClass={({ word }) => {
-                            if (word === t('title_part_highlight')) {
+                            if (word === 'AI-Komekshi') {
                                 return 'bg-gradient-to-r from-[#006BF9] to-[#78B2FF] bg-clip-text text-transparent'
                             }
 
@@ -46,7 +46,7 @@ const HeroContent = ({ mode }: { mode: Mode }) => {
                         className="flex items-center gap-4 justify-center mt-10 relative z-10"
                     >
                         <Button variant="solid" onClick={handleSignIn}>
-                            {t('button.create')}
+                            {t('cta')}
                         </Button>
                     </motion.div>
                 </div>

@@ -11,8 +11,7 @@ import Link from 'next/link'
 import type { Mode } from '@/@types/theme'
 import { useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
-import LanguageSelector from '@/components/template/LanguageSelector' 
-
+import LanguageSelector from '@/components/template/LanguageSelector'
 
 type NavigationProps = {
     toggleMode: () => void
@@ -24,6 +23,7 @@ const Navigation = ({ toggleMode, mode }: NavigationProps) => {
 
     const tNav = useTranslations('landing.nav')
     const tCommon = useTranslations('landing.button')
+    const tNavigation = useTranslations('navigation')
 
     const handleLogin = () => {
         router.push('/sign-in')
@@ -74,7 +74,7 @@ const Navigation = ({ toggleMode, mode }: NavigationProps) => {
                     <TbMenu2 size={24} />
                 </button>
                 <Drawer
-                    title="Navigation"
+                    title={tNavigation('drawer.title')}
                     isOpen={isOpen}
                     onClose={onDrawerClose}
                     onRequestClose={onDrawerClose}
@@ -113,6 +113,7 @@ const Navigation = ({ toggleMode, mode }: NavigationProps) => {
                     <button
                         className="relative flex cursor-pointer items-center justify-center rounded-xl p-2 text-neutral-500 hover:shadow-input dark:text-neutral-500"
                         onClick={toggleMode}
+                        aria-label={tNavigation('buttons.toggleTheme')}
                     >
                         <svg
                             className="lucide lucide-sun rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0"
@@ -150,7 +151,9 @@ const Navigation = ({ toggleMode, mode }: NavigationProps) => {
                         >
                             <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
                         </svg>
-                        <span className="sr-only">Toggle theme</span>
+                        <span className="sr-only">
+                            {tNavigation('buttons.toggleTheme')}
+                        </span>
                     </button>
                     <div className="relative border border-gray-200 dark:border-gray-700 rounded-full inline-flex items-center justify-center gap-0 py-1 px-4 bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                         <img
@@ -160,7 +163,7 @@ const Navigation = ({ toggleMode, mode }: NavigationProps) => {
                         />
 
                         <Button variant="plain" onClick={handleLogin}>
-                            {tCommon('login')}
+                            {tNavigation('buttons.login')}
                         </Button>
                     </div>
                 </div>

@@ -5,10 +5,12 @@ import Notification from '@/components/ui/Notification'
 import SignUp from '@/components/auth/SignUp'
 import { apiSignUp } from '@/services/AuthService'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import type { OnSignUpPayload } from '@/components/auth/SignUp'
 
 const SignUpClient = () => {
     const router = useRouter()
+    const t = useTranslations('auth.signUp')
 
     const handleSignUp = async ({
         values,
@@ -31,15 +33,15 @@ const SignUpClient = () => {
 
             console.log('Signup success:', res)
             toast.push(
-                <Notification title="Account created!" type="success">
-                    You can now sign in from our sign in page
+                <Notification title={t('success.title')} type="success">
+                    {t('success.message')}
                 </Notification>,
             )
             router.push('/sign-in')
         } catch (error) {
             console.error('Signup error:', error)
 
-            let errorMessage = 'An unexpected error occurred during sign up'
+            let errorMessage = t('errors.generalError')
 
             if (error instanceof Error) {
                 errorMessage = error.message
