@@ -4,6 +4,7 @@ import { ReactNode, memo } from 'react'
 import { Progress } from '@/components/ui/Progress'
 import { motion } from 'framer-motion'
 import Container from '@/components/shared/Container'
+import LanguageSelector from '@/components/template/LanguageSelector';
 
 interface OnboardingLayoutProps {
     children: ReactNode
@@ -53,6 +54,7 @@ const OnboardingLayout = memo(
                             <p className="text-lg text-gray-600 dark:text-gray-400 mb-4">
                                 Давайте настроим ваш профиль
                             </p>
+                            <LanguageSelector className="ml-auto" />
                             {/* Progress Bar */}
                             <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden mb-6">
                                 <div

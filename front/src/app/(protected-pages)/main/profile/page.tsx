@@ -27,8 +27,10 @@ import ProfileService, {
     type AssessmentResult,
 } from '@/services/ProfileService'
 import { useRouter } from 'next/navigation'
+import { useTranslations } from 'next-intl';
 
 export default function ProfilePage() {
+    const t = useTranslations();
     const router = useRouter()
     const [profileData, setProfileData] = useState<FullUserProfile | null>(null)
     const [loading, setLoading] = useState(true)
@@ -45,19 +47,19 @@ export default function ProfilePage() {
             setProfileData(data)
         } catch (err) {
             console.error('Error loading profile data:', err)
-            setError('Ошибка при загрузке данных профиля')
+            setError(t('profile.error.loading'))
         } finally {
             setLoading(false)
         }
     }
 
     const formatSalary = (min?: number, max?: number, currency = 'KZT') => {
-        if (!min && !max) return 'Не указано'
+        if (!min && !max) return t('profile.salary.notSpecified')
         if (min && max)
             return `${min.toLocaleString()} - ${max.toLocaleString()} ${currency}`
-        if (min) return `от ${min.toLocaleString()} ${currency}`
-        if (max) return `до ${max.toLocaleString()} ${currency}`
-        return 'Не указано'
+        if (min) return `${t('profile.salary.from')} ${min.toLocaleString()} ${currency}`
+        if (max) return `${t('profile.salary.upTo')} ${max.toLocaleString()} ${currency}`
+        return t('profile.salary.notSpecified')
     }
 
     const formatDate = (dateString: string) => {
@@ -88,7 +90,7 @@ export default function ProfilePage() {
         return (
             <div className="text-center py-12">
                 <p className="text-red-600 mb-4">{error}</p>
-                <Button onClick={loadProfileData}>Попробовать снова</Button>
+                <Button onClick={loadProfileData}>{t('profile.error.retry')}</Button>
             </div>
         )
     }
@@ -103,10 +105,10 @@ export default function ProfilePage() {
             <div className="flex justify-between items-start">
                 <div>
                     <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                        Мой профиль
+                        {t('profile.title')}
                     </h1>
                     <p className="text-gray-600 dark:text-gray-400">
-                        Детальная информация о ваших навыках и предпочтениях
+                        {t('profile.subtitle')}
                     </p>
                 </div>
                 <Button
@@ -115,7 +117,7 @@ export default function ProfilePage() {
                     onClick={() => router.push('/onboarding')}
                 >
                     <TbEdit className="w-4 h-4" />
-                    Редактировать
+                    {t('profile.edit')}
                 </Button>
             </div>
 
@@ -128,7 +130,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="flex-1">
                             <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
-                                Сводка профиля
+                                {t('profile.summary.title')}
                             </h3>
                             <p className="text-blue-800 dark:text-blue-200 leading-relaxed">
                                 {profile_summary.summary_text}
@@ -136,7 +138,7 @@ export default function ProfilePage() {
                             <div className="flex items-center gap-4 mt-3 text-sm text-blue-600 dark:text-blue-300">
                                 <span className="flex items-center gap-1">
                                     <TbCalendar className="w-4 h-4" />
-                                    Обновлено:{' '}
+                                    {t('profile.summary.updated')}:{' '}
                                     {formatDate(
                                         profile_summary.updated_at ||
                                             profile_summary.created_at,
@@ -145,11 +147,11 @@ export default function ProfilePage() {
                                 {profile_summary.generated_from && (
                                     <span className="flex items-center gap-1">
                                         <TbTarget className="w-4 h-4" />
-                                        Источник:{' '}
+                                        {t('profile.summary.source')}:{' '}
                                         {profile_summary.generated_from ===
                                         'assessment'
-                                            ? 'Тестирование'
-                                            : 'Онбординг'}
+                                            ? t('profile.summary.assessment')
+                                            : t('profile.summary.onboarding')}
                                     </span>
                                 )}
                             </div>
@@ -165,7 +167,7 @@ export default function ProfilePage() {
                         <div className="flex items-center gap-3">
                             <TbChartBar className="w-6 h-6 text-purple-600" />
                             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                                Результаты тестирования
+                                {t('profile.assessment.title')}
                             </h2>
                         </div>
                         {latestAssessment.overall_score && (
@@ -175,7 +177,7 @@ export default function ProfilePage() {
                                     /5
                                 </div>
                                 <div className="text-sm text-gray-500">
-                                    Общий балл
+                                    {t('profile.assessment.score')}
                                 </div>
                             </div>
                         )}
@@ -186,7 +188,7 @@ export default function ProfilePage() {
                         <div>
                             <h3 className="text-lg font-semibold text-green-700 dark:text-green-400 mb-4 flex items-center gap-2">
                                 <TbTrendingUp className="w-5 h-5" />
-                                Сильные стороны
+                                {t('profile.assessment.strengths')}
                             </h3>
                             <div className="space-y-3">
                                 {latestAssessment.top_strengths.map(
@@ -221,7 +223,7 @@ export default function ProfilePage() {
                         <div>
                             <h3 className="text-lg font-semibold text-amber-700 dark:text-amber-400 mb-4 flex items-center gap-2">
                                 <TbTarget className="w-5 h-5" />
-                                Области для развития
+                                {t('profile.assessment.improvement')}
                             </h3>
                             <div className="space-y-3">
                                 {latestAssessment.top_weaknesses.length > 0 ? (
@@ -253,8 +255,7 @@ export default function ProfilePage() {
                                 ) : (
                                     <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg text-center">
                                         <p className="text-green-700 dark:text-green-300 font-medium">
-                                            🎉 Отлично! Значительных областей
-                                            для улучшения не выявлено.
+                                            {t('profile.assessment.noImprovement')}
                                         </p>
                                     </div>
                                 )}
@@ -270,7 +271,7 @@ export default function ProfilePage() {
                                 {latestAssessment.strengths_analysis && (
                                     <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
                                         <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
-                                            Анализ сильных сторон
+                                            {t('profile.assessment.strengthsAnalysis')}
                                         </h4>
                                         <p className="text-blue-700 dark:text-blue-300 text-sm leading-relaxed">
                                             {
@@ -282,7 +283,7 @@ export default function ProfilePage() {
                                 {latestAssessment.improvement_suggestions && (
                                     <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg">
                                         <h4 className="font-semibold text-indigo-800 dark:text-indigo-200 mb-2">
-                                            Рекомендации по развитию
+                                            {t('profile.assessment.improvementSuggestions')}
                                         </h4>
                                         <p className="text-indigo-700 dark:text-indigo-300 text-sm leading-relaxed">
                                             {
@@ -297,12 +298,12 @@ export default function ProfilePage() {
 
                     <div className="mt-4 text-xs text-gray-500 flex items-center justify-between">
                         <span>
-                            Тест пройден:{' '}
+                            {t('profile.assessment.testDate')}:{' '}
                             {formatDate(latestAssessment.created_at)}
                         </span>
                         {latestAssessment.confidence_level && (
                             <span>
-                                Уверенность AI:{' '}
+                                {t('profile.assessment.confidenceLevel')}:{' '}
                                 {(
                                     latestAssessment.confidence_level * 100
                                 ).toFixed(0)}
@@ -322,14 +323,14 @@ export default function ProfilePage() {
                             <div className="flex items-center gap-3 mb-6">
                                 <TbUser className="w-6 h-6 text-green-600" />
                                 <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                                    Личная информация
+                                    {t('profile.personal.title')}
                                 </h2>
                             </div>
                             <div className="space-y-4">
                                 {(onboarding_profile.first_name || onboarding_profile.last_name) && (
                                     <div>
                                         <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            Имя
+                                            {t('profile.personal.fullName')}
                                         </label>
                                         <p className="text-gray-900 dark:text-gray-100">
                                             {[onboarding_profile.first_name, onboarding_profile.last_name].filter(Boolean).join(' ')}
@@ -340,7 +341,7 @@ export default function ProfilePage() {
                                 {onboarding_profile.phone && (
                                     <div>
                                         <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            Телефон
+                                            {t('profile.personal.phone')}
                                         </label>
                                         <p className="text-gray-900 dark:text-gray-100">
                                             {onboarding_profile.phone}
@@ -351,7 +352,7 @@ export default function ProfilePage() {
                                 {onboarding_profile.date_of_birth && (
                                     <div>
                                         <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            Дата рождения
+                                            {t('profile.personal.dob')}
                                         </label>
                                         <p className="text-gray-900 dark:text-gray-100">
                                             {onboarding_profile.date_of_birth}
@@ -362,13 +363,13 @@ export default function ProfilePage() {
                                 {onboarding_profile.gender && (
                                     <div>
                                         <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            Пол
+                                            {t('profile.personal.gender')}
                                         </label>
                                         <p className="text-gray-900 dark:text-gray-100">
-                                            {onboarding_profile.gender === 'male' ? 'Мужской' : 
-                                             onboarding_profile.gender === 'female' ? 'Женский' : 
-                                             onboarding_profile.gender === 'other' ? 'Другое' : 
-                                             onboarding_profile.gender === 'prefer_not_to_say' ? 'Предпочитаю не указывать' : 
+                                            {onboarding_profile.gender === 'male' ? t('profile.personal.male') : 
+                                             onboarding_profile.gender === 'female' ? t('profile.personal.female') : 
+                                             onboarding_profile.gender === 'other' ? t('profile.personal.other') : 
+                                             onboarding_profile.gender === 'prefer_not_to_say' ? t('profile.personal.preferNotToSay') : 
                                              onboarding_profile.gender}
                                         </p>
                                     </div>
@@ -382,14 +383,14 @@ export default function ProfilePage() {
                         <div className="flex items-center gap-3 mb-6">
                             <TbBriefcase className="w-6 h-6 text-blue-600" />
                             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                                Профессиональная информация
+                                {t('profile.professional.title')}
                             </h2>
                         </div>
                         <div className="space-y-4">
                             {(onboarding_profile.profession || onboarding_profile.desired_field) && (
                                 <div>
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        Профессия/Желаемая область
+                                        {t('profile.professional.profession')}
                                     </label>
                                     <p className="text-gray-900 dark:text-gray-100">
                                         {onboarding_profile.profession || onboarding_profile.desired_field}
@@ -400,7 +401,7 @@ export default function ProfilePage() {
                             {onboarding_profile.industry && (
                                 <div>
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        Отрасль
+                                        {t('profile.professional.industry')}
                                     </label>
                                     <p className="text-gray-900 dark:text-gray-100">
                                         {onboarding_profile.industry}
@@ -412,10 +413,10 @@ export default function ProfilePage() {
                                 onboarding_profile.min_salary,
                                 onboarding_profile.max_salary,
                                 onboarding_profile.currency,
-                            ) !== 'Не указано' && (
+                            ) !== t('profile.salary.notSpecified') && (
                                 <div>
                                     <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                        Желаемая зарплата
+                                        {t('profile.professional.salaryExpectations')}
                                     </label>
                                     <p className="text-gray-900 dark:text-gray-100">
                                         {formatSalary(
@@ -431,7 +432,7 @@ export default function ProfilePage() {
                                 onboarding_profile.skills.length > 0 && (
                                     <div>
                                         <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 block">
-                                            Навыки
+                                            {t('profile.professional.skills')}
                                         </label>
                                         <div className="flex flex-wrap gap-2">
                                             {onboarding_profile.skills.map(
@@ -455,14 +456,14 @@ export default function ProfilePage() {
                         <div className="flex items-center gap-3 mb-6">
                             <TbSettings className="w-6 h-6 text-green-600" />
                             <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                                Предпочтения по работе
+                                {t('profile.preferences.title')}
                             </h2>
                         </div>
 
                         <div className="space-y-4">
                             <div>
                                 <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                    Желаемая зарплата
+                                    {t('profile.preferences.salaryExpectations')}
                                 </label>
                                 <p className="text-gray-900 dark:text-gray-100 font-medium flex items-center gap-2">
                                     <TbCurrencyTenge className="w-4 h-4" />
@@ -478,7 +479,7 @@ export default function ProfilePage() {
                                 onboarding_profile.work_format.length > 0 && (
                                     <div>
                                         <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 block">
-                                            Формат работы
+                                            {t('profile.preferences.workFormat')}
                                         </label>
                                         <div className="flex flex-wrap gap-2">
                                             {onboarding_profile.work_format.map(
@@ -500,7 +501,7 @@ export default function ProfilePage() {
                                     0 && (
                                     <div>
                                         <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 block">
-                                            Тип занятости
+                                            {t('profile.preferences.employmentType')}
                                         </label>
                                         <div className="flex flex-wrap gap-2">
                                             {onboarding_profile.employment_type.map(
@@ -522,7 +523,7 @@ export default function ProfilePage() {
                                     0 && (
                                     <div>
                                         <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 block">
-                                            Предпочитаемые города
+                                            {t('profile.preferences.preferredCities')}
                                         </label>
                                         <div className="flex flex-wrap gap-2">
                                             {onboarding_profile.preferred_cities.map(
@@ -550,7 +551,7 @@ export default function ProfilePage() {
                             <div className="flex items-center gap-3 mb-6">
                                 <TbAccessible className="w-6 h-6 text-purple-600" />
                                 <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                                    Доступность и адаптации
+                                    {t('profile.accessibility.title')}
                                 </h2>
                             </div>
 
@@ -558,7 +559,7 @@ export default function ProfilePage() {
                                 {onboarding_profile.disability_type && (
                                     <div>
                                         <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            Тип особенностей
+                                            {t('profile.accessibility.disabilityType')}
                                         </label>
                                         <p className="text-gray-900 dark:text-gray-100">
                                             {onboarding_profile.disability_type}
@@ -569,7 +570,7 @@ export default function ProfilePage() {
                                 {onboarding_profile.workplace_preferences && (
                                     <div>
                                         <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            Предпочтения по рабочему месту
+                                            {t('profile.accessibility.workplacePreferences')}
                                         </label>
                                         <p className="text-gray-900 dark:text-gray-100">
                                             {
@@ -584,7 +585,7 @@ export default function ProfilePage() {
                                         .length > 0 && (
                                         <div>
                                             <label className="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2 block">
-                                                Необходимые адаптации
+                                                {t('profile.accessibility.adaptations')}
                                             </label>
                                             <div className="flex flex-wrap gap-2">
                                                 {onboarding_profile.accessibility_adaptations.map(
@@ -604,7 +605,7 @@ export default function ProfilePage() {
                                 {onboarding_profile.accessibility_notes && (
                                     <div>
                                         <label className="text-sm font-medium text-gray-500 dark:text-gray-400">
-                                            Дополнительные заметки
+                                            {t('profile.accessibility.notes')}
                                         </label>
                                         <p className="text-gray-900 dark:text-gray-100 bg-gray-50 dark:bg-gray-800 p-3 rounded-lg text-sm">
                                             {
@@ -623,7 +624,7 @@ export default function ProfilePage() {
                             <div className="flex items-center gap-3 mb-6">
                                 <TbFileText className="w-6 h-6 text-indigo-600" />
                                 <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-                                    О себе
+                                    {t('profile.bio.title')}
                                 </h2>
                             </div>
                             <p className="text-gray-700 dark:text-gray-300 leading-relaxed bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
@@ -639,24 +640,23 @@ export default function ProfilePage() {
                 <Card className="p-12 text-center">
                     <TbUser className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                     <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                        Профиль не заполнен
+                        {t('profile.empty.title')}
                     </h3>
                     <p className="text-gray-600 dark:text-gray-400 mb-6">
-                        Пройдите онбординг или тестирование, чтобы увидеть
-                        детальную информацию о ваших навыках и предпочтениях.
+                        {t('profile.empty.description')}
                     </p>
                     <div className="flex justify-center gap-4">
                         <Button
                             variant="solid"
                             onClick={() => router.push('/onboarding')}
                         >
-                            Пройти онбординг
+                            {t('profile.empty.onboarding')}
                         </Button>
                         <Button
                             variant="default"
                             onClick={() => router.push('/main/assessment')}
                         >
-                            Пройти тест
+                            {t('profile.empty.test')}
                         </Button>
                     </div>
                 </Card>

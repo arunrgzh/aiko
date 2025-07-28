@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import ChatHistory from './ChatHistory'
@@ -20,6 +21,7 @@ const ChatSideNav = ({ className, bodyClass, onClick }: ChatSideNavProps) => {
     const [queryText, setQueryText] = useState('')
     const participant = useParticipant()
     const { setSelectedConversation } = useGenerativeChatStore()
+    const t = useTranslations('aiChat')
 
     function handleDebounceFn(e: ChangeEvent<HTMLInputElement>) {
         setQueryText?.(e.target.value)
@@ -44,7 +46,7 @@ const ChatSideNav = ({ className, bodyClass, onClick }: ChatSideNavProps) => {
                         <TbSearch className="text-xl" />
                         <input
                             className="flex-1 h-full placeholder:text-gray-400 placeholder:text-base bg-transparent focus:outline-hidden heading-text"
-                            placeholder="Search chat"
+                            placeholder={t('searchPlaceholder')}
                             onChange={handleInputChange}
                         />
                     </div>
@@ -60,7 +62,7 @@ const ChatSideNav = ({ className, bodyClass, onClick }: ChatSideNavProps) => {
             <ChatHistory queryText={queryText} onClick={onClick} />
             <div className="px-5 py-2">
                 <Button block variant="solid" onClick={handleNewChat}>
-                    New chat
+                    {t('newChat')}
                 </Button>
             </div>
         </Card>

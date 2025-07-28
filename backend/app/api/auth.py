@@ -73,16 +73,26 @@ async def refresh_token(refresh_token: str = Body(..., embed=True), db: AsyncSes
     )
     
     try:
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.info(f"Attempting to verify refresh token: {refresh_token[:20]}...")
         payload = await verify_token(refresh_token, credentials_exception, token_type="refresh")
         username = payload.username
         if username is None:
+            logger.error("Refresh token payload has no username")
             raise credentials_exception
-    except:
-        raise credentials_exception
+    except Exception as e:
+        logger.error(f"Error verifying refresh token: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Token verification failed")
         
-    user = await get_user_by_username(username, db)
-    if user is None:
-        raise credentials_exception
+    try:
+        user = await get_user_by_username(username, db)
+        if user is None:
+            logger.error(f"User not found for username: {username}")
+            raise credentials_exception
+    except Exception as e:
+        logger.error(f"Database error retrieving user: {str(e)}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database query failed")
         
     access_token = await create_access_token(data={"sub": username})
     new_refresh_token = await create_refresh_token(data={"sub": username})

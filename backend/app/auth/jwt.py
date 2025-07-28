@@ -34,6 +34,8 @@ async def create_refresh_token(data: dict) -> str:
     return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
 
 async def verify_token(token: str, credentials_exception: HTTPException, token_type: str = "access") -> TokenData:
+    if not settings.secret_key:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Secret key is not configured")
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         username: Optional[str] = payload.get("sub")

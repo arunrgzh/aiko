@@ -1,24 +1,26 @@
 'use client'
 
 import { useState } from 'react'
+import { useTranslations } from 'next-intl'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Badge from '@/components/ui/Badge'
-import Avatar from '@/components/ui/Avatar'
 import {
     TbHeart,
     TbHeartFilled,
     TbExternalLink,
+    TbSend,
     TbMapPin,
-    TbCalendar,
+    TbCurrencyDollar,
     TbClock,
     TbBriefcase,
-    TbCurrencyTenge,
     TbTarget,
+    TbBuilding,
+    TbTrendingUp,
     TbStar,
-    TbInfoCircle,
 } from 'react-icons/tb'
-import { JobRecommendation } from '../types'
+import type { JobRecommendation } from '../types'
+import Link from 'next/link'
 
 type VacancyCardProps = {
     vacancy: JobRecommendation
@@ -33,9 +35,7 @@ export default function VacancyCard({
     onApply,
     onViewDetails,
 }: VacancyCardProps) {
-    // Remove local isSaved state
-    // const [isSaved, setIsSaved] = useState(vacancy.is_saved || false);
-
+    const t = useTranslations('vacancies')
     const isSaved = vacancy.is_saved || false
 
     const handleSave = () => {
@@ -48,9 +48,9 @@ export default function VacancyCard({
         if (vacancy.salary_from && vacancy.salary_to) {
             return `${vacancy.salary_from.toLocaleString()} - ${vacancy.salary_to.toLocaleString()} ${vacancy.currency}`
         } else if (vacancy.salary_from) {
-            return `от ${vacancy.salary_from.toLocaleString()} ${vacancy.currency}`
+            return `${t('card.salary.from')} ${vacancy.salary_from.toLocaleString()} ${vacancy.currency}`
         } else if (vacancy.salary_to) {
-            return `до ${vacancy.salary_to.toLocaleString()} ${vacancy.currency}`
+            return `${t('card.salary.to')} ${vacancy.salary_to.toLocaleString()} ${vacancy.currency}`
         }
     }
 
@@ -61,9 +61,9 @@ export default function VacancyCard({
     }
 
     const getRelevanceLabel = (score: number) => {
-        if (score >= 0.8) return 'Отлично подходит'
-        if (score >= 0.6) return 'Хорошо подходит'
-        return 'Может подойти'
+        if (score >= 0.8) return t('card.relevance.excellent')
+        if (score >= 0.6) return t('card.relevance.good')
+        return t('card.relevance.fair')
     }
 
     const timeAgo = () => {
@@ -73,219 +73,196 @@ export default function VacancyCard({
             (now.getTime() - created.getTime()) / (1000 * 60 * 60),
         )
 
-        if (diffInHours < 1) return 'Только что'
-        if (diffInHours < 24) return `${diffInHours} ч. назад`
+        if (diffInHours < 1) return t('card.timeAgo.justNow')
+        if (diffInHours < 24)
+            return t('card.timeAgo.hoursAgo', { count: diffInHours })
 
         const diffInDays = Math.floor(diffInHours / 24)
-        if (diffInDays < 7) return `${diffInDays} дн. назад`
+        if (diffInDays < 7)
+            return t('card.timeAgo.daysAgo', { count: diffInDays })
 
-        return created.toLocaleDateString('ru-RU')
+        return created.toLocaleDateString()
     }
 
     return (
-        <Card className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500">
-            <div className="p-6">
-                {/* Header */}
-                <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center space-x-3 flex-1 min-w-0">
-                        <Avatar
-                            className="shrink-0"
-                            size="md"
-                            shape="square"
-                            src={vacancy.raw_data?.employer?.logo_urls?.['90']}
-                        >
-                            {vacancy.company_name?.charAt(0).toUpperCase() ||
-                                'К'}
-                        </Avatar>
-                        <div className="min-w-0 flex-1">
-                            <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100 mb-1 line-clamp-2">
-                                {vacancy.title}
-                            </h3>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm">
-                                {vacancy.company_name}
-                            </p>
-                        </div>
+        <Card className="group hover:shadow-lg transition-all duration-300 border-l-4 border-l-blue-500 hover:border-l-blue-600">
+            <div className="p-6 space-y-4">
+                {/* Header with save button */}
+                <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-1 group-hover:text-blue-600 transition-colors">
+                            {vacancy.title}
+                        </h3>
+                        {vacancy.company_name && (
+                            <div className="flex items-center text-gray-600 dark:text-gray-400 mb-2">
+                                <TbBuilding className="w-4 h-4 mr-1" />
+                                <span className="text-sm">
+                                    {vacancy.company_name}
+                                </span>
+                            </div>
+                        )}
                     </div>
-                    <div className="flex items-center space-x-2 shrink-0">
-                        <Button
-                            size="sm"
-                            variant="plain"
-                            shape="circle"
-                            onClick={handleSave}
-                            className="text-gray-400 hover:text-red-500"
-                            aria-label={
-                                isSaved
-                                    ? 'Удалить из сохраненных'
-                                    : 'Сохранить вакансию'
-                            }
-                        >
-                            {isSaved ? (
-                                <TbHeartFilled className="text-red-500" />
-                            ) : (
-                                <TbHeart />
-                            )}
-                        </Button>
-                        <div className="flex items-center space-x-1">
-                            <TbTarget
-                                className={`text-sm ${getRelevanceColor(vacancy.relevance_score)}`}
-                            />
-                            <span
-                                className={`text-xs font-medium ${getRelevanceColor(vacancy.relevance_score)}`}
-                            >
-                                {Math.round(vacancy.relevance_score * 100)}%
-                            </span>
-                        </div>
-                    </div>
+
+                    <button
+                        onClick={handleSave}
+                        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                        aria-label={
+                            isSaved
+                                ? t('card.actions.saved')
+                                : t('card.actions.save')
+                        }
+                    >
+                        {isSaved ? (
+                            <TbHeartFilled className="w-5 h-5 text-red-500" />
+                        ) : (
+                            <TbHeart className="w-5 h-5 text-gray-400 hover:text-red-500" />
+                        )}
+                    </button>
                 </div>
 
-                {/* Relevance Badge */}
-                <div className="mb-4">
+                {/* Key info badges */}
+                <div className="flex flex-wrap gap-2">
+                    {/* Relevance Score */}
                     <Badge
-                        className={`${
-                            vacancy.relevance_score >= 0.8
-                                ? 'bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                                : vacancy.relevance_score >= 0.6
-                                  ? 'bg-yellow-100 dark:bg-yellow-900/20 text-yellow-700 dark:text-yellow-300'
-                                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300'
-                        } text-xs`}
+                        className={`${getRelevanceColor(vacancy.relevance_score)} bg-opacity-10`}
                     >
-                        <TbStar className="mr-1" />
+                        <TbTarget className="w-3 h-3 mr-1" />
                         {getRelevanceLabel(vacancy.relevance_score)}
                     </Badge>
-                </div>
-
-                {/* Job Details */}
-                <div className="space-y-3 mb-4">
-                    {/* Salary */}
-                    {formatSalary() && (
-                        <div className="flex items-center text-gray-700 dark:text-gray-300">
-                            <TbCurrencyTenge className="mr-2 text-green-600 dark:text-green-400" />
-                            <span className="font-medium">
-                                {formatSalary()}
-                            </span>
-                        </div>
-                    )}
 
                     {/* Location */}
                     {vacancy.area_name && (
-                        <div className="flex items-center text-gray-600 dark:text-gray-400">
-                            <TbMapPin className="mr-2" />
-                            <span>{vacancy.area_name}</span>
-                        </div>
+                        <Badge
+                            variant="outline"
+                            className="text-gray-600 dark:text-gray-400"
+                        >
+                            <TbMapPin className="w-3 h-3 mr-1" />
+                            {vacancy.area_name}
+                        </Badge>
                     )}
 
-                    {/* Employment Type & Experience */}
-                    <div className="flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
-                        {vacancy.employment_type && (
-                            <div className="flex items-center">
-                                <TbBriefcase className="mr-1" />
-                                <span>{vacancy.employment_type}</span>
-                            </div>
-                        )}
-                        {vacancy.experience_required && (
-                            <div className="flex items-center">
-                                <TbClock className="mr-1" />
-                                <span>{vacancy.experience_required}</span>
-                            </div>
+                    {/* Employment Type */}
+                    {vacancy.employment_type && (
+                        <Badge
+                            variant="outline"
+                            className="text-gray-600 dark:text-gray-400"
+                        >
+                            <TbBriefcase className="w-3 h-3 mr-1" />
+                            {vacancy.employment_type}
+                        </Badge>
+                    )}
+
+                    {/* Experience */}
+                    {vacancy.experience_required && (
+                        <Badge
+                            variant="outline"
+                            className="text-gray-600 dark:text-gray-400"
+                        >
+                            <TbTrendingUp className="w-3 h-3 mr-1" />
+                            {vacancy.experience_required}
+                        </Badge>
+                    )}
+                </div>
+
+                {/* Salary */}
+                {formatSalary() && (
+                    <div className="flex items-center text-green-600 dark:text-green-400">
+                        <TbCurrencyDollar className="w-4 h-4 mr-1" />
+                        <span className="font-medium">{formatSalary()}</span>
+                    </div>
+                )}
+
+                {/* Description preview */}
+                {vacancy.description && (
+                    <p className="text-gray-600 dark:text-gray-400 text-sm line-clamp-3">
+                        {vacancy.description}
+                    </p>
+                )}
+
+                {/* Skills tags */}
+                {vacancy.key_skills && vacancy.key_skills.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                        {vacancy.key_skills.slice(0, 5).map((skill, index) => (
+                            <span
+                                key={index}
+                                className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-full"
+                            >
+                                {skill}
+                            </span>
+                        ))}
+                        {vacancy.key_skills.length > 5 && (
+                            <span className="px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 rounded-full">
+                                +{vacancy.key_skills.length - 5}
+                            </span>
                         )}
                     </div>
+                )}
 
-                    {/* Posted Date */}
-                    <div className="flex items-center text-sm text-gray-500 dark:text-gray-500">
-                        <TbCalendar className="mr-1" />
+                {/* Time and source info */}
+                <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 pt-2 border-t border-gray-100 dark:border-gray-800">
+                    <div className="flex items-center">
+                        <TbClock className="w-3 h-3 mr-1" />
                         <span>{timeAgo()}</span>
                     </div>
-                </div>
 
-                {/* Skills */}
-                {vacancy.key_skills && vacancy.key_skills.length > 0 && (
-                    <div className="mb-4">
-                        <div className="flex flex-wrap gap-2">
-                            {vacancy.key_skills
-                                .slice(0, 5)
-                                .map((skill, index) => (
-                                    <Badge
-                                        key={index}
-                                        className="text-xs bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300"
-                                    >
-                                        {skill}
-                                    </Badge>
-                                ))}
-                            {vacancy.key_skills.length > 5 && (
-                                <Badge className="text-xs bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400">
-                                    +{vacancy.key_skills.length - 5} еще
-                                </Badge>
-                            )}
+                    {vacancy.recommendation_source && (
+                        <div className="flex items-center">
+                            <TbStar className="w-3 h-3 mr-1" />
+                            <span>{vacancy.recommendation_source}</span>
                         </div>
-                    </div>
-                )}
-
-                {/* Description Preview */}
-                {vacancy.description && (
-                    <div className="mb-4">
-                        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-3">
-                            {vacancy.description}
-                        </p>
-                    </div>
-                )}
-
-                {/* Match Scores */}
-                <div className="mb-4 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                    <div className="flex items-center justify-between text-xs">
-                        <span className="text-gray-600 dark:text-gray-400">
-                            Совпадение навыков
-                        </span>
-                        <span className="font-medium">
-                            {Math.round(vacancy.skills_match_score * 100)}%
-                        </span>
-                    </div>
-                    <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-1">
-                        <div
-                            className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
-                            style={{
-                                width: `${vacancy.skills_match_score * 100}%`,
-                            }}
-                        />
-                    </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-3">
-                        <Button
-                            size="sm"
-                            variant="solid"
-                            onClick={() => onApply?.(vacancy.id)}
-                            className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-                        >
-                            Откликнуться
-                        </Button>
-                        <Button
-                            size="sm"
-                            variant="plain"
-                            onClick={() => onViewDetails?.(vacancy.id)}
-                        >
-                            <TbInfoCircle className="mr-1" />
-                            Подробнее
-                        </Button>
-                    </div>
-
-                    {vacancy.raw_data?.alternate_url && (
-                        <Button
-                            size="sm"
-                            variant="plain"
-                            onClick={() =>
-                                window.open(
-                                    vacancy.raw_data?.alternate_url,
-                                    '_blank',
-                                )
-                            }
-                            className="text-gray-500 hover:text-gray-700"
-                        >
-                            <TbExternalLink />
-                        </Button>
                     )}
                 </div>
+
+                {/* Action buttons */}
+                <div className="flex gap-2 pt-4">
+                    <Button
+                        size="sm"
+                        variant="solid"
+                        onClick={() => onApply?.(vacancy.id)}
+                        className="flex-1"
+                        icon={<TbSend />}
+                    >
+                        {t('card.actions.apply')}
+                    </Button>
+
+                    <Button
+                        size="sm"
+                        variant="plain"
+                        onClick={() => onViewDetails?.(vacancy.id)}
+                        icon={<TbExternalLink />}
+                    >
+                        {t('card.actions.viewDetails')}
+                    </Button>
+                </div>
+
+                {/* Detailed scores - for debugging/development */}
+                {vacancy.detailed_scores &&
+                    Object.keys(vacancy.detailed_scores).length > 0 && (
+                        <details className="mt-4">
+                            <summary className="text-xs text-gray-500 cursor-pointer">
+                                Detailed matching scores
+                            </summary>
+                            <div className="mt-2 space-y-1">
+                                {Object.entries(vacancy.detailed_scores).map(
+                                    ([key, value]) => (
+                                        <div
+                                            key={key}
+                                            className="flex justify-between text-xs"
+                                        >
+                                            <span className="text-gray-600 dark:text-gray-400">
+                                                {key}:
+                                            </span>
+                                            <span className="text-gray-800 dark:text-gray-200">
+                                                {typeof value === 'number'
+                                                    ? value.toFixed(2)
+                                                    : value}
+                                            </span>
+                                        </div>
+                                    ),
+                                )}
+                            </div>
+                        </details>
+                    )}
             </div>
         </Card>
     )

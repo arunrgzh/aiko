@@ -156,6 +156,181 @@
         "fotter-text": "Don't have an account yet? Sign up"
     },
 
+    "dashboard": {
+        "welcome": "Welcome to AI-Komekshi!",
+        "greeting": {
+            "morning": "Good morning, ",
+            "afternoon": "Good afternoon, ",
+            "evening": "Good evening, "
+        },
+        "subtitle": "Your personal AI assistant is ready to help you find the perfect job.",
+        "stats": {
+            "activeProfiles": "Active Profiles",
+            "activeProfilesChange": "+5% this week",
+            "newVacancies": "New Vacancies",
+            "newVacanciesChange": "+10% this month",
+            "activeResponses": "Active Responses",
+            "activeResponsesChange": "0% change",
+            "profileRating": "Profile Rating",
+            "profileRatingChange": "+2% increase",
+            "totalVacancies": "Total Vacancies",
+            "activeVacancies": "Active Vacancies",
+            "closedVacancies": "Closed Vacancies",
+            "totalResponses": "Total Responses",
+            "pendingResponses": "Pending Responses",
+            "interviewsScheduled": "Interviews Scheduled",
+            "offersExtended": "Offers Extended",
+            "hires": "Hires"
+        },
+        "activity": {
+            "title": "Activity Overview"
+        },
+        "quickActions": {
+            "title": "Quick Actions",
+            "createVacancy": "Create New Vacancy",
+            "viewResponses": "View Responses",
+            "scheduleInterview": "Schedule Interview"
+        },
+        "services": {
+            "title": "Choose the service you need",
+            "subtitle": "Comprehensive tools for successful job search",
+            "action": "Open",
+            "vacancies": {
+                "title": "Vacancies Service",
+                "description": "Find and manage job opportunities",
+                "stats": "Vacancy Statistics",
+                "features": [
+                    "Personalized job recommendations",
+                    "Advanced search filters",
+                    "Application tracking"
+                ],
+                "badge": "Popular"
+            },
+            "aiAssistant": {
+                "title": "AI Assistant",
+                "description": "Get intelligent career guidance",
+                "stats": "AI Statistics",
+                "features": [
+                    "24/7 career counseling",
+                    "Resume optimization",
+                    "Interview preparation"
+                ],
+                "badge": "AI Powered"
+            },
+            "profile": {
+                "title": "Profile Management",
+                "description": "Manage your professional profile",
+                "stats": "Profile Statistics",
+                "features": [
+                    "Skills assessment",
+                    "Experience tracking",
+                    "Accessibility options"
+                ]
+            },
+            "interviews": {
+                "title": "Practice Interviews",
+                "description": "Improve your interview skills",
+                "stats": "Interview Statistics",
+                "features": [
+                    "Mock interviews",
+                    "Feedback analysis",
+                    "Video recording"
+                ]
+            }
+        },
+        "recentActivity": {
+            "title": "Recent Activity",
+            "application": {
+                "title": "Application Submitted",
+                "time": "2 hours ago"
+            },
+            "aiChat": {
+                "title": "AI Chat Session",
+                "time": "1 hour ago"
+            },
+            "profile": {
+                "title": "Profile Updated",
+                "time": "3 days ago"
+            }
+        }
+    },
+
+    "aiChat": {
+        "greeting": "Hello!",
+        "subtitle": "How can I help you find a job today?",
+        "placeholder": "Enter your question here",
+        "aiAssistantName": "AI Assistant",
+        "userName": "You",
+        "newChat": "New chat",
+        "searchPlaceholder": "Search chat",
+        "suggestions": {
+            "resume": {
+                "title": "Help me prepare a resume with my specific needs",
+                "prompt": "I want to create an effective resume that highlights my strengths and skills. Please consider that I have a disability and I want to properly present my experience to employers."
+            },
+            "vacancies": {
+                "title": "Find suitable vacancies for people with disabilities",
+                "prompt": "Help me find employers and vacancies that are open to hiring people with disabilities. Tell me about employment programs and quotas."
+            },
+            "interview": {
+                "title": "Prepare me for an interview",
+                "prompt": "Give me advice on interview preparation. How to talk about my abilities, how to discuss necessary workplace adaptations, and how to make a positive impression."
+            },
+            "careers": {
+                "title": "What careers suit my skills?",
+                "prompt": "Help me identify career opportunities and professions that are suitable for people with various types of disabilities. Tell me about remote work and flexible employment options."
+            }
+        },
+        "feedback": {
+            "title": "Feedback",
+            "thankYou": "Thanks for your feedback!",
+            "options": {
+                "notFactuallyCorrect": "Not factually correct",
+                "harmfulContent": "Harmful content",
+                "overeactiveRefusal": "Overreactive refusal",
+                "other": "Other"
+            },
+            "praiseLabel": "Please provide details: (optional)",
+            "praisePlaceholder": "What was satisfying about this response?",
+            "blameLabel": "What type of issue do you wish to report? (optional)",
+            "blamePlaceholder": "What was unsatisfying about this response?",
+            "cancel": "Cancel",
+            "submit": "Submit"
+        },
+        "actions": {
+            "copy": "Copy",
+            "copied": "Copied",
+            "goodResponse": "Good response",
+            "badResponse": "Bad response"
+        },
+        "history": {
+            "rename": "Rename",
+            "archive": "Archive",
+            "delete": "Delete",
+            "deleteAll": "Delete All",
+            "deleteAllTitle": "Delete All Chats",
+            "deleteAllMessage": "Are you sure you want to delete all chat history? This action cannot be undone.",
+            "showLess": "Show Less",
+            "showMore": "Show {{count}} More",
+            "noChatsFound": "No chats found matching \"{{query}}\"",
+            "renameChat": "Rename chat",
+            "chatTitle": "Chat title",
+            "renamePlaceholder": "Rename chat"
+        },
+        "errors": {
+            "communicationError": "Communication Error",
+            "generalError": "Something went wrong. Please try again later.",
+            "fileProcessingError": "Error processing files"
+        },
+        "mockResponses": {
+            "fileAnalysis": "Excellent! I can see the attached files! 🔍\n\n**What I can do with images:**\n\n📋 **Resume Analysis** - if it's a scan or photo of a resume, I'll analyze the structure and give improvement tips\n\n📄 **Document Analysis** - help analyze any employment-related documents\n\n💼 **Vacancy Analysis** - if it's a screenshot of a job posting, I'll suggest how to better prepare for it\n\n🎯 **Interview Preparation** - if it's company materials, I'll help prepare questions\n\nDescribe what exactly is in the image, and I'll give you the most useful advice for your job search!",
+            "resumeHelp": "Of course, I'll help you create an effective resume! Here are the main recommendations:\n\n1. **Resume Structure:**\n   - Personal information\n   - Professional objective\n   - Education\n   - Work experience\n   - Skills and competencies\n   - Additional information\n\n2. **Composition Tips:**\n   - Focus on your achievements and skills\n   - Use clear formulations\n   - Specify concrete results\n\nWould you like me to help create a resume for a specific vacancy?",
+            "jobSearch": "I'll help you find suitable vacancies! Here's where to look for work:\n\n1. **Specialized sites for people with disabilities:**\n   - Special People (special-people.com)\n   - Diswork.com\n   - Jobs for Everyone\n\n2. **Employment quotas:**\n   - Companies with 100+ employees must have a 3% quota\n   - Government organizations - 4% quota\n\n3. **Support:**\n   - Employment centers\n   - NGOs supporting people with disabilities\n\nWhat field of activity interests you?",
+            "interviewPrep": "Great question! Here are interview preparation tips:\n\n1. **Preparation:**\n   - Study the company and vacancy\n   - Prepare examples of your achievements\n   - Think of questions for the employer\n\n2. **Discussing specifics:**\n   - Be honest about your needs\n   - Explain how your skills will help the company\n   - Discuss necessary workplace adaptations\n\n3. **Confidence:**\n   - Focus on your strengths\n   - Show enthusiasm and motivation\n\nIs there a specific vacancy you're preparing for?",
+            "general": "Thank you for your question! I'm ready to help you with job searching.\n\nAs your AI job search assistant, I can:\n- Help create a resume\n- Find suitable vacancies\n- Prepare for interviews\n- Give career development advice\n\nHow specifically can I help? Tell me more about your situation."
+        }
+    },
+
     "signUp": {
         "signUp": "Sign Up",
         "subheading": "Start your free trial",
@@ -165,5 +340,191 @@
         "confirm-password": "Confirm password",
         "button": "Register",
         "footer-text": "Already have an account? Log in"
+    },
+
+    "vacancies": {
+        "loader": {
+            "title": "Selecting Personalized Vacancies",
+            "subtitle": "Analyzing your data to find suitable job offers",
+            "steps": {
+                "analyzeProfile": {
+                    "title": "Analyzing Your Profile",
+                    "description": "Studying your skills and preferences"
+                },
+                "applyAI": {
+                    "title": "Applying AI Algorithms",
+                    "description": "Matching with test results"
+                },
+                "searchVacancies": {
+                    "title": "Searching for Vacancies",
+                    "description": "Parsing current job offers"
+                },
+                "personalizeResults": {
+                    "title": "Personalizing Results",
+                    "description": "Selecting the most suitable vacancies"
+                }
+            },
+            "completed": "Done! Loading your recommendations...",
+            "progress": "Progress"
+        },
+        "recommendations": {
+            "title": "Vacancy Recommendations",
+            "subtitle": "Personalized job offers based on your profile and skills",
+            "stats": {
+                "total": "Total Recommendations",
+                "excellentFit": "Excellent Fit",
+                "saved": "Saved"
+            },
+            "tabs": {
+                "personal": "Personal ({{count}})",
+                "assessment": "By Assessment ({{count}})"
+            },
+            "search": {
+                "title": "Search Results: '{{query}}'",
+                "description": "Found {{count}} vacancies",
+                "placeholder": "Search vacancies...",
+                "notFound": "Nothing found",
+                "tryAgain": "Try changing your search query"
+            },
+            "personal": {
+                "title": "Personal Recommendations",
+                "description": "Vacancies selected based on your skills and preferences",
+                "notFound": "Recommendations not found",
+                "tryAgain": "Try updating your profile or expanding search criteria"
+            },
+            "assessment": {
+                "title": "Assessment-Based Recommendations",
+                "description": "Recommendations based on professional testing results",
+                "notFound": "Recommendations not found",
+                "tryAgain": "Take a professional assessment for recommendations"
+            },
+            "filter": "Filters",
+            "refresh": "Refresh",
+            "debugSkills": "Debug Skills"
+        },
+        "card": {
+            "salary": {
+                "from": "from",
+                "to": "up to"
+            },
+            "relevance": {
+                "excellent": "Excellent match",
+                "good": "Good match",
+                "fair": "Might be suitable"
+            },
+            "timeAgo": {
+                "justNow": "Just now",
+                "hoursAgo": "{{count}}h ago",
+                "daysAgo": "{{count}}d ago"
+            },
+            "actions": {
+                "save": "Save",
+                "saved": "Saved",
+                "apply": "Apply",
+                "viewDetails": "View Details"
+            }
+        },
+        "loading": {
+            "text": "Loading...",
+            "error": "Loading error",
+            "tryAgain": "Try again"
+        },
+        "assistant": {
+            "suggestion": "Now that your profile is set up, would you like to take a quick test for more accurate recommendations?"
+        }
+    },
+    "profile": {
+        "title": "My Profile",
+        "subtitle": "Detailed information about your skills and preferences",
+        "edit": "Edit",
+        "error": {
+            "loading": "Error loading profile data",
+            "retry": "Try Again"
+        },
+        "salary": {
+            "notSpecified": "Not specified",
+            "from": "from",
+            "upTo": "up to"
+        },
+        "personal": {
+            "title": "Personal Information",
+            "fullName": "Full Name",
+            "phone": "Phone Number",
+            "dob": "Date of Birth",
+            "gender": "Gender",
+            "notSpecified": "Not specified"
+        },
+        "professional": {
+            "title": "Professional Information",
+            "currentPosition": "Current Position",
+            "experience": "Experience",
+            "industry": "Industry",
+            "salaryExpectations": "Salary Expectations",
+            "notSpecified": "Not specified",
+            "years": "years"
+        },
+        "skills": {
+            "title": "Skills"
+        },
+        "education": {
+            "title": "Education",
+            "present": "Present",
+            "specialization": "Specialization"
+        },
+        "preferences": {
+            "title": "Work Preferences",
+            "workFormat": "Work Format",
+            "employmentType": "Employment Type",
+            "workLocations": "Preferred Locations",
+            "notSpecified": "Not specified"
+        },
+        "accessibility": {
+            "title": "Accessibility and Adaptations",
+            "needs": "Accessibility Needs",
+            "adaptations": "Required Adaptations",
+            "notes": "Additional Notes",
+            "none": "None specified"
+        },
+        "bio": {
+            "title": "About Me"
+        },
+        "empty": {
+            "title": "Profile Not Filled",
+            "description": "Complete onboarding or testing to see detailed information about your skills and preferences.",
+            "onboarding": "Complete Onboarding",
+            "test": "Take Test"
+        }
+    },
+    "assessment": {
+        "title": "Skills Assessment Test",
+        "description": "Take the test so we can better match you with suitable vacancies",
+        "error": {
+            "loadingQuestions": "Failed to load test questions. Try refreshing the page.",
+            "submittingAssessment": "Error submitting test results. Please try again."
+        },
+        "results": {
+            "title": "Your Assessment Results",
+            "score": "Score: {{score}} out of {{maxScore}}",
+            "level": "Level: {{level}}",
+            "detailedResults": "Detailed Results",
+            "percentage": "{{percentage}}%",
+            "recommendations": "Recommendations:",
+            "profileSummary": "Profile Summary:",
+            "sections": {
+                "technical": "Technical Skills",
+                "soft": "Soft Skills",
+                "cognitive": "Cognitive Abilities"
+            }
+        },
+        "unavailable": {
+            "title": "Test Unavailable",
+            "description": "Unfortunately, the test questions could not be loaded."
+        },
+        "buttons": {
+            "retakeAssessment": "Retake Test",
+            "findVacancies": "Find Vacancies",
+            "completing": "Completing...",
+            "goToVacancies": "Go to Vacancies"
+        }
     }
 }

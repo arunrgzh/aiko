@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import Select from '@/components/ui/Select'
@@ -23,13 +24,6 @@ type ChatCustomActionProps = {
     content: string
 }
 
-const responseOption = [
-    { label: 'Not factually correct', value: 'notFactuallyCorrect' },
-    { label: 'Harmful content', value: 'harmfulContent' },
-    { label: 'Overeactive refusal', value: 'overeactiveRefusal' },
-    { label: 'Other', value: 'other' },
-]
-
 const ChatCustomAction = ({ content }: ChatCustomActionProps) => {
     const detailInput = useRef<HTMLTextAreaElement>(null)
     const [copied, setCopied] = useState(false)
@@ -42,6 +36,23 @@ const ChatCustomAction = ({ content }: ChatCustomActionProps) => {
         type: '',
         open: false,
     })
+    const t = useTranslations('aiChat')
+
+    const responseOption = [
+        {
+            label: t('feedback.options.notFactuallyCorrect'),
+            value: 'notFactuallyCorrect',
+        },
+        {
+            label: t('feedback.options.harmfulContent'),
+            value: 'harmfulContent',
+        },
+        {
+            label: t('feedback.options.overeactiveRefusal'),
+            value: 'overeactiveRefusal',
+        },
+        { label: t('feedback.options.other'), value: 'other' },
+    ]
 
     const btnClass =
         'p-2 rounded-full hover:bg-black  hover:bg-opacity-5 hover:text-gray-900 dark:hover:bg-black dark:hover:text-gray-100 dark:hover:bg-opacity-40 transition-colors duration-300 ease-in-out'
@@ -74,7 +85,7 @@ const ChatCustomAction = ({ content }: ChatCustomActionProps) => {
         handleDialogClose()
         toast.push(
             <Notification type="success">
-                Thanks for your feedback!
+                {t('feedback.thankYou')}
             </Notification>,
             { placement: 'top-center' },
         )
@@ -83,7 +94,10 @@ const ChatCustomAction = ({ content }: ChatCustomActionProps) => {
     return (
         <>
             <div className="flex mt-0.5">
-                <Tooltip title={copied ? 'Copied' : 'Copy'} placement="bottom">
+                <Tooltip
+                    title={copied ? t('actions.copied') : t('actions.copy')}
+                    placement="bottom"
+                >
                     <button
                         className={classNames(btnClass, 'text-lg')}
                         onClick={() => setCopied(true)}
@@ -95,7 +109,7 @@ const ChatCustomAction = ({ content }: ChatCustomActionProps) => {
                         )}
                     </button>
                 </Tooltip>
-                <Tooltip title="Good response" placement="bottom">
+                <Tooltip title={t('actions.goodResponse')} placement="bottom">
                     <button
                         className={classNames(btnClass, 'text-lg')}
                         onClick={() =>
@@ -109,7 +123,7 @@ const ChatCustomAction = ({ content }: ChatCustomActionProps) => {
                         )}
                     </button>
                 </Tooltip>
-                <Tooltip title="Bad response" placement="bottom">
+                <Tooltip title={t('actions.badResponse')} placement="bottom">
                     <button
                         className={classNames(btnClass, 'text-lg')}
                         onClick={() =>
@@ -129,20 +143,20 @@ const ChatCustomAction = ({ content }: ChatCustomActionProps) => {
                 onClose={handleDialogClose}
                 onRequestClose={handleDialogClose}
             >
-                <h5 className="mb-4">Feedback</h5>
+                <h5 className="mb-4">{t('feedback.title')}</h5>
                 <Form onSubmit={handleSubmit}>
                     {responseDialog.type === 'praise' && (
-                        <FormItem label="Please provide details: (optional)">
+                        <FormItem label={t('feedback.praiseLabel')}>
                             <Input
                                 ref={detailInput}
                                 textArea
-                                placeholder="What was statifying about this response?"
+                                placeholder={t('feedback.praisePlaceholder')}
                             />
                         </FormItem>
                     )}
                     {responseDialog.type === 'blame' && (
                         <>
-                            <FormItem label="What type of issue do you wish to report? (optional)">
+                            <FormItem label={t('feedback.blameLabel')}>
                                 <Select
                                     instanceId="response-option"
                                     options={responseOption}
@@ -155,11 +169,11 @@ const ChatCustomAction = ({ content }: ChatCustomActionProps) => {
                                     }
                                 />
                             </FormItem>
-                            <FormItem label="Please provide details: (optional)">
+                            <FormItem label={t('feedback.praiseLabel')}>
                                 <Input
                                     ref={detailInput}
                                     textArea
-                                    placeholder="What was unstatifying about this response?"
+                                    placeholder={t('feedback.blamePlaceholder')}
                                 />
                             </FormItem>
                         </>
@@ -172,14 +186,14 @@ const ChatCustomAction = ({ content }: ChatCustomActionProps) => {
                         type="button"
                         onClick={handleDialogClose}
                     >
-                        Cancel
+                        {t('feedback.cancel')}
                     </Button>
                     <Button
                         variant="solid"
                         type="submit"
                         onClick={handleSubmit}
                     >
-                        Submit
+                        {t('feedback.submit')}
                     </Button>
                 </div>
             </Dialog>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { useTranslations } from 'next-intl'
 import VacancyGenerationLoader from './_components/VacancyGenerationLoader'
 import VacancyRecommendations from './_components/VacancyRecommendations'
 import AssistantSuggestion from '@/components/shared/AssistantSuggestion'
@@ -16,6 +17,7 @@ import Container from '@/components/shared/Container'
 export default function VacanciesPage() {
     const searchParams = useSearchParams()
     const { data: session, status } = useSession()
+    const t = useTranslations('vacancies')
     const [isLoading, setIsLoading] = useState(true)
     const [showLoader, setShowLoader] = useState(true)
     const [personalRecommendations, setPersonalRecommendations] = useState<
@@ -282,7 +284,7 @@ export default function VacanciesPage() {
                 <div className="text-center">
                     <Spinner size={40} />
                     <p className="mt-4 text-gray-600 dark:text-gray-400">
-                        Загрузка...
+                        {t('loading.text')}
                     </p>
                 </div>
             </Container>
@@ -300,7 +302,7 @@ export default function VacanciesPage() {
             <div className="flex items-center justify-center min-h-[400px]">
                 <div className="text-center">
                     <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                        Ошибка загрузки
+                        {t('loading.error')}
                     </h2>
                     <p className="text-gray-600 dark:text-gray-400 mb-4">
                         {error}
@@ -309,7 +311,7 @@ export default function VacanciesPage() {
                         onClick={loadPersonalizedVacancies}
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
-                        Попробовать снова
+                        {t('loading.tryAgain')}
                     </button>
                 </div>
             </div>
@@ -336,7 +338,7 @@ export default function VacanciesPage() {
                 isVisible={showAssistantSuggestion}
                 onTakeAssessment={handleChooseAssessment}
                 onDismiss={handleDismissAssistant}
-                uncertaintyReason="Теперь, когда ваш профиль настроен, хотите пройти быстрый тест для более точных рекомендаций?"
+                uncertaintyReason={t('assistant.suggestion')}
             />
 
             {/* Assessment Choice Modal */}
