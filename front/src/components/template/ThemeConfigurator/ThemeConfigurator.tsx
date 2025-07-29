@@ -27,6 +27,7 @@ const ThemeConfigurator = ({ callBackClose }: ThemeConfiguratorProps) => {
                                 {t('darkMode.description')}
                             </span>
                         </div>
+                        <ModeSwitcher />
                     </div>
                     <div className="flex items-center justify-between">
                         <div>
