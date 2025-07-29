@@ -528,6 +528,54 @@
             "goToVacancies": "Перейти к вакансиям"
         }
     },
+    "themeConfig": {
+        "title": "Инструменты доступности",
+        "darkMode": {
+            "title": "Темный режим",
+            "description": "Переключить на темную тему"
+        },
+        "direction": {
+            "title": "Направление",
+            "description": "Выберите направление"
+        },
+        "theme": {
+            "title": "Тема"
+        },
+        "saveChanges": "Сохранить изменения",
+        "accessibilityTools": "Инструменты доступности",
+        "customizeYourExperience": "Настроить ваш опыт"
+    },
+    "accessibility": {
+        "title": "Помощник доступности",
+        "resetAllSettings": "Сбросить все настройки",
+        "emergencyReset": "Экстренный сброс:",
+        "content": {
+            "title": "Контент",
+            "biggerText": "Увеличить текст (+50%)",
+            "biggerCursor": "Увеличить курсор",
+            "tooltips": "Подсказки",
+            "lineHeight": "Высота строки",
+            "hideImages": "Скрыть изображения",
+            "clearFont": "Четкий шрифт",
+            "dyslexicFont": "Шрифт для дислексиков",
+            "letterSpacing": "Интервал между буквами",
+            "textMagnifier": "Увеличитель текста"
+        },
+        "colors": {
+            "title": "Цвета",
+            "invertColor": "Инвертировать цвета",
+            "brightness": "Яркость",
+            "contrast": "Контрастность",
+            "grayscale": "Оттенки серого",
+            "saturation": "Насыщенность"
+        },
+        "navigation": {
+            "title": "Навигация",
+            "readingLine": "Линия чтения",
+            "highlightLinks": "Выделить ссылки",
+            "pageRead": "Чтение страницы"
+        }
+    },
     "auth": {
         "signIn": {
             "title": "Добро пожаловать!",
