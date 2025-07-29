@@ -616,6 +616,54 @@
             "goToVacancies": "Вакансияларға өту"
         }
     },
+    "themeConfig": {
+        "title": "Қолжетімділік құралдары",
+        "darkMode": {
+            "title": "Қараңғы режим",
+            "description": "Тақырыпты қараңғы режимге ауыстыру"
+        },
+        "direction": {
+            "title": "Бағыт",
+            "description": "Бағытты таңдаңыз"
+        },
+        "theme": {
+            "title": "Тақырып"
+        },
+        "saveChanges": "Өзгерістерді сақтау",
+        "accessibilityTools": "Қолжетімділік құралдары",
+        "customizeYourExperience": "Қолдану жолын өзгертіңіз"
+    },
+    "accessibility": {
+        "title": "Қолжетімділік көмекшісі",
+        "resetAllSettings": "Барлық параметрлерді қалпына келтіру",
+        "emergencyReset": "Жедел қалпына келтіру:",
+        "content": {
+            "title": "Мазмұн",
+            "biggerText": "Мәтінді үлкейту (+50%)",
+            "biggerCursor": "Курсорды үлкейту",
+            "tooltips": "Кеңестер",
+            "lineHeight": "Жол биіктігі",
+            "hideImages": "Суреттерді жасыру",
+            "clearFont": "Анық қаріп",
+            "dyslexicFont": "Дислексиялық қаріп",
+            "letterSpacing": "Әріптер арасындағы аралық",
+            "textMagnifier": "Мәтін ұлғайтқышы"
+        },
+        "colors": {
+            "title": "Түстер",
+            "invertColor": "Түстерді кері айналдыру",
+            "brightness": "Жарықтық",
+            "contrast": "Контраст",
+            "grayscale": "Сұр түстер",
+            "saturation": "Қанықтық"
+        },
+        "navigation": {
+            "title": "Навигация",
+            "readingLine": "Оқу сызығы",
+            "highlightLinks": "Сілтемелерді ерекшелеу",
+            "pageRead": "Бетті оқу"
+        }
+    },
     "content": {
         "title": "Мүмкіндіктер",
         "sub": "\"Жұмыс іздеуге арналған мүмкіндіктер\"",

@@ -5,7 +5,19 @@ import ThemeContext from '@/components/template/Theme/ThemeContext'
 import { MODE_DARK, MODE_LIGHT } from '@/constants/theme.constant'
 import presetThemeSchemaConfig from '@/configs/preset-theme-schema.config'
 import applyTheme from '@/utils/applyThemeSchema'
-import type { Mode, Direction, LayoutType, Theme } from '@/@types/theme'
+import {
+    applyAccessibilitySettings,
+    enableReadingLine,
+    disableReadingLine,
+} from '@/utils/applyAccessibilitySettings'
+import { DEFAULT_ACCESSIBILITY_SETTINGS } from '@/constants/accessibility.constant'
+import type {
+    Mode,
+    Direction,
+    LayoutType,
+    Theme,
+    AccessibilitySettings,
+} from '@/@types/theme'
 
 type UseThemeReturnType = {
     setSchema: (schema: string) => void
@@ -14,6 +26,7 @@ type UseThemeReturnType = {
     setDirection: (direction: Direction) => void
     setPanelExpand: (panelExpand: boolean) => void
     setLayout: (layout: LayoutType) => void
+    setAccessibility: (accessibility: Partial<AccessibilitySettings>) => void
 } & Theme
 
 const useTheme = <T>(selector: (state: UseThemeReturnType) => T): T => {
@@ -56,6 +69,32 @@ const useTheme = <T>(selector: (state: UseThemeReturnType) => T): T => {
                 ...prevTheme,
                 layout: { ...prevTheme.layout, type: layout },
             }))
+        },
+        setAccessibility: (accessibility: Partial<AccessibilitySettings>) => {
+            const currentAccessibility =
+                context.theme.accessibility || DEFAULT_ACCESSIBILITY_SETTINGS
+
+            const newAccessibility = {
+                ...currentAccessibility,
+                ...accessibility,
+            }
+
+            context.setTheme((prevTheme) => ({
+                ...prevTheme,
+                accessibility: newAccessibility,
+            }))
+
+            // Apply accessibility settings to DOM
+            applyAccessibilitySettings(newAccessibility)
+
+            // Handle reading line separately
+            if (accessibility.readingLine !== undefined) {
+                if (accessibility.readingLine) {
+                    enableReadingLine()
+                } else {
+                    disableReadingLine()
+                }
+            }
         },
     })
 

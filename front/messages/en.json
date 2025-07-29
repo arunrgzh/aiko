@@ -672,5 +672,53 @@
             "completing": "Completing...",
             "goToVacancies": "Go to Vacancies"
         }
+    },
+    "themeConfig": {
+        "title": "Accessibility Tools",
+        "darkMode": {
+            "title": "Dark Mode",
+            "description": "Switch theme to dark mode"
+        },
+        "direction": {
+            "title": "Direction",
+            "description": "Select a direction"
+        },
+        "theme": {
+            "title": "Theme"
+        },
+        "saveChanges": "Save changes",
+        "accessibilityTools": "Accessibility Tools",
+        "customizeYourExperience": "Customize your experience"
+    },
+    "accessibility": {
+        "title": "Accessibility Assistant",
+        "resetAllSettings": "Reset all settings",
+        "emergencyReset": "Emergency reset:",
+        "content": {
+            "title": "Content",
+            "biggerText": "Bigger Text (+10%)",
+            "biggerCursor": "Bigger Cursor",
+            "tooltips": "Tooltips",
+            "lineHeight": "Line Height",
+            "hideImages": "Hide Images",
+            "clearFont": "Clear Font",
+            "dyslexicFont": "Dyslexic Font",
+            "letterSpacing": "Letter Spacing",
+            "textMagnifier": "Text Magnifier"
+        },
+        "colors": {
+            "title": "Colors",
+            "invertColor": "Invert color",
+            "brightness": "Brightness",
+            "contrast": "Contrast",
+            "grayscale": "Grayscale",
+            "saturation": "Saturation"
+        },
+        "navigation": {
+            "title": "Navigation",
+            "readingLine": "Reading Line",
+            "highlightLinks": "Highlight Links",
+            "pageRead": "Page Read"
+        }
     }
 }

@@ -3,46 +3,50 @@ import LayoutSwitcher from './LayoutSwitcher'
 import ThemeSwitcher from './ThemeSwitcher'
 import DirectionSwitcher from './DirectionSwitcher'
 import CopyButton from './CopyButton'
+import AccessibilityPanel from './AccessibilityPanel'
 import ScrollBar from '@/components/ui/ScrollBar'
+import { useTranslations } from 'next-intl'
 
 export type ThemeConfiguratorProps = {
     callBackClose?: () => void
 }
 
 const ThemeConfigurator = ({ callBackClose }: ThemeConfiguratorProps) => {
+    const t = useTranslations('themeConfig')
+
     return (
         <div className="flex flex-col h-full justify-between">
             <ScrollBar className="flex-1">
                 <div className="flex flex-col gap-y-6 md:gap-y-10 p-4 md:p-6">
                     <div className="flex items-center justify-between">
                         <div>
-                            <h6 className="text-sm md:text-base">Dark Mode</h6>
+                            <h6 className="text-sm md:text-base">
+                                {t('darkMode.title')}
+                            </h6>
                             <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                                Switch theme to dark mode
+                                {t('darkMode.description')}
                             </span>
                         </div>
-                        <ModeSwitcher />
                     </div>
                     <div className="flex items-center justify-between">
                         <div>
-                            <h6 className="text-sm md:text-base">Direction</h6>
+                            <h6 className="text-sm md:text-base">
+                                {t('direction.title')}
+                            </h6>
                             <span className="text-xs md:text-sm text-gray-500 dark:text-gray-400">
-                                Select a direction
+                                {t('direction.description')}
                             </span>
                         </div>
                         <DirectionSwitcher callBackClose={callBackClose} />
                     </div>
                     <div>
                         <h6 className="mb-2 md:mb-3 text-sm md:text-base">
-                            Theme
+                            {t('theme.title')}
                         </h6>
                         <ThemeSwitcher />
                     </div>
                     <div>
-                        <h6 className="mb-2 md:mb-3 text-sm md:text-base">
-                            Layout
-                        </h6>
-                        <LayoutSwitcher />
+                        <AccessibilityPanel />
                     </div>
                 </div>
             </ScrollBar>

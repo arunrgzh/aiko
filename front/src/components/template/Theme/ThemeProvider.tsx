@@ -1,9 +1,11 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import ThemeContext from './ThemeContext'
 import ConfigProvider from '@/components/ui/ConfigProvider'
 import appConfig from '@/configs/app.config'
 import applyTheme from '@/utils/applyThemeSchema'
+import { applyAccessibilitySettings } from '@/utils/applyAccessibilitySettings'
+import { DEFAULT_ACCESSIBILITY_SETTINGS } from '@/constants/accessibility.constant'
 import presetThemeSchemaConfig from '@/configs/preset-theme-schema.config'
 import type { Theme } from '@/@types/theme'
 import type { CommonProps } from '@/@types/common'
@@ -14,7 +16,20 @@ interface ThemeProviderProps extends CommonProps {
 }
 
 const ThemeProvider = ({ children, theme, locale }: ThemeProviderProps) => {
-    const [themeState, setThemeState] = useState<Theme>(theme)
+    // Ensure accessibility is always defined with fallback defaults
+    const initialTheme: Theme = {
+        ...theme,
+        accessibility: theme.accessibility || DEFAULT_ACCESSIBILITY_SETTINGS,
+    }
+
+    const [themeState, setThemeState] = useState<Theme>(initialTheme)
+
+    // Apply accessibility settings on mount and when they change
+    useEffect(() => {
+        if (typeof window !== 'undefined' && themeState.accessibility) {
+            applyAccessibilitySettings(themeState.accessibility)
+        }
+    }, [themeState.accessibility])
 
     const handleSetTheme = async (payload: (param: Theme) => Theme | Theme) => {
         const setTheme = async (theme: Theme) => {
