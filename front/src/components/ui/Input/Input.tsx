@@ -183,7 +183,7 @@ const Input = (props: InputProps) => {
             {prefix ? (
                 <div ref={prefixNode} className="input-suffix-start">
                     {' '}
-                    {prefix}{' '}
+                    {}{' '}
                 </div>
             ) : null}
             {renderInput}
