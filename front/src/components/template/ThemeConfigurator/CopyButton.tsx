@@ -4,11 +4,12 @@ import toast from '@/components/ui/toast'
 import { themeConfig } from '@/configs/theme.config'
 import useTheme from '@/utils/hooks/useTheme'
 import useResponsive from '@/utils/hooks/useResponsive'
+import { useTranslations } from 'next-intl'
 
 const CopyButton = () => {
     const theme = useTheme((state) => state)
     const { larger } = useResponsive()
-
+    const t = useTranslations('themeConfig')
     const handleCopy = () => {
         const config = {
             ...themeConfig,
@@ -47,7 +48,7 @@ export const themeConfig: ThemeConfig = ${JSON.stringify(config, null, 2)}
             size={larger.md ? 'md' : 'sm'}
             className="text-sm md:text-base h-8 md:h-10"
         >
-            Copy config
+            {t('saveChanges')}
         </Button>
     )
 }
