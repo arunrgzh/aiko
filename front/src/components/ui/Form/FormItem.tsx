@@ -41,7 +41,7 @@ const FormItem = (props: FormItemProps) => {
     const formContext = useForm()
     const { controlSize } = useConfig()
 
-    const formItemLabelHeight = size || formContext?.size || controlSize
+    const formItemLabelHeight = size || formContext?.size || controlSize || 'md'
     const formItemLabelWidth = labelWidth || formContext?.labelWidth
     const formItemLayout = layout || formContext?.layout || 'vertical'
 
@@ -49,14 +49,14 @@ const FormItem = (props: FormItemProps) => {
         switch (formItemLayout) {
             case LAYOUT.HORIZONTAL:
                 return label
-                    ? `${CONTROL_SIZES[formItemLabelHeight].h} ${
+                    ? `${CONTROL_SIZES[formItemLabelHeight as keyof typeof CONTROL_SIZES]?.h || 'h-12'} ${
                           label && 'ltr:pr-2 rtl:pl-2'
                       }`
                     : 'ltr:pr-2 rtl:pl-2'
             case LAYOUT.VERTICAL:
                 return `mb-2`
             case LAYOUT.INLINE:
-                return `${CONTROL_SIZES[formItemLabelHeight].h} ${
+                return `${CONTROL_SIZES[formItemLabelHeight as keyof typeof CONTROL_SIZES]?.h || 'h-12'} ${
                     label && 'ltr:pr-2 rtl:pl-2'
                 }`
             default:

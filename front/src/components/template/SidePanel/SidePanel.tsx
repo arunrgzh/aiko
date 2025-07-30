@@ -68,7 +68,7 @@ const _SidePanel = (props: SidePanelProps) => {
                     className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 
                                bg-gray-900 text-white text-xs px-2 py-1 rounded-md
                                opacity-0 group-hover:opacity-100 transition-opacity duration-200
-                               whitespace-nowrap pointer-events-none z-50
+                               whitespace-nowrap pointer-events-none z-60
                                shadow-lg"
                 >
                     <div className="font-semibold">

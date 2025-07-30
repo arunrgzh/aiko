@@ -1,6 +1,8 @@
 import { useMemo, lazy, type JSX } from 'react'
 import type { CommonProps } from '@/@types/common'
 import type { LazyExoticComponent } from 'react'
+import LanguageSelector from '@/components/template/LanguageSelector'
+import SidePanel from '@/components/template/SidePanel/SidePanel'
 
 type LayoutType = 'simple' | 'split' | 'side'
 
@@ -22,7 +24,17 @@ const AuthLayout = ({ children }: CommonProps) => {
         return layouts[currentLayoutType]
     }, [])
 
-    return <Layout>{children}</Layout>
+    return (
+        <>
+            <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-2">
+                <SidePanel />
+                <div className="bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg border border-gray-200 dark:border-gray-700">
+                    <LanguageSelector />
+                </div>
+            </div>
+            <Layout>{children}</Layout>
+        </>
+    )
 }
 
 export default AuthLayout

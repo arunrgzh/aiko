@@ -45,7 +45,7 @@ const Progress = (props: ProgressProps) => {
         }
         return (
             <span className={`progress-info heading-text font-bold ${variant}`}>
-                {customInfo || `${percent}%`}
+                {customInfo || `${Math.round(percent)}%`}
             </span>
         )
     }

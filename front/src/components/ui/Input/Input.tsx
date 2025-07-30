@@ -60,7 +60,8 @@ const Input = (props: InputProps) => {
     const formItemInvalid = useFormItem()?.invalid
     const inputGroupSize = useInputGroup()?.size
 
-    const inputSize = size || inputGroupSize || formControlSize || controlSize
+    const inputSize =
+        size || inputGroupSize || formControlSize || controlSize || 'md'
 
     const isInputInvalid = invalid || formItemInvalid
 
@@ -79,7 +80,7 @@ const Input = (props: InputProps) => {
     }
 
     const inputDefaultClass = 'input'
-    const inputSizeClass = `input-${inputSize} ${CONTROL_SIZES[inputSize].h}`
+    const inputSizeClass = `input-${inputSize} ${CONTROL_SIZES[inputSize as keyof typeof CONTROL_SIZES]?.h || 'h-12'}`
     const inputFocusClass = `focus:ring-primary focus-within:ring-primary focus-within:border-primary focus:border-primary`
     const inputWrapperClass = classNames(
         'input-wrapper',

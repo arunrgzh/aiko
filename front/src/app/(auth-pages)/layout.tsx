@@ -1,10 +1,10 @@
 import { ReactNode } from 'react'
-import Simple from '@/components/layouts/AuthLayout/Simple'
+import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
 
 const Layout = ({ children }: { children: ReactNode }) => {
     return (
         <div className="flex flex-auto flex-col h-[100vh]">
-            <Simple>{children}</Simple>
+            <AuthLayout>{children}</AuthLayout>
         </div>
     )
 }

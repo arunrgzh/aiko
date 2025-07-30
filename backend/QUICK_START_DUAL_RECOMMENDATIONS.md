@@ -33,8 +33,8 @@ docker run -d -p 6379:6379 redis:alpine
 
 ```bash
 # backend/.env
-CELERY_BROKER_URL=redis://20.67.232.168:6379/0
-CELERY_RESULT_BACKEND=redis://20.67.232.168:6379/0
+CELERY_BROKER_URL=redis://localhost:6379/0
+CELERY_RESULT_BACKEND=redis://localhost:6379/0
 ```
 
 ### 4. Запуск сервисов
@@ -73,10 +73,10 @@ npm run dev
 
 ```bash
 # Здоровье сервиса
-curl http://20.67.232.168:8000/health
+curl http://localhost:8000/health
 
 # Получение рекомендаций (нужна авторизация)
-curl -X GET "http://20.67.232.168:8000/api/enhanced-jobs/dual-recommendations" \
+curl -X GET "http://localhost:8000/api/enhanced-jobs/dual-recommendations" \
      -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -84,11 +84,11 @@ curl -X GET "http://20.67.232.168:8000/api/enhanced-jobs/dual-recommendations" \
 
 ```bash
 # Для текущего пользователя
-curl -X POST "http://20.67.232.168:8000/api/enhanced-jobs/trigger-update" \
+curl -X POST "http://localhost:8000/api/enhanced-jobs/trigger-update" \
      -H "Authorization: Bearer YOUR_TOKEN"
 
 # Статус задачи
-curl -X GET "http://20.67.232.168:8000/api/enhanced-jobs/task-status/TASK_ID" \
+curl -X GET "http://localhost:8000/api/enhanced-jobs/task-status/TASK_ID" \
      -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -98,7 +98,7 @@ curl -X GET "http://20.67.232.168:8000/api/enhanced-jobs/task-status/TASK_ID" \
 # Flower UI
 celery -A celery_app flower
 
-# Открыть: http://20.67.232.168:5555
+# Открыть: http://localhost:5555
 ```
 
 ## 📋 Структура ответа API

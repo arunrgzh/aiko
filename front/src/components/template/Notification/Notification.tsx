@@ -53,12 +53,19 @@ const _Notification = ({ className }: { className?: string }) => {
     const router = useRouter()
 
     const getNotificationCount = async () => {
-        const resp = await apiGetNotificationCount()
-        if (resp.count > 0) {
-            setNoResult(false)
-            setUnreadNotification(true)
-        } else {
+        try {
+            const resp = await apiGetNotificationCount()
+            if (resp.count > 0) {
+                setNoResult(false)
+                setUnreadNotification(true)
+            } else {
+                setNoResult(true)
+            }
+        } catch (error) {
+            // Handle authentication errors gracefully
+            console.log('📱 Notifications unavailable (user not authenticated)')
             setNoResult(true)
+            setUnreadNotification(false)
         }
     }
 
@@ -69,9 +76,17 @@ const _Notification = ({ className }: { className?: string }) => {
     const onNotificationOpen = async () => {
         if (notificationList.length === 0) {
             setLoading(true)
-            const resp = await apiGetNotificationList()
-            setLoading(false)
-            setNotificationList(resp)
+            try {
+                const resp = await apiGetNotificationList()
+                setNotificationList(resp)
+            } catch (error) {
+                console.log(
+                    '📱 Failed to load notifications (user not authenticated)',
+                )
+                setNotificationList([])
+            } finally {
+                setLoading(false)
+            }
         }
     }
 
