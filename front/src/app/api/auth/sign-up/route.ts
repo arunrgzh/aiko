@@ -15,9 +15,9 @@ export async function POST(req: NextRequest) {
         }
 
         const apiUrl = appConfig.apiUrl
-        console.log('Calling backend URL:', `${apiUrl}/api/auth/register`)
+        console.log('Calling backend URL:', `${apiUrl}/auth/register`)
 
-        const res = await fetch(`${apiUrl}/api/auth/register`, {
+        const res = await fetch(`${apiUrl}/auth/register`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
