@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     redis_url: Optional[str] = None
 
     # Frontend
-    frontend_url: str = "http://localhost:3000"
+    frontend_url: str = "http://20.67.232.168:3000"
 
     # Azure OpenAI API (используем ваши переменные из azure_test.py)
     azure_openai_api_key: Optional[str] = None
