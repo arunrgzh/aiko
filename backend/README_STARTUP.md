@@ -52,10 +52,10 @@ python run.py
 
 Once the server is running, you can access:
 
--   **Swagger UI**: http://20.67.232.168:8000/docs
--   **ReDoc**: http://20.67.232.168:8000/redoc
--   **OpenAPI JSON**: http://20.67.232.168:8000/openapi.json
--   **Health Check**: http://20.67.232.168:8000/health
+-   **Swagger UI**: https://ai-komekshi.site/api/docs
+-   **ReDoc**: https://ai-komekshi.site/api/redoc
+-   **OpenAPI JSON**: https://ai-komekshi.site/api/openapi.json
+-   **Health Check**: https://ai-komekshi.site/api/health
 
 ## Common Issues and Solutions
 

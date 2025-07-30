@@ -25,10 +25,10 @@ Make sure your frontend is calling the correct backend URL:
 
 ```javascript
 // ✅ Correct URLs
-const API_BASE = 'http://20.67.232.168:8000'
+const API_BASE = 'https://ai-komekshi.site/api'
 
 // Frontend should call:
-POST http://20.67.232.168:8000/main/assistants/1/chat
+POST https://ai-komekshi.site/api/main/assistants/1/chat
 ```
 
 ### 2. **Fix Authentication Headers**
@@ -125,7 +125,7 @@ async function testChatAPI() {
     try {
         // 1. Login first
         const loginResponse = await fetch(
-            'http://20.67.232.168:8000/api/auth/login',
+            'https://ai-komekshi.site/api/api/auth/login',
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -142,7 +142,7 @@ async function testChatAPI() {
 
         // 2. Test chat
         const chatResponse = await fetch(
-            'http://20.67.232.168:8000/main/assistants/1/chat',
+            'https://ai-komekshi.site/api/main/assistants/1/chat',
             {
                 method: 'POST',
                 headers: {
@@ -248,7 +248,8 @@ const sendMessage = useCallback(
 
 ```javascript
 // Make sure your frontend has correct API URL
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://20.67.232.168:8000'
+const API_BASE =
+    process.env.NEXT_PUBLIC_API_URL || 'https://ai-komekshi.site/api'
 ```
 
 ### Fix #2: CORS Check
