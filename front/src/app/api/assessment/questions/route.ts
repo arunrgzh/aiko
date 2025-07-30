@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import getServerSession from '@/server/actions/auth/getServerSession'
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://REDACTED:8000'
+const BACKEND_URL = process.env.BACKEND_URL || 'https://ai-komekshi.site/api'
 
 export async function GET(request: NextRequest) {
     try {

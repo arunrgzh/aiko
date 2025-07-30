@@ -53,15 +53,15 @@
 
     ```env
     # Backend API URL
-    NEXT_PUBLIC_API_URL=http://REDACTED:8000
+    NEXT_PUBLIC_API_URL=https://ai-komekshi.site/api
 
     # NextAuth Configuration
     NEXTAUTH_SECRET=your-nextauth-secret-key-here-make-it-long-and-random
     NEXTAUTH_URL=http://REDACTED:3000
 
     # Backend URL for server-side requests
-    API_URL=http://REDACTED:8000/
-    BACKEND_URL=http://REDACTED:8000
+    API_URL=https://ai-komekshi.site/api/
+    BACKEND_URL=https://ai-komekshi.site/api
     ```
 
 3. **Запустите фронтенд:**

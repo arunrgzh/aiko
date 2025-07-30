@@ -350,11 +350,11 @@ celery -A celery_app flower
 
 ```bash
 # Тест API
-curl -X GET "http://REDACTED:8000/api/enhanced-jobs/dual-recommendations" \
+curl -X GET "https://ai-komekshi.site/api/api/enhanced-jobs/dual-recommendations" \
      -H "Authorization: Bearer YOUR_TOKEN"
 
 # Тест задач
-curl -X POST "http://REDACTED:8000/api/enhanced-jobs/trigger-update" \
+curl -X POST "https://ai-komekshi.site/api/api/enhanced-jobs/trigger-update" \
      -H "Authorization: Bearer YOUR_TOKEN"
 ```
 

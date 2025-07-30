@@ -10,9 +10,9 @@ export type AppConfig = {
 }
 
 const appConfig: AppConfig = {
-    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://REDACTED:8000',
+    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'https://ai-komekshi.site/api',
     apiPrefix:
-        process.env.NEXT_PUBLIC_API_BASE_URL || 'http://REDACTED:8000',
+        process.env.NEXT_PUBLIC_API_BASE_URL || 'https://ai-komekshi.site/api',
     authenticatedEntryPath: '/main/dashboard',
     unAuthenticatedEntryPath: '/landing',
     signInEntryPath: '/sign-in',

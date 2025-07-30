@@ -6,7 +6,7 @@ Test script to specifically test the chat API functionality
 import requests
 import json
 
-BASE_URL = "http://REDACTED:8000"
+BASE_URL = "https://ai-komekshi.site/api"
 
 def test_chat_flow():
     """Test complete chat flow"""
