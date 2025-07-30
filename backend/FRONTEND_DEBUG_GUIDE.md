@@ -6,8 +6,8 @@ Your backend is 100% working. The issue is your **frontend authentication**.
 
 Console errors show:
 
--   ❌ `GET http://REDACTED:8000/notifications/count 401 (Unauthorized)`
--   ❌ `GET http://REDACTED:8000/main/assistants/1 401 (Unauthorized)`
+-   ❌ `GET https://ai-komekshi.site/api/notifications/count 401 (Unauthorized)`
+-   ❌ `GET https://ai-komekshi.site/api/main/assistants/1 401 (Unauthorized)`
 
 ## Step-by-Step Fix
 
@@ -40,14 +40,17 @@ Run this in browser console on your frontend:
 ```javascript
 // Test login and token saving
 async function testLogin() {
-    const response = await fetch('http://REDACTED:8000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            username: 'testuser123',
-            password: 'testpassword123',
-        }),
-    })
+    const response = await fetch(
+        'https://ai-komekshi.site/api/api/auth/login',
+        {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                username: 'testuser123',
+                password: 'testpassword123',
+            }),
+        }
+    )
 
     const data = await response.json()
     console.log('Login response:', data)
@@ -71,7 +74,7 @@ async function testProtectedEndpoint() {
     }
 
     const response = await fetch(
-        'http://REDACTED:8000/notifications/count',
+        'https://ai-komekshi.site/api/notifications/count',
         {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -155,7 +158,7 @@ Make sure they're:
 
 1. ✅ Saving JWT token after login
 2. ✅ Including `Authorization: Bearer ${token}` in ALL API requests
-3. ✅ Using the correct backend URL (`http://REDACTED:8000`)
+3. ✅ Using the correct backend URL (`https://ai-komekshi.site/api`)
 
 ### 6. **Quick Frontend Test**
 
@@ -168,7 +171,7 @@ export function AuthTest() {
         try {
             // Test login
             const loginResp = await fetch(
-                'http://REDACTED:8000/api/auth/login',
+                'https://ai-komekshi.site/api/api/auth/login',
                 {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -182,7 +185,7 @@ export function AuthTest() {
 
             // Test protected endpoint
             const protectedResp = await fetch(
-                'http://REDACTED:8000/notifications/count',
+                'https://ai-komekshi.site/api/notifications/count',
                 {
                     headers: { Authorization: `Bearer ${access_token}` },
                 }

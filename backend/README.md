@@ -57,9 +57,9 @@ npm run dev
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Сервер будет доступен по адресу: http://REDACTED:8000
+Сервер будет доступен по адресу: https://ai-komekshi.site/api
 
-API документация (Swagger): http://REDACTED:8000/docs
+API документация (Swagger): https://ai-komekshi.site/api/docs
 
 ## Структура API
 

@@ -124,7 +124,7 @@ FRONTEND_URL=http://REDACTED:3000
 ## Next Steps
 
 1. **Start the server**: `python start_server.py`
-2. **Test in browser**: Go to http://REDACTED:8000/docs
+2. **Test in browser**: Go to https://ai-komekshi.site/api/docs
 3. **Register a user** via Swagger UI or API call
 4. **Test protected endpoints** with the JWT token
 

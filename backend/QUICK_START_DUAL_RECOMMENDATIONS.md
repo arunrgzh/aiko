@@ -73,10 +73,10 @@ npm run dev
 
 ```bash
 # Здоровье сервиса
-curl http://REDACTED:8000/health
+curl https://ai-komekshi.site/api/health
 
 # Получение рекомендаций (нужна авторизация)
-curl -X GET "http://REDACTED:8000/api/enhanced-jobs/dual-recommendations" \
+curl -X GET "https://ai-komekshi.site/api/api/enhanced-jobs/dual-recommendations" \
      -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
@@ -84,11 +84,11 @@ curl -X GET "http://REDACTED:8000/api/enhanced-jobs/dual-recommendations" \
 
 ```bash
 # Для текущего пользователя
-curl -X POST "http://REDACTED:8000/api/enhanced-jobs/trigger-update" \
+curl -X POST "https://ai-komekshi.site/api/api/enhanced-jobs/trigger-update" \
      -H "Authorization: Bearer YOUR_TOKEN"
 
 # Статус задачи
-curl -X GET "http://REDACTED:8000/api/enhanced-jobs/task-status/TASK_ID" \
+curl -X GET "https://ai-komekshi.site/api/api/enhanced-jobs/task-status/TASK_ID" \
      -H "Authorization: Bearer YOUR_TOKEN"
 ```
 
