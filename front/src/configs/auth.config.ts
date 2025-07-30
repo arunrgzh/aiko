@@ -10,7 +10,8 @@ type FastAPIAuthResponse = {
 }
 type AccessPayload = { sub: string; exp: number }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://ai-komekshi.site/api'
+const API_URL =
+    process.env.NEXT_PUBLIC_API_URL || 'https://ai-komekshi.site/api'
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
     const res = await fetch(`${API_URL}/api/auth/refresh`, {
@@ -153,6 +154,8 @@ export const authOptions: NextAuthConfig = {
 
     pages: {
         signIn: '/sign-in',
+        // Removed error page since /auth/error doesn't exist
+        // NextAuth will use its default error handling
     },
     logger: {
         error(code, ...message) {
