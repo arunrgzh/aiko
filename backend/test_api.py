@@ -6,7 +6,7 @@ Simple test script to verify API endpoints are working
 import requests
 import json
 
-BASE_URL = "http://REDACTED:8000"
+BASE_URL = "http://localhost:8000"
 
 def test_health():
     """Test health endpoint"""

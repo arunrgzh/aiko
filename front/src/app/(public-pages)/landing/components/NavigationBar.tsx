@@ -12,6 +12,7 @@ import type { Mode } from '@/@types/theme'
 import { useRouter } from 'next/navigation'
 import Button from '@/components/ui/Button'
 import LanguageSelector from '@/components/template/LanguageSelector'
+import SidePanel from '@/components/template/SidePanel/SidePanel'
 
 type NavigationProps = {
     toggleMode: () => void
@@ -110,6 +111,7 @@ const Navigation = ({ toggleMode, mode }: NavigationProps) => {
                     <NavList tabs={navMenu} />
                 </div>
                 <div className="flex items-center gap-2">
+                    <SidePanel />
                     <button
                         className="relative flex cursor-pointer items-center justify-center rounded-xl p-2 text-neutral-500 hover:shadow-input dark:text-neutral-500"
                         onClick={toggleMode}
