@@ -10,14 +10,13 @@ export type AppConfig = {
 }
 
 const appConfig: AppConfig = {
-    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://REDACTED:8000',
-    apiPrefix:
-        process.env.NEXT_PUBLIC_API_BASE_URL || 'http://REDACTED:8000',
+    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
+    apiPrefix: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000',
     authenticatedEntryPath: '/main/dashboard',
     unAuthenticatedEntryPath: '/landing',
     signInEntryPath: '/sign-in',
     onboardingPath: '/onboarding',
-    locale: 'kz',
+    locale: 'ru',
     activeNavTranslation: true,
 }
 

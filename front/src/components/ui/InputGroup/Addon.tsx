@@ -19,11 +19,11 @@ const Addon = ({ ref, ...props }: AddonProps) => {
     const inputGroupSize = useInputGroup()?.size
 
     const inputAddonSize =
-        size || inputGroupSize || formControlSize || controlSize
+        size || inputGroupSize || formControlSize || controlSize || 'md'
 
     const addonClass = classNames(
         'input-addon',
-        `input-addon-${inputAddonSize} ${CONTROL_SIZES[inputAddonSize].h}`,
+        `input-addon-${inputAddonSize} ${CONTROL_SIZES[inputAddonSize as keyof typeof CONTROL_SIZES]?.h || 'h-12'}`,
         className,
     )
 

@@ -639,6 +639,21 @@
             "description": "Complete onboarding or testing to see detailed information about your skills and preferences.",
             "onboarding": "Complete Onboarding",
             "test": "Take Test"
+        },
+        "summary": {
+            "title": "Profile Summary",
+            "updated": "Last updated",
+            "source": "Source",
+            "assessment": "Assessment results",
+            "onboarding": "Onboarding data"
+        },
+        "assessment": {
+            "title": "Assessment Results",
+            "score": "Overall Score",
+            "strengths": "Strengths",
+            "improvement": "Areas for Improvement",
+            "strengthsAnalysis": "Strengths Analysis",
+            "improvementSuggestions": "Improvement Suggestions"
         }
     },
     "assessment": {

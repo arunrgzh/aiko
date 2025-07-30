@@ -5,6 +5,7 @@ import { Progress } from '@/components/ui/Progress'
 import { motion } from 'framer-motion'
 import Container from '@/components/shared/Container'
 import LanguageSelector from '@/components/template/LanguageSelector'
+import SidePanel from '@/components/template/SidePanel/SidePanel'
 
 interface OnboardingLayoutProps {
     children: ReactNode
@@ -38,9 +39,12 @@ const OnboardingLayout = memo(
 
         return (
             <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-200 dark:from-gray-900 dark:to-gray-800">
-                {/* Language Selector positioned in top right */}
-                <div className="fixed top-4 right-4 z-50 bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg border border-gray-200 dark:border-gray-700">
-                    <LanguageSelector />
+                {/* Language Selector and Accessibility Panel positioned in bottom right */}
+                <div className="fixed bottom-4 right-4 z-40 flex flex-col items-end gap-2">
+                    <SidePanel />
+                    <div className="bg-white dark:bg-gray-800 rounded-full p-2 shadow-lg border border-gray-200 dark:border-gray-700">
+                        <LanguageSelector />
+                    </div>
                 </div>
 
                 <Container>

@@ -6,7 +6,7 @@ Test script for Assessment and Onboarding API functionality
 import requests
 import json
 
-BASE_URL = "http://REDACTED:8000"
+BASE_URL = "http://localhost:8000"
 
 def test_assessment_flow():
     """Test complete assessment flow"""
@@ -265,4 +265,4 @@ if __name__ == "__main__":
         
     except Exception as e:
         print(f"\n❌ Test failed with error: {e}")
-        print("Make sure the server is running on http://REDACTED:8000") 
+        print("Make sure the server is running on http://localhost:8000") 
