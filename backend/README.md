@@ -25,7 +25,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 REFRESH_TOKEN_EXPIRE_DAYS=7
 
 # Frontend
-FRONTEND_URL=http://localhost:3000
+FRONTEND_URL=http://REDACTED:3000
 
 # OpenAI API (получите ключ на https://platform.openai.com/api-keys)
 OPENAI_API_KEY=sk-your-openai-api-key-here
@@ -57,9 +57,9 @@ npm run dev
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Сервер будет доступен по адресу: http://localhost:8000
+Сервер будет доступен по адресу: http://REDACTED:8000
 
-API документация (Swagger): http://localhost:8000/docs
+API документация (Swagger): http://REDACTED:8000/docs
 
 ## Структура API
 
