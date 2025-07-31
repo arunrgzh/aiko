@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const response = await fetch(`${BACKEND_URL}/jobs/debug/skills`, {
+        const response = await fetch(`${BACKEND_URL}/assessment/results`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -21,14 +21,13 @@ export async function GET(request: NextRequest) {
 
         if (!response.ok) {
             const error = await response.json()
-            console.error('Backend debug skills error:', error)
             return NextResponse.json(error, { status: response.status })
         }
 
         const result = await response.json()
         return NextResponse.json(result)
     } catch (error) {
-        console.error('Error fetching debug skills:', error)
+        console.error('Error fetching assessment results:', error)
         return NextResponse.json(
             { error: 'Internal server error' },
             { status: 500 },
