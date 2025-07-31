@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
         }
 
         const response = await fetch(
-            `${BACKEND_URL}/api/assessment/profile-summary`,
+            `${BACKEND_URL}/assessment/profile-summary`,
             {
                 method: 'GET',
                 headers: {
