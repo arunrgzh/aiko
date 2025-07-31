@@ -54,11 +54,11 @@ services:
             dockerfile: Dockerfile
         container_name: ai_komekshi_frontend
         environment:
-            - NEXT_PUBLIC_API_URL=http://localhost:8000/api
-            - NEXT_PUBLIC_API_BASE_URL=http://localhost:8000/api
+            - NEXT_PUBLIC_API_URL=https://ai-komekshi.site/api
+            - NEXT_PUBLIC_API_BASE_URL=https://ai-komekshi.site/api
             - BACKEND_URL=http://backend:8000/api
             - NEXTAUTH_SECRET=your-nextauth-secret-change-this-in-production
-            - NEXTAUTH_URL=http://localhost:3000
+            - NEXTAUTH_URL=https://ai-komekshi.site
         ports:
             - '3000:3000'
         depends_on:
