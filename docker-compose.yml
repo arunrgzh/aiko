@@ -30,7 +30,7 @@ services:
             dockerfile: Dockerfile
         container_name: ai_komekshi_backend
         env_file:
-            - .env.production
+            - ./backend/.env.production
         ports:
             - '8000:8000'
         depends_on:
@@ -48,7 +48,7 @@ services:
             dockerfile: Dockerfile
         container_name: ai_komekshi_frontend
         env_file:
-            - .env.production
+            - ./front/.env.production
         ports:
             - '3000:3000'
         depends_on:
