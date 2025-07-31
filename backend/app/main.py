@@ -37,11 +37,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-<<<<<<< HEAD
-    allow_origins=["http://REDACTED:3000", "http://127.0.0.1:3000", "http://REDACTED:3000", settings.frontend_url],
-=======
     allow_origins=origins,
->>>>>>> 3abd56210396aa4ab1007ed780052fdf73c363e5
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
