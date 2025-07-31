@@ -4,7 +4,7 @@ import Header from '@/components/template/Header'
 import SidePanel from '@/components/template/SidePanel'
 import UserProfileDropdown from '@/components//template/UserProfileDropdown'
 import LanguageSelector from '@/components/template/LanguageSelector'
-import Notification from '@/components/template/Notification'
+import ThemeToggle from '@/components/template/ThemeToggle'
 import HeaderLogo from '@/components/template/HeaderLogo'
 import Search from '@/components/template/Search'
 import MobileNav from '@/components/template/MobileNav'
@@ -19,16 +19,20 @@ import useNavigation from '@/utils/hooks/useNavigation'
 import { NavigationTree } from '@/@types/navigation'
 
 interface ContentOverlayProps extends CommonProps {
-    withSidePanel?: boolean,
-    isMainPages?: boolean,
+    withSidePanel?: boolean
+    isMainPages?: boolean
 }
 
-const ContentOverlay = ({ children, withSidePanel = true, isMainPages= false }: ContentOverlayProps) => {
+const ContentOverlay = ({
+    children,
+    withSidePanel = true,
+    isMainPages = false,
+}: ContentOverlayProps) => {
     const { isSticky } = useScrollTop()
     const navigation = useNavigation()
-    const navigationTree: NavigationTree[] = isMainPages ?
-        navigation.navigationTree.filter(tree => tree.key !== 'assistants')
-        : navigation.navigationTree;
+    const navigationTree: NavigationTree[] = isMainPages
+        ? navigation.navigationTree.filter((tree) => tree.key !== 'assistants')
+        : navigation.navigationTree
 
     return (
         <LayoutBase
@@ -122,12 +126,14 @@ const ContentOverlay = ({ children, withSidePanel = true, isMainPages= false }: 
                                 />
                             </>
                         }
-                        headerMiddle={<HorizontalNav navigationTree={navigationTree} />}
+                        headerMiddle={
+                            <HorizontalNav navigationTree={navigationTree} />
+                        }
                         headerEnd={
                             <>
                                 <Search />
                                 <LanguageSelector />
-                                <Notification />
+                                <ThemeToggle />
                                 {withSidePanel && <SidePanel />}
                                 <UserProfileDropdown hoverable={false} />
                             </>

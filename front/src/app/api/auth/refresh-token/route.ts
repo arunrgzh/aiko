@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
         const { refreshToken } = (await req.json()) as RefreshRequest
 
         const res = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/auth/refresh`,
+            `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/auth/refresh`,
             {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
