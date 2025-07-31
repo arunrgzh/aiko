@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
             searchParams.get('assessment_type') || 'skills_assessment'
 
         const response = await fetch(
-            `${BACKEND_URL}/api/assessment/questions?assessment_type=${assessmentType}`,
+            `${BACKEND_URL}/assessment/questions?assessment_type=${assessmentType}`,
             {
                 method: 'GET',
                 headers: {

@@ -14,7 +14,7 @@ const API_URL =
     process.env.NEXT_PUBLIC_API_URL || 'https://ai-komekshi.site/api'
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
-    const res = await fetch(`${API_URL}/api/auth/refresh`, {
+    const res = await fetch(`${API_URL}/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh_token: token.refreshToken }),
@@ -48,7 +48,7 @@ export const authOptions: NextAuthConfig = {
             async authorize(credentials): Promise<User | null> {
                 if (!credentials) return null
 
-                const res = await fetch(`${API_URL}/api/auth/login`, {
+                const res = await fetch(`${API_URL}/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

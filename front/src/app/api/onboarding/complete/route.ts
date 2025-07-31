@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
         const data = await request.json()
 
-        const response = await fetch(`${BACKEND_URL}/api/onboarding/complete`, {
+        const response = await fetch(`${BACKEND_URL}/onboarding/complete`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
