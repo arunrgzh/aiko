@@ -4,7 +4,7 @@ import Header from '@/components/template/Header'
 import SidePanel from '@/components/template/SidePanel'
 import UserProfileDropdown from '@/components//template/UserProfileDropdown'
 import LanguageSelector from '@/components/template/LanguageSelector'
-import Notification from '@/components/template/Notification'
+import ThemeToggle from '@/components/template/ThemeToggle'
 import HeaderLogo from '@/components/template/HeaderLogo'
 import Search from '@/components/template/Search'
 import MobileNav from '@/components/template/MobileNav'
@@ -112,12 +112,16 @@ const ContentOverlay = ({ children }: CommonProps) => {
                                 />
                             </>
                         }
-                        headerMiddle={<HorizontalNav navigationTree={navigation.navigationTree} />}
+                        headerMiddle={
+                            <HorizontalNav
+                                navigationTree={navigation.navigationTree}
+                            />
+                        }
                         headerEnd={
                             <>
                                 <Search />
                                 <LanguageSelector />
-                                <Notification />
+                                <ThemeToggle />
                                 <SidePanel />
                                 <UserProfileDropdown hoverable={false} />
                             </>

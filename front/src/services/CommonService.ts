@@ -1,38 +1,14 @@
 import ApiService from './ApiService'
 
-export async function apiGetNotificationCount() {
+export async function apiGetSearchResult() {
     return ApiService.fetchDataWithAxios<{
-        count: number
+        query: string
+        category: string
+        title: string
+        content: string
+        url: string
     }>({
-        url: '/notifications/count',
-        method: 'get',
-    })
-}
-
-export async function apiGetNotificationList() {
-    return ApiService.fetchDataWithAxios<
-        {
-            id: string
-            target: string
-            description: string
-            date: string
-            image: string
-            type: number
-            location: string
-            locationLabel: string
-            status: string
-            readed: boolean
-        }[]
-    >({
-        url: '/notifications',
-        method: 'get',
-    })
-}
-
-export async function apiGetSearchResult<T>(params: { query: string }) {
-    return ApiService.fetchDataWithAxios<T>({
         url: '/search',
         method: 'get',
-        params,
     })
 }

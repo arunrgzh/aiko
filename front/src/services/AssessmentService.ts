@@ -69,7 +69,7 @@ class AssessmentService {
                 questions: AssessmentQuestion[]
                 total_questions: number
             }>({
-                url: `/api/assessment/questions?assessment_type=${assessmentType}`,
+                url: `/assessment/questions?assessment_type=${assessmentType}`,
                 method: 'get',
             })
             return response
@@ -85,7 +85,7 @@ class AssessmentService {
     ): Promise<AssessmentResult> {
         try {
             const response = await ApiService.fetchData<AssessmentResult>({
-                url: '/api/assessment/submit',
+                url: '/assessment/submit',
                 method: 'post',
                 data: {
                     answers,
@@ -102,7 +102,7 @@ class AssessmentService {
     static async getResults(): Promise<AssessmentResult[]> {
         try {
             const response = await ApiService.fetchData<AssessmentResult[]>({
-                url: '/api/assessment/results',
+                url: '/assessment/results',
                 method: 'get',
             })
             return response
@@ -115,7 +115,7 @@ class AssessmentService {
     static async getResult(assessmentId: number): Promise<AssessmentResult> {
         try {
             const response = await ApiService.fetchData<AssessmentResult>({
-                url: `/api/assessment/results/${assessmentId}`,
+                url: `/assessment/results/${assessmentId}`,
                 method: 'get',
             })
             return response
@@ -128,7 +128,7 @@ class AssessmentService {
     static async getProfileSummary(): Promise<ProfileSummary | null> {
         try {
             const response = await ApiService.fetchData<ProfileSummary | null>({
-                url: '/api/assessment/profile-summary',
+                url: '/assessment/profile-summary',
                 method: 'get',
             })
             return response
@@ -151,7 +151,7 @@ class AssessmentService {
                 action: string
                 assessment_url?: string
             }>({
-                url: '/api/onboarding/assessment-option',
+                url: '/onboarding/assessment-option',
                 method: 'post',
                 data: option as unknown as Record<string, unknown>,
             })
