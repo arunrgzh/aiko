@@ -26,11 +26,20 @@ app = FastAPI(
 )
 
 # Add CORS middleware
+# in your settings.py or wherever you load ENV
+# settings.frontend_url = "https://ai-komekshi.site"  (in production)
+
+origins = [
+    "http://localhost:3000",      # local dev
+    "http://127.0.0.1:3000",      # local dev
+    settings.frontend_url,        # e.g. https://ai-komekshi.site in prod
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:3000", settings.frontend_url],
+    allow_origins=origins,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 

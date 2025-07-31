@@ -1,6 +1,6 @@
 export type AppConfig = {
-    apiUrl: string
-    apiPrefix: string
+    apiUrl: string | undefined
+    apiPrefix: string | undefined
     authenticatedEntryPath: string
     unAuthenticatedEntryPath: string
     signInEntryPath: string
@@ -10,8 +10,8 @@ export type AppConfig = {
 }
 
 const appConfig: AppConfig = {
-    apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
-    apiPrefix: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000',
+    apiUrl: process.env.NEXT_PUBLIC_API_URL,
+    apiPrefix: process.env.NEXT_PUBLIC_API_BASE_URL,
     authenticatedEntryPath: '/main/dashboard',
     unAuthenticatedEntryPath: '/landing',
     signInEntryPath: '/sign-in',
