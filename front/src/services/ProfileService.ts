@@ -3,7 +3,7 @@ import ApiService from './ApiService'
 export interface OnboardingProfile {
     id: number
     user_id: number
-    
+
     // Персональная информация
     first_name?: string
     last_name?: string
@@ -12,12 +12,12 @@ export interface OnboardingProfile {
     gender?: string
     disability_type?: string[]
     disability_description?: string
-    
+
     // Условия работы и предпочтения рабочего места
     work_conditions?: string[]
     workplace_preferences?: string[]
     workplace_other?: string
-    
+
     // Навыки и опыт
     skills?: string[]
     skills_other?: string
@@ -25,34 +25,34 @@ export interface OnboardingProfile {
     desired_field_other?: string
     extra_skills?: string
     certifications?: string
-    
+
     // Образование и обучение
     education_status?: string
     education_level?: string
     wants_courses?: string
     learning_topics?: string[]
     learning_topics_other?: string
-    
+
     // Профессиональная информация
     profession?: string
     current_position?: string
     years_of_experience?: number
     experience_level?: string
     industry?: string
-    
+
     // Рабочие предпочтения
     preferred_work_time?: string
     work_format?: string[]
     employment_type?: string[]
     preferred_job_types?: string[]
-    
+
     // Условия работы и зарплата
     min_salary?: number
     max_salary?: number
     currency?: string
     preferred_cities?: string[]
     preferred_locations?: string[]
-    
+
     // Адаптации и доступность
     important_adaptations?: string[]
     adaptations_other?: string
@@ -60,22 +60,22 @@ export interface OnboardingProfile {
     accessibility_issues?: string[]
     accessibility_issues_other?: string
     accessibility_notes?: string
-    
+
     // Ожидания от платформы
     platform_features?: string[]
     platform_features_other?: string
     feedback_preference?: string
     feedback?: string
-    
+
     // Категории работы и особенности
     suitable_job_categories?: string[]
     job_features?: string[]
-    
+
     // Личная информация и ссылки
     bio?: string
     linkedin_url?: string
     portfolio_url?: string
-    
+
     // Статус
     is_completed: boolean
     created_at: string
@@ -130,7 +130,7 @@ class ProfileService {
     async getOnboardingProfile(): Promise<OnboardingProfile | null> {
         try {
             return await ApiService.fetchDataWithAxios<OnboardingProfile>({
-                url: '/api/onboarding/profile',
+                url: '/onboarding/profile',
                 method: 'get',
             })
         } catch (error) {
@@ -142,7 +142,7 @@ class ProfileService {
     async getAssessmentResults(): Promise<AssessmentResult[]> {
         try {
             return await ApiService.fetchDataWithAxios<AssessmentResult[]>({
-                url: '/api/assessment/results',
+                url: '/assessment/results',
                 method: 'get',
             })
         } catch (error) {
@@ -154,7 +154,7 @@ class ProfileService {
     async getProfileSummary(): Promise<ProfileSummary | null> {
         try {
             return await ApiService.fetchDataWithAxios<ProfileSummary>({
-                url: '/api/assessment/profile-summary',
+                url: '/assessment/profile-summary',
                 method: 'get',
             })
         } catch (error) {

@@ -85,9 +85,12 @@ const DualJobRecommendations: React.FC = () => {
             setLoading(true)
             setError(null)
 
-            const response = await fetch('/jobs/recommendations?refresh=true', {
-                credentials: 'include',
-            })
+            const response = await fetch(
+                '/api/enhanced-jobs/dual-recommendations?refresh=true',
+                {
+                    credentials: 'include',
+                },
+            )
 
             if (!response.ok) {
                 throw new Error('Failed to fetch recommendations')

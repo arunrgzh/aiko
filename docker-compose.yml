@@ -29,6 +29,7 @@ services:
             context: ./backend
             dockerfile: Dockerfile
         container_name: ai_komekshi_backend
+<<<<<<< HEAD
         environment:
             - DATABASE_URL=postgresql+asyncpg://REDACTED:REDACTED@postgres:5432/ai_komek
             - REDIS_URL=redis://redis:6379
@@ -37,6 +38,11 @@ services:
             - ENVIRONMENT=production
             - HTTP_PROXY=
             - HTTPS_PROXY=
+=======
+        # ← load your production env (make sure the file lives at backend/.env.production)
+        env_file:
+            - ./backend/.env.production
+>>>>>>> 3abd56210396aa4ab1007ed780052fdf73c363e5
         ports:
             - '8000:8000'
         depends_on:
@@ -53,10 +59,16 @@ services:
             context: ./front
             dockerfile: Dockerfile
         container_name: ai_komekshi_frontend
+<<<<<<< HEAD
         environment:
             - API_URL=https://ai-komekshi.site/api
             - NEXTAUTH_SECRET=your-nextauth-secret-change-this-in-production
             - NEXTAUTH_URL=http://REDACTED:3000
+=======
+        # ← load your production env (rename front/.env.frontend → front/.env.production or adjust path)
+        env_file:
+            - ./front/.env.production
+>>>>>>> 3abd56210396aa4ab1007ed780052fdf73c363e5
         ports:
             - '3000:3000'
         depends_on:
@@ -65,7 +77,9 @@ services:
         volumes:
             - ./front:/app
             - /app/node_modules
-        command: npm run dev
+        environment:
+            - NODE_ENV=production
+        command: sh -c "npm ci && npm run build && npm run start"
 
 volumes:
     postgres_data:
