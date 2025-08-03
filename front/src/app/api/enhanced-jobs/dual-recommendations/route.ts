@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import getServerSession from '@/server/actions/auth/getServerSession'
 
-const BACKEND_URL = process.env.BACKEND_URL || 'https://ai-komekshi.site/api'
+const BACKEND_URL = process.env.BACKEND_URL
 
 export async function GET(request: NextRequest) {
     try {
@@ -17,7 +17,9 @@ export async function GET(request: NextRequest) {
         const refresh = searchParams.get('refresh') || 'false'
         const disable_filters = searchParams.get('disable_filters') || 'false'
 
-        const url = new URL(`${BACKEND_URL}/enhanced-jobs/dual-recommendations`)
+        const url = new URL(
+            `${BACKEND_URL}/api/enhanced-jobs/dual-recommendations`,
+        )
         url.searchParams.append('page', page)
         url.searchParams.append('per_page', per_page)
         url.searchParams.append('refresh', refresh)

@@ -21,7 +21,7 @@ import type {
 
 export async function apiSignUp(data: SignUpCredential) {
     return ApiService.fetchDataWithAxios<SignUpResponse>({
-        url: '/auth/register',
+        url: '/api/auth/register',
         method: 'post',
         data,
     }).catch((error) => {
@@ -52,7 +52,7 @@ export async function apiSignUp(data: SignUpCredential) {
 
 export async function apiForgotPassword<T>(data: ForgotPassword) {
     return ApiService.fetchDataWithAxios<T>({
-        url: '/auth/forgot-password',
+        url: '/api/auth/forgot-password',
         method: 'post',
         data,
     })
@@ -60,7 +60,7 @@ export async function apiForgotPassword<T>(data: ForgotPassword) {
 
 export async function apiResetPassword<T>(data: ResetPassword) {
     return ApiService.fetchDataWithAxios<T>({
-        url: '/auth/reset-password',
+        url: '/api/auth/reset-password',
         method: 'post',
         data,
     })

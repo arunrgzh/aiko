@@ -17,13 +17,16 @@ export async function GET(
         const { id } = await params
         console.log('Getting assistant:', id)
 
-        const response = await fetch(`${BACKEND_URL}/main/assistants/${id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${session.accessToken}`,
+        const response = await fetch(
+            `${BACKEND_URL}/api/main/assistants/${id}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.accessToken}`,
+                },
             },
-        })
+        )
 
         if (!response.ok) {
             const error = await response.json()

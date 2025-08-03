@@ -10,12 +10,15 @@ export async function GET(
 
     console.log('assistant id:', id)
 
-    const res = await fetch(`${process.env.API_URL}/main/assistants/${id}`, {
-        method: 'GET',
-        headers: {
-            Authorization: `Bearer ${token?.accessToken}`,
+    const res = await fetch(
+        `${process.env.API_URL}/api/main/assistants/${id}`,
+        {
+            method: 'GET',
+            headers: {
+                Authorization: `Bearer ${token?.accessToken}`,
+            },
         },
-    })
+    )
 
     if (!res.ok) throw new Error('Ошибка при получения ассистента')
     return NextResponse.json(await res.json())
