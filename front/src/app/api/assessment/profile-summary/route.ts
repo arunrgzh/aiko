@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import getServerSession from '@/server/actions/auth/getServerSession'
 
-const BACKEND_URL = process.env.BACKEND_URL || 'https://ai-komekshi.site/api'
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000'
 
 export async function GET(request: NextRequest) {
     try {
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
         }
 
         const response = await fetch(
-            `${BACKEND_URL}/assessment/profile-summary`,
+            `${BACKEND_URL}/api/assessment/profile-summary`,
             {
                 method: 'GET',
                 headers: {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import getServerSession from '@/server/actions/auth/getServerSession'
 
-const BACKEND_URL = process.env.BACKEND_URL || 'https://ai-komekshi.site/api'
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:8000'
 
 export async function POST(request: NextRequest) {
     try {
@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
         const data = await request.json()
 
-        const response = await fetch(`${BACKEND_URL}/onboarding/profile`, {
+        const response = await fetch(`${BACKEND_URL}/api/onboarding/profile`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const response = await fetch(`${BACKEND_URL}/onboarding/profile`, {
+        const response = await fetch(`${BACKEND_URL}/api/onboarding/profile`, {
             method: 'GET',
             headers: {
                 Authorization: `Bearer ${session.accessToken}`,

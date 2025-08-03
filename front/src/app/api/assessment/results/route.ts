@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
         }
 
-        const response = await fetch(`${BACKEND_URL}/assessment/results`, {
+        const response = await fetch(`${BACKEND_URL}/api/assessment/results`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
