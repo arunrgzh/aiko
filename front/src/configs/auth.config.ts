@@ -14,7 +14,7 @@ const API_URL =
     process.env.NEXT_PUBLIC_API_URL || 'https://ai-komekshi.site/api'
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
-    const res = await fetch(`${API_URL}/auth/refresh`, {
+    const res = await fetch(`${API_URL}/api/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh_token: token.refreshToken }),
@@ -48,7 +48,7 @@ export const authOptions: NextAuthConfig = {
             async authorize(credentials): Promise<User | null> {
                 if (!credentials) return null
 
-                const res = await fetch(`${API_URL}/auth/login`, {
+                const res = await fetch(`${API_URL}/api/auth/login`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -128,12 +128,31 @@ export const authOptions: NextAuthConfig = {
         },
 
         async session({ session, token }): Promise<Session> {
-            session.user.id = String(token.id)
+            // Ensure session.user exists with required properties
+            if (!session.user) {
+                session.user = {
+                    id: '',
+                    email: '',
+                    emailVerified: null,
+                    accessTokenExpires: 0,
+                    authority: [],
+                    isFirstLogin: false,
+                    }
+            }
+
+            // Safely assign properties with null checks
+            if (token.id) {
+                session.user.id = String(token.id)
+            }
+
+            // This is critical - ensure accessToken is set
             session.accessToken = token.accessToken
             session.error = token.error
+            session.user.accessTokenExpires = token.accessTokenExpires
+            session.user.authority = token.authority || []
+
             // FOR TESTING: Force isFirstLogin to always be true
             session.user.isFirstLogin = true // token.isFirstLogin
-            session.user.accessTokenExpires = token.accessTokenExpires
 
             // Debug logging
             if (process.env.NODE_ENV === 'development') {
@@ -141,9 +160,11 @@ export const authOptions: NextAuthConfig = {
                     '🔍 NextAuth Session Callback (with isFirstLogin):',
                     {
                         hasAccessToken: !!token.accessToken,
+                        hasSessionAccessToken: !!session.accessToken,
                         tokenExpires: token.accessTokenExpires,
                         error: token.error,
                         isFirstLogin: true, // Always true for testing
+                        userId: session.user.id,
                     },
                 )
             }

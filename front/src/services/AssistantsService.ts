@@ -72,8 +72,8 @@ export async function apiGetAssistants(
 export async function apiGetAssistant(
     assistantId: string,
 ): Promise<{ chat_history: ChatHistory[] }> {
-    return ApiService.fetchDataWithAxios({
-        url: `/main/assistants/${assistantId}`,
+    return ApiService.fetchDataWithAxios<{ chat_history: ChatHistory[] }>({
+        url: `/api/main/assistants/${assistantId}`,
         method: 'get',
     })
 }
@@ -85,14 +85,14 @@ export async function apiSendMessageToAssistant(
     console.log('🚀 AssistantsService: Sending message to assistant', {
         assistantId,
         data,
-        url: `/main/assistants/${assistantId}/chat`,
+        url: `/api/main/assistants/${assistantId}/chat`,
     })
 
     try {
         const result = await ApiService.fetchDataWithAxios<
             SendMessageResponse | { error: string }
         >({
-            url: `/main/assistants/${assistantId}/chat`,
+            url: `/api/main/assistants/${assistantId}/chat`,
             method: 'post',
             data,
         })
