@@ -23,88 +23,210 @@ from ..auth.jwt import get_current_user
 
 router = APIRouter(prefix="/api/assessment", tags=["assessment"])
 
-# Sample assessment questions - you can move these to database later
-SAMPLE_QUESTIONS = [
-    {
-        "id": 1,
-        "question_text": "Как вы оцениваете свои навыки коммуникации?",
-        "question_type": "scale",
-        "assessment_category": "communication",
-        "options": ["1 - Очень слабые", "2 - Слабые", "3 - Средние", "4 - Хорошие", "5 - Отличные"],
-        "weight": 1.0
-    },
-    {
-        "id": 2,
-        "question_text": "Какие из перечисленных технических навыков вы считаете своими сильными сторонами?",
-        "question_type": "multiple_choice",
-        "assessment_category": "technical",
-        "options": [
-            "Программирование", "Анализ данных", "Работа с компьютером", 
-            "Интернет и соцсети", "Дизайн", "Техническая поддержка"
+# Import strength assessment logic from seed script
+import sys
+import os
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'scripts'))
+from app.utils.strength_assessment import calculate_profile_scores, STRENGTH_PROFILES
+
+# Temporary non-authenticated endpoint for testing
+@router.get("/questions-test", response_model=AssessmentQuestionsResponse)
+async def get_assessment_questions_test(
+    assessment_type: str = "strength_assessment",
+    db: AsyncSession = Depends(get_db)
+):
+    """Получить вопросы для оценки сильных сторон (тестовая версия без авторизации)"""
+    
+    # Get questions from database instead of hardcoded sample
+    result = await db.execute(
+        select(AssessmentQuestion).where(AssessmentQuestion.is_active == 'true')
+    )
+    questions = result.scalars().all()
+    
+    if not questions:
+        # Return sample questions if database is empty
+        sample_questions = [
+            {
+                "id": 1,
+                "question_text": "Как вы чувствуете себя при общении с новыми людьми?",
+                "question_type": "single_choice",
+                "assessment_category": "communication",
+                "options": [
+                    "Легко завожу разговор и чувствую себя комфортно",
+                    "Немного стесняюсь, но быстро привыкаю", 
+                    "Предпочитаю слушать, а не говорить",
+                    "Чувствую себя неуверенно, нужно время"
+                ],
+                "weight": 1.0
+            },
+            {
+                "id": 2,
+                "question_text": "Когда вам нужно объяснить что-то сложное:",
+                "question_type": "single_choice",
+                "assessment_category": "communication",
+                "options": [
+                    "Использую примеры и аналогии",
+                    "Разбиваю на простые части",
+                    "Показываю на практике",
+                    "Прошу коллег помочь с объяснением"
+                ],
+                "weight": 1.0
+            },
+            {
+                "id": 3,
+                "question_text": "Как вы планируете свой рабочий день?",
+                "question_type": "single_choice",
+                "assessment_category": "organization",
+                "options": [
+                    "Составляю подробный план заранее",
+                    "Делаю общий список задач",
+                    "Планирую по ходу дня",
+                    "Реагирую на ситуации по мере поступления"
+                ],
+                "weight": 1.0
+            }
+        ]
+        
+        return AssessmentQuestionsResponse(
+            questions=[
+                AssessmentQuestionResponse(**q) for q in sample_questions
+            ],
+            total_questions=len(sample_questions)
+        )
+    
+    return AssessmentQuestionsResponse(
+        questions=[
+            AssessmentQuestionResponse(
+                id=q.id,
+                question_text=q.question_text,
+                question_type=q.question_type,
+                assessment_category=q.assessment_category,
+                options=q.options,
+                weight=q.weight
+            ) for q in questions
         ],
-        "weight": 1.2
-    },
-    {
-        "id": 3,
-        "question_text": "Как вы справляетесь с решением сложных проблем?",
-        "question_type": "scale",
-        "assessment_category": "problem_solving",
-        "options": ["1 - Очень плохо", "2 - Плохо", "3 - Средне", "4 - Хорошо", "5 - Отлично"],
-        "weight": 1.1
-    },
-    {
-        "id": 4,
-        "question_text": "Какой стиль работы вам больше подходит?",
-        "question_type": "single_choice",
-        "assessment_category": "work_style",
-        "options": [
-            "Работа в команде", "Самостоятельная работа", 
-            "Руководство другими", "Выполнение четких инструкций"
-        ],
-        "weight": 1.0
-    },
-    {
-        "id": 5,
-        "question_text": "Как вы оцениваете свою способность к обучению новому?",
-        "question_type": "scale",
-        "assessment_category": "learning",
-        "options": ["1 - Очень медленно", "2 - Медленно", "3 - Средне", "4 - Быстро", "5 - Очень быстро"],
-        "weight": 1.0
-    },
-    {
-        "id": 6,
-        "question_text": "В каких ситуациях вы чувствуете себя наиболее комфортно?",
-        "question_type": "multiple_choice",
-        "assessment_category": "work_environment",
-        "options": [
-            "Рутинные задачи", "Творческие задачи", "Аналитическая работа",
-            "Работа с людьми", "Работа с документами", "Практическая работа"
-        ],
-        "weight": 1.0
-    }
-]
+        total_questions=len(questions)
+    )
 
 @router.get("/questions", response_model=AssessmentQuestionsResponse)
 async def get_assessment_questions(
-    assessment_type: str = "skills_assessment",
+    assessment_type: str = "strength_assessment",  # Changed from skills_assessment
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Получить вопросы для оценки"""
+    """Получить вопросы для оценки сильных сторон"""
     
-    questions = [
-        AssessmentQuestionResponse(
-            id=q["id"],
-            question_text=q["question_text"],
-            question_type=q["question_type"],
-            assessment_category=q["assessment_category"],
-            options=q.get("options", []),
-            weight=q["weight"]
-        ) for q in SAMPLE_QUESTIONS
-    ]
+    # Handle both old and new assessment types
+    if assessment_type == "skills_assessment":
+        assessment_type = "strength_assessment"
+    
+    # Get questions from database instead of hardcoded sample
+    result = await db.execute(
+        select(AssessmentQuestion).where(AssessmentQuestion.is_active == 'true')
+    )
+    questions = result.scalars().all()
+    
+    if not questions:
+        # Return sample questions if database is empty instead of throwing error
+        sample_questions = [
+            {
+                "id": 1,
+                "question_text": "Как вы чувствуете себя при общении с новыми людьми?",
+                "question_type": "single_choice",
+                "assessment_category": "communication",
+                "options": [
+                    "Легко завожу разговор и чувствую себя комфортно",
+                    "Немного стесняюсь, но быстро привыкаю", 
+                    "Предпочитаю слушать, а не говорить",
+                    "Чувствую себя неуверенно, нужно время"
+                ],
+                "weight": 1.0
+            },
+            {
+                "id": 2,
+                "question_text": "Когда вам нужно объяснить что-то сложное:",
+                "question_type": "single_choice",
+                "assessment_category": "communication",
+                "options": [
+                    "Использую примеры и аналогии",
+                    "Разбиваю на простые части",
+                    "Показываю на практике",
+                    "Прошу коллег помочь с объяснением"
+                ],
+                "weight": 1.0
+            },
+            {
+                "id": 3,
+                "question_text": "В групповых дискуссиях вы чаще:",
+                "question_type": "single_choice", 
+                "assessment_category": "communication",
+                "options": [
+                    "Активно выражаю свою точку зрения",
+                    "Внимательно слушаю других",
+                    "Пытаюсь найти компромисс",
+                    "Поддерживаю других участников"
+                ],
+                "weight": 1.0
+            },
+            {
+                "id": 4,
+                "question_text": "Как вы планируете свой рабочий день?",
+                "question_type": "single_choice",
+                "assessment_category": "organization",
+                "options": [
+                    "Составляю подробный план заранее",
+                    "Делаю общий список задач",
+                    "Планирую по ходу дня",
+                    "Реагирую на ситуации по мере поступления"
+                ],
+                "weight": 1.0
+            },
+            {
+                "id": 5,
+                "question_text": "При работе над проектом вы предпочитаете:",
+                "question_type": "single_choice",
+                "assessment_category": "organization", 
+                "options": [
+                    "Четко следовать плану и срокам",
+                    "Гибко адаптироваться к изменениям",
+                    "Сначала изучить все детали",
+                    "Начать с самого интересного"
+                ],
+                "weight": 1.0
+            },
+            {
+                "id": 6,
+                "question_text": "Когда у вас много задач одновременно:",
+                "question_type": "single_choice",
+                "assessment_category": "organization",
+                "options": [
+                    "Расставляю приоритеты и выполняю по порядку",
+                    "Делаю несколько задач параллельно",
+                    "Сначала делаю простые, потом сложные",
+                    "Прошу помощи в распределении задач"
+                ],
+                "weight": 1.0
+            }
+        ]
+        
+        return AssessmentQuestionsResponse(
+            questions=[
+                AssessmentQuestionResponse(**q) for q in sample_questions
+            ],
+            total_questions=len(sample_questions)
+        )
     
     return AssessmentQuestionsResponse(
-        questions=questions,
+        questions=[
+            AssessmentQuestionResponse(
+                id=q.id,
+                question_text=q.question_text,
+                question_type=q.question_type,
+                assessment_category=q.assessment_category,
+                options=q.options,
+                weight=q.weight
+            ) for q in questions
+        ],
         total_questions=len(questions)
     )
 
@@ -114,15 +236,183 @@ async def submit_assessment(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    """Отправить ответы на оценку и получить результаты"""
+    """Отправить ответы на оценку сильных сторон и получить результаты"""
     
-    # Analyze answers and generate results
-    strengths, weaknesses, overall_score = _analyze_assessment_answers(submission.answers)
+    # Get questions from database
+    result = await db.execute(
+        select(AssessmentQuestion).where(AssessmentQuestion.is_active == 'true')
+    )
+    questions = result.scalars().all()
+    
+    if not questions:
+        # Use sample questions if database is empty
+        sample_questions = [
+            {
+                "id": 1,
+                "question_text": "Как вы чувствуете себя при общении с новыми людьми?",
+                "question_type": "single_choice",
+                "assessment_category": "communication",
+                "options": [
+                    "Легко завожу разговор и чувствую себя комфортно",
+                    "Немного стесняюсь, но быстро привыкаю", 
+                    "Предпочитаю слушать, а не говорить",
+                    "Чувствую себя неуверенно, нужно время"
+                ],
+                "weight": 1.0
+            },
+            {
+                "id": 2,
+                "question_text": "Когда вам нужно объяснить что-то сложное:",
+                "question_type": "single_choice",
+                "assessment_category": "communication",
+                "options": [
+                    "Использую примеры и аналогии",
+                    "Разбиваю на простые части",
+                    "Показываю на практике",
+                    "Прошу коллег помочь с объяснением"
+                ],
+                "weight": 1.0
+            },
+            {
+                "id": 3,
+                "question_text": "В групповых дискуссиях вы чаще:",
+                "question_type": "single_choice", 
+                "assessment_category": "communication",
+                "options": [
+                    "Активно выражаю свою точку зрения",
+                    "Внимательно слушаю других",
+                    "Пытаюсь найти компромисс",
+                    "Поддерживаю других участников"
+                ],
+                "weight": 1.0
+            },
+            {
+                "id": 4,
+                "question_text": "Как вы планируете свой рабочий день?",
+                "question_type": "single_choice",
+                "assessment_category": "organization",
+                "options": [
+                    "Составляю подробный план заранее",
+                    "Делаю общий список задач",
+                    "Планирую по ходу дня",
+                    "Реагирую на ситуации по мере поступления"
+                ],
+                "weight": 1.0
+            },
+            {
+                "id": 5,
+                "question_text": "При работе над проектом вы предпочитаете:",
+                "question_type": "single_choice",
+                "assessment_category": "organization", 
+                "options": [
+                    "Четко следовать плану и срокам",
+                    "Гибко адаптироваться к изменениям",
+                    "Сначала изучить все детали",
+                    "Начать с самого интересного"
+                ],
+                "weight": 1.0
+            },
+            {
+                "id": 6,
+                "question_text": "Когда у вас много задач одновременно:",
+                "question_type": "single_choice",
+                "assessment_category": "organization",
+                "options": [
+                    "Расставляю приоритеты и выполняю по порядку",
+                    "Делаю несколько задач параллельно",
+                    "Сначала делаю простые, потом сложные",
+                    "Прошу помощи в распределении задач"
+                ],
+                "weight": 1.0
+            }
+        ]
+        
+        # Create mock question objects for processing
+        class MockQuestion:
+            def __init__(self, data):
+                self.id = data["id"]
+                self.question_text = data["question_text"]
+                self.question_type = data["question_type"]
+                self.assessment_category = data["assessment_category"]
+                self.options = data["options"]
+                self.weight = data["weight"]
+        
+        questions = [MockQuestion(q) for q in sample_questions]
+
+    # Extract answer indices for profile calculation
+    answer_indices = []
+    for answer in submission.answers:
+        question = next((q for q in questions if q.id == answer.question_id), None)
+        if question and question.options:
+            try:
+                # Find the index of the selected answer in options
+                answer_index = question.options.index(str(answer.answer))
+                answer_indices.append(answer_index)
+            except (ValueError, IndexError):
+                answer_indices.append(0)  # Default to first option if not found
+        else:
+            answer_indices.append(0)
+
+    # Calculate profile scores using the new logic
+    profile_scores = calculate_profile_scores(answer_indices)
+    
+    # Find primary strength profile
+    primary_profile = max(profile_scores.items(), key=lambda x: x[1])[0]
+    profile_data = STRENGTH_PROFILES[primary_profile]
+    
+    # Convert profile scores to category scores for compatibility
+    category_mapping = {
+        "communicative_leader": "communication",
+        "organizer": "organization", 
+        "technical_specialist": "technical",
+        "executor": "execution",
+        "team_player": "teamwork",
+        "independent_worker": "independence"
+    }
+    
+    # Create strengths and weaknesses from profile scores
+    strengths = []
+    weaknesses = []
+    
+    for profile, score in profile_scores.items():
+        category = category_mapping.get(profile, profile)
+        if score >= 25:  # High score threshold
+            strengths.append(AssessmentStrength(
+                category=category,
+                score=min(score / 5, 10.0),  # Normalize to 0-10 scale
+                description=STRENGTH_PROFILES[profile]["description"]
+            ))
+        elif score <= 15:  # Low score threshold
+            weaknesses.append(AssessmentWeakness(
+                category=category,
+                score=min(score / 5, 10.0),  # Normalize to 0-10 scale
+                description=f"Область для развития: {STRENGTH_PROFILES[profile]['name']}"
+            ))
+    
+    # Ensure we have at least some strengths and weaknesses
+    if not strengths:
+        strengths = [AssessmentStrength(
+            category=category_mapping[primary_profile],
+            score=8.0,
+            description=profile_data["description"]
+        )]
+    
+    if not weaknesses:
+        # Find lowest scoring profile
+        lowest_profile = min(profile_scores.items(), key=lambda x: x[1])[0]
+        weaknesses = [AssessmentWeakness(
+            category=category_mapping[lowest_profile],
+            score=3.0,
+            description=f"Область для развития: {STRENGTH_PROFILES[lowest_profile]['name']}"
+        )]
     
     # Generate AI analysis
-    strengths_analysis = _generate_strengths_analysis(strengths)
+    strengths_analysis = _generate_strengths_analysis(strengths, profile_data)
     weaknesses_analysis = _generate_weaknesses_analysis(weaknesses)
-    improvement_suggestions = _generate_improvement_suggestions(weaknesses)
+    improvement_suggestions = _generate_improvement_suggestions(weaknesses, profile_data)
+    
+    # Calculate overall score
+    overall_score = sum(profile_scores.values()) / len(profile_scores) / 5  # Normalize to 0-10
     
     # Create assessment result
     assessment_result = AssessmentResult(
@@ -136,7 +426,11 @@ async def submit_assessment(
         weaknesses_analysis=weaknesses_analysis,
         improvement_suggestions=improvement_suggestions,
         overall_score=overall_score,
-        confidence_level=0.85  # AI confidence level
+        confidence_level=0.85
+        # Temporarily removed new fields until database migration:
+        # strength_profile=primary_profile,
+        # profile_scores=profile_scores,
+        # recommended_spheres=profile_data["recommended_spheres"]
     )
     
     db.add(assessment_result)
@@ -144,12 +438,29 @@ async def submit_assessment(
     await db.refresh(assessment_result)
     
     # Generate and store profile summary based on assessment
-    summary_text = _generate_profile_summary_from_assessment(strengths, weaknesses, strengths_analysis)
-    await _create_or_update_profile_summary(db, current_user.id, summary_text, "assessment")  # type: ignore
+    summary_text = _generate_profile_summary_from_assessment(strengths, weaknesses, strengths_analysis, profile_data)
+    await _create_or_update_profile_summary(db, current_user.id, summary_text, "assessment")
     
-    result_data = AssessmentResultResponse.model_validate(assessment_result)
-    result_data.top_strengths = strengths
-    result_data.top_weaknesses = weaknesses
+    # Manually create response to avoid database validation issues
+    result_data = AssessmentResultResponse(
+        id=assessment_result.id,
+        user_id=assessment_result.user_id,
+        assessment_type=assessment_result.assessment_type,
+        version=assessment_result.version,
+        top_strengths=strengths,
+        top_weaknesses=weaknesses,
+        strengths_analysis=assessment_result.strengths_analysis,
+        weaknesses_analysis=assessment_result.weaknesses_analysis,
+        improvement_suggestions=assessment_result.improvement_suggestions,
+        overall_score=assessment_result.overall_score,
+        confidence_level=assessment_result.confidence_level,
+        # Add the profile data that's not in database yet
+        strength_profile=primary_profile,
+        profile_scores=profile_scores,
+        recommended_spheres=profile_data["recommended_spheres"],
+        created_at=assessment_result.created_at,
+        updated_at=assessment_result.updated_at
+    )
     return result_data
 
 @router.get("/results/{assessment_id}", response_model=AssessmentResultResponse)
@@ -211,6 +522,114 @@ async def get_profile_summary(
         return None
     
     return ProfileSummaryResponse.model_validate(profile_summary)  # type: ignore
+
+# Admin endpoints for managing assessment questions
+@router.post("/admin/questions", response_model=AssessmentQuestionResponse)
+async def create_assessment_question(
+    question_data: dict,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Создать новый вопрос для оценки (только для админов)"""
+    # TODO: Add admin role check
+    # if not current_user.is_admin:
+    #     raise HTTPException(status_code=403, detail="Admin access required")
+    
+    question = AssessmentQuestion(**question_data)
+    db.add(question)
+    await db.commit()
+    await db.refresh(question)
+    
+    return AssessmentQuestionResponse(
+        id=question.id,
+        question_text=question.question_text,
+        question_type=question.question_type,
+        assessment_category=question.assessment_category,
+        options=question.options or [],
+        weight=question.weight
+    )
+
+@router.put("/admin/questions/{question_id}", response_model=AssessmentQuestionResponse)
+async def update_assessment_question(
+    question_id: int,
+    question_data: dict,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Обновить вопрос для оценки (только для админов)"""
+    # TODO: Add admin role check
+    
+    result = await db.execute(
+        select(AssessmentQuestion).where(AssessmentQuestion.id == question_id)
+    )
+    question = result.scalar_one_or_none()
+    
+    if not question:
+        raise HTTPException(status_code=404, detail="Question not found")
+    
+    # Update question fields
+    for field, value in question_data.items():
+        if hasattr(question, field):
+            setattr(question, field, value)
+    
+    await db.commit()
+    await db.refresh(question)
+    
+    return AssessmentQuestionResponse(
+        id=question.id,
+        question_text=question.question_text,
+        question_type=question.question_type,
+        assessment_category=question.assessment_category,
+        options=question.options or [],
+        weight=question.weight
+    )
+
+@router.delete("/admin/questions/{question_id}")
+async def delete_assessment_question(
+    question_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Удалить вопрос для оценки (только для админов)"""
+    # TODO: Add admin role check
+    
+    result = await db.execute(
+        select(AssessmentQuestion).where(AssessmentQuestion.id == question_id)
+    )
+    question = result.scalar_one_or_none()
+    
+    if not question:
+        raise HTTPException(status_code=404, detail="Question not found")
+    
+    # Soft delete by setting is_active to False
+    question.is_active = False
+    await db.commit()
+    
+    return {"message": "Question deleted successfully"}
+
+@router.get("/admin/questions", response_model=List[AssessmentQuestionResponse])
+async def get_all_assessment_questions(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    """Получить все вопросы для оценки (включая неактивные) (только для админов)"""
+    # TODO: Add admin role check
+    
+    result = await db.execute(
+        select(AssessmentQuestion).order_by(AssessmentQuestion.id)
+    )
+    questions = result.scalars().all()
+    
+    return [
+        AssessmentQuestionResponse(
+            id=q.id,
+            question_text=q.question_text,
+            question_type=q.question_type,
+            assessment_category=q.assessment_category,
+            options=q.options or [],
+            weight=q.weight
+        ) for q in questions
+    ]
 
 # Helper functions for assessment analysis
 
@@ -294,13 +713,17 @@ def _get_weakness_description(category: str, score: float) -> str:
     }
     return descriptions.get(category, f"Область для развития: {category}")
 
-def _generate_strengths_analysis(strengths: List[AssessmentStrength]) -> str:
+def _generate_strengths_analysis(strengths: List[AssessmentStrength], profile_data: Dict[str, Any]) -> str:
     """Generate AI analysis of strengths"""
     if not strengths:
         return "На основе результатов оценки, ваши сильные стороны требуют дополнительного анализа."
     
+    profile_name = profile_data.get("name", "Профессионал")
+    profile_description = profile_data.get("description", "")
     strength_categories = [s.category for s in strengths]
-    return f"Ваши основные сильные стороны включают: {', '.join(strength_categories)}. " \
+    
+    return f"Ваш профиль: {profile_name}. {profile_description} " \
+           f"Ваши основные сильные стороны включают: {', '.join(strength_categories)}. " \
            f"Эти навыки делают вас ценным кандидатом для должностей, требующих данных компетенций."
 
 def _generate_weaknesses_analysis(weaknesses: List[AssessmentWeakness]) -> str:
@@ -312,9 +735,13 @@ def _generate_weaknesses_analysis(weaknesses: List[AssessmentWeakness]) -> str:
     return f"Области для развития: {', '.join(weakness_categories)}. " \
            f"Рекомендуем сосредоточиться на улучшении этих навыков для расширения карьерных возможностей."
 
-def _generate_improvement_suggestions(weaknesses: List[AssessmentWeakness]) -> str:
+def _generate_improvement_suggestions(weaknesses: List[AssessmentWeakness], profile_data: Dict[str, Any]) -> str:
     """Generate improvement suggestions"""
     if not weaknesses:
+        recommended_spheres = profile_data.get("recommended_spheres", [])
+        if recommended_spheres:
+            return f"Продолжайте развивать свои сильные стороны. " \
+                   f"Рекомендуемые сферы деятельности: {', '.join(recommended_spheres)}."
         return "Продолжайте развивать свои сильные стороны и изучать новые навыки для карьерного роста."
     
     suggestions = []
@@ -323,24 +750,43 @@ def _generate_improvement_suggestions(weaknesses: List[AssessmentWeakness]) -> s
             suggestions.append("Пройдите курсы по развитию коммуникативных навыков")
         elif weakness.category == "technical":
             suggestions.append("Изучите новые технические инструменты и программы")
-        elif weakness.category == "problem_solving":
-            suggestions.append("Практикуйтесь в решении сложных задач и кейсов")
+        elif weakness.category == "organization":
+            suggestions.append("Освойте методы планирования и организации работы")
+        elif weakness.category == "teamwork":
+            suggestions.append("Развивайте навыки командной работы и сотрудничества")
+        elif weakness.category == "execution":
+            suggestions.append("Улучшите навыки выполнения задач и соблюдения сроков")
+        elif weakness.category == "independence":
+            suggestions.append("Развивайте самостоятельность в принятии решений")
+    
+    recommended_spheres = profile_data.get("recommended_spheres", [])
+    if recommended_spheres:
+        suggestions.append(f"Рекомендуемые сферы деятельности: {', '.join(recommended_spheres)}")
     
     return ". ".join(suggestions) + "." if suggestions else "Продолжайте развивать свои навыки."
 
 def _generate_profile_summary_from_assessment(
     strengths: List[AssessmentStrength], 
     weaknesses: List[AssessmentWeakness], 
-    analysis: str
+    analysis: str,
+    profile_data: Dict[str, Any]
 ) -> str:
     """Generate profile summary based on assessment results"""
+    profile_name = profile_data.get("name", "Профессионал")
+    profile_description = profile_data.get("description", "")
+    recommended_spheres = profile_data.get("recommended_spheres", [])
     
-    strength_text = ", ".join([s.category for s in strengths[:3]]) if strengths else "различные навыки"
-    weakness_text = ", ".join([w.category for w in weaknesses[:2]]) if weaknesses else "без значительных слабостей"
+    strength_text = ", ".join([s.category for s in strengths]) if strengths else "не выявлены"
+    weakness_text = ", ".join([w.category for w in weaknesses]) if weaknesses else "не выявлены"
     
-    return f"Кандидат с сильными навыками в областях: {strength_text}. " \
-           f"Области для развития: {weakness_text}. " \
-           f"Результаты оценки показывают потенциал для роста и развития в выбранной сфере деятельности."
+    summary = f"Профиль: {profile_name}. {profile_description} "
+    summary += f"Сильные стороны: {strength_text}. "
+    summary += f"Области для развития: {weakness_text}. "
+    
+    if recommended_spheres:
+        summary += f"Рекомендуемые сферы деятельности: {', '.join(recommended_spheres)}."
+    
+    return summary
 
 async def _create_or_update_profile_summary(
     db: AsyncSession, 

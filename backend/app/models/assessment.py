@@ -13,7 +13,7 @@ class AssessmentQuestion(Base):
     options = Column(JSON, nullable=True)  # For multiple choice questions
     weight = Column(Float, default=1.0)  # Weight for scoring
     scoring_criteria = Column(JSON, nullable=True)  # How to score this question
-    is_active = Column(Boolean, default=True)
+    is_active = Column(String, default='true')  # Changed from Boolean to String for compatibility
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
@@ -22,7 +22,7 @@ class AssessmentResult(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    assessment_type = Column(String, default="skills_assessment")
+    assessment_type = Column(String, default="strength_assessment")  # Changed from skills_assessment
     version = Column(String, default="1.0")
     raw_answers = Column(JSON, nullable=False)  # User's raw answers
     top_strengths = Column(JSON, nullable=False)  # Top 5 strengths
@@ -32,7 +32,11 @@ class AssessmentResult(Base):
     improvement_suggestions = Column(Text, nullable=True)  # AI suggestions
     overall_score = Column(Float, nullable=True)  # Overall assessment score
     confidence_level = Column(Float, nullable=True)  # AI confidence in results
-    embedding_id = Column(String, nullable=True, unique=True)  # ChromaDB embedding ID
+    # Temporarily commented out new fields until database migration:
+    # strength_profile = Column(String, nullable=True)  # Primary strength profile (e.g., "communicative_leader")
+    # profile_scores = Column(JSON, nullable=True)  # Scores for all 6 profiles
+    # recommended_spheres = Column(JSON, nullable=True)  # Recommended work spheres
+    # embedding_id = Column(String, nullable=True, unique=True)  # ChromaDB embedding ID
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     

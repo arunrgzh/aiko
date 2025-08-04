@@ -9,7 +9,7 @@ class AssessmentAnswer(BaseModel):
 
 class AssessmentSubmission(BaseModel):
     """Schema for submitting assessment answers"""
-    assessment_type: str = Field(default="skills_assessment")
+    assessment_type: str = Field(default="strength_assessment")  # Changed from skills_assessment
     answers: List[AssessmentAnswer] = Field(..., min_length=1)
 
 class AssessmentStrength(BaseModel):
@@ -27,7 +27,7 @@ class AssessmentWeakness(BaseModel):
 class AssessmentResultCreate(BaseModel):
     """Schema for creating assessment result"""
     user_id: int
-    assessment_type: str = Field(default="skills_assessment")
+    assessment_type: str = Field(default="strength_assessment")  # Changed from skills_assessment
     version: str = Field(default="1.0")
     raw_answers: Dict[str, Any]
     top_strengths: List[AssessmentStrength]
@@ -37,6 +37,10 @@ class AssessmentResultCreate(BaseModel):
     improvement_suggestions: Optional[str] = None
     overall_score: Optional[float] = Field(None, ge=0, le=10)
     confidence_level: Optional[float] = Field(None, ge=0, le=1)
+    # New fields for strength profiles
+    strength_profile: Optional[str] = None
+    profile_scores: Optional[Dict[str, float]] = None
+    recommended_spheres: Optional[List[str]] = None
 
 class AssessmentResultResponse(BaseModel):
     """Schema for assessment result response"""
@@ -51,6 +55,10 @@ class AssessmentResultResponse(BaseModel):
     improvement_suggestions: Optional[str] = None
     overall_score: Optional[float] = None
     confidence_level: Optional[float] = None
+    # New fields for strength profiles
+    strength_profile: Optional[str] = None
+    profile_scores: Optional[Dict[str, float]] = None
+    recommended_spheres: Optional[List[str]] = None
     created_at: datetime
     updated_at: Optional[datetime] = None
     

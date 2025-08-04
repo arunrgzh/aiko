@@ -33,13 +33,17 @@ export interface AssessmentResult {
     version: string
     top_strengths: AssessmentStrength[]
     top_weaknesses: AssessmentWeakness[]
-    strengths_analysis: string
-    weaknesses_analysis: string
-    improvement_suggestions: string
-    overall_score: number
-    confidence_level: number
+    strengths_analysis?: string
+    weaknesses_analysis?: string
+    improvement_suggestions?: string
+    overall_score?: number
+    confidence_level?: number
+    // New fields for strength profiles
+    strength_profile?: string
+    profile_scores?: Record<string, number>
+    recommended_spheres?: string[]
     created_at: string
-    updated_at: string
+    updated_at?: string
 }
 
 export interface ProfileSummary {
