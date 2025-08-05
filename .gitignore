@@ -34,3 +34,9 @@ next-env.d.ts
 
 # here
 .env
+.env.local
+.env.development
+.env.production
+.env.test.local
+.env.production.local
+.env.development.local
