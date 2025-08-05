@@ -638,7 +638,9 @@ const OnboardingPage = () => {
                     </h1>
                     <div className="bg-white dark:bg-gray-800 rounded-xl p-8 shadow-lg mb-8">
                         <div className="text-6xl font-bold text-indigo-600 mb-4">
-                            {assessmentResult.overall_score.toFixed(1)}/5
+                            {assessmentResult.overall_score?.toFixed(1) ||
+                                '0.0'}
+                            /5
                         </div>
                         <h3 className="text-xl font-semibold mb-4">
                             {getTranslation('overall_score', userLanguage)}
