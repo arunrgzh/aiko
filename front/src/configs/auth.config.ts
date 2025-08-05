@@ -48,28 +48,46 @@ export const authOptions: NextAuthConfig = {
             async authorize(credentials): Promise<User | null> {
                 if (!credentials) return null
 
-                const res = await fetch(`${API_URL}/api/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        username: credentials.username,
-                        password: credentials.password,
-                    }),
-                })
+                try {
+                    console.log(
+                        '🔐 Attempting login to:',
+                        `${API_URL}/api/auth/login`,
+                    )
+                    const res = await fetch(`${API_URL}/api/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            username: credentials.username,
+                            password: credentials.password,
+                        }),
+                    })
 
-                if (!res.ok) return null
-                const data = (await res.json()) as FastAPIAuthResponse
-                const payload = jwtDecode<AccessPayload>(data.access_token)
+                    console.log('🔐 Response status:', res.status)
 
-                return {
-                    id: payload.sub,
-                    name: payload.sub,
-                    email: payload.sub,
-                    accessToken: data.access_token,
-                    refreshToken: data.refresh_token,
-                    accessTokenExpires: payload.exp * 1000,
-                    authority: [],
-                    isFirstLogin: data.is_first_login,
+                    if (!res.ok) {
+                        const errorText = await res.text()
+                        console.error('🔐 Login failed:', res.status, errorText)
+                        return null
+                    }
+
+                    const data = (await res.json()) as FastAPIAuthResponse
+                    const payload = jwtDecode<AccessPayload>(data.access_token)
+
+                    console.log('🔐 Login successful for user:', payload.sub)
+
+                    return {
+                        id: payload.sub,
+                        name: payload.sub,
+                        email: payload.sub,
+                        accessToken: data.access_token,
+                        refreshToken: data.refresh_token,
+                        accessTokenExpires: payload.exp * 1000,
+                        authority: [],
+                        isFirstLogin: data.is_first_login,
+                    }
+                } catch (error) {
+                    console.error('🔐 Login error:', error)
+                    return null
                 }
             },
         }),
@@ -103,7 +121,9 @@ export const authOptions: NextAuthConfig = {
                 if (process.env.NODE_ENV === 'development') {
                     console.log('✅ Storing new JWT token:', {
                         accessToken: user.accessToken?.slice(0, 20) + '...',
-                        expires: new Date(user.accessTokenExpires),
+                        expires: user.accessTokenExpires
+                            ? new Date(user.accessTokenExpires)
+                            : undefined,
                     })
                 }
 
@@ -111,7 +131,10 @@ export const authOptions: NextAuthConfig = {
             }
 
             // Check if token is still valid
-            if (Date.now() < token.accessTokenExpires) {
+            if (
+                token.accessTokenExpires &&
+                Date.now() < token.accessTokenExpires
+            ) {
                 if (process.env.NODE_ENV === 'development') {
                     console.log(
                         '✅ Token still valid, returning existing token',
@@ -137,7 +160,7 @@ export const authOptions: NextAuthConfig = {
                     accessTokenExpires: 0,
                     authority: [],
                     isFirstLogin: false,
-                    }
+                }
             }
 
             // Safely assign properties with null checks

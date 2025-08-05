@@ -16,7 +16,7 @@ import {
     ClockIcon,
     AcademicCapIcon,
     StarIcon,
-    ExternalLinkIcon,
+    ArrowUpRightIcon,
     InformationCircleIcon,
 } from '@heroicons/react/24/outline'
 
@@ -469,7 +469,7 @@ const DualJobRecommendations: React.FC = () => {
                                         }
                                         className="flex items-center space-x-2"
                                     >
-                                        <ExternalLinkIcon className="h-4 w-4" />
+                                        <ArrowUpRightIcon className="h-4 w-4" />
                                         <span>Откликнуться на hh.ru</span>
                                     </Button>
                                 </div>
