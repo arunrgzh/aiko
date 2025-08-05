@@ -120,7 +120,7 @@ async def seed_questions():
         try:
             # Check if questions already exist
             existing_count = await session.execute(
-                select(AssessmentQuestion).where(AssessmentQuestion.is_active == 'true')
+                select(AssessmentQuestion).where(AssessmentQuestion.is_active.is_(True))
             )
             existing_questions = existing_count.scalars().all()
             

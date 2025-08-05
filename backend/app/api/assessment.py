@@ -39,7 +39,7 @@ async def get_assessment_questions_test(
     
     # Get questions from database instead of hardcoded sample
     result = await db.execute(
-        select(AssessmentQuestion).where(AssessmentQuestion.is_active == 'true')
+        select(AssessmentQuestion).where(AssessmentQuestion.is_active.is_(True))
     )
     questions = result.scalars().all()
     
@@ -122,7 +122,7 @@ async def get_assessment_questions(
     
     # Get questions from database instead of hardcoded sample
     result = await db.execute(
-        select(AssessmentQuestion).where(AssessmentQuestion.is_active == 'true')
+        select(AssessmentQuestion).where(AssessmentQuestion.is_active.is_(True))
     )
     questions = result.scalars().all()
     
@@ -240,7 +240,7 @@ async def submit_assessment(
     
     # Get questions from database
     result = await db.execute(
-        select(AssessmentQuestion).where(AssessmentQuestion.is_active == 'true')
+        select(AssessmentQuestion).where(AssessmentQuestion.is_active.is_(True))
     )
     questions = result.scalars().all()
     
