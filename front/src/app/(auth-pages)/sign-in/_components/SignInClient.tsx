@@ -4,7 +4,7 @@
 import appConfig from '@/configs/app.config'
 import SignIn from '@/components/auth/SignIn'
 import { signIn } from '@/auth'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { REDIRECT_URL_KEY } from '@/constants/app.constant'
 import { useTranslations } from 'next-intl'
 import type {
@@ -16,6 +16,7 @@ import { onSignInWithCredentials } from '@/server/actions/auth/handleSignIn'
 
 const SignInClient = () => {
     const searchParams = useSearchParams()
+    const router = useRouter()
     const callbackUrl = searchParams.get(REDIRECT_URL_KEY)
     const t = useTranslations('auth.signIn')
 
@@ -39,7 +40,7 @@ const SignInClient = () => {
             if (data?.success && data?.redirectTo) {
                 console.log('🎯 Redirecting to:', data.redirectTo)
                 // Use window.location for a hard redirect to ensure session is refreshed
-                window.location.href = data.redirectTo
+                router.push(data.redirectTo)
                 return
             }
 
@@ -47,7 +48,7 @@ const SignInClient = () => {
             // Note: We need to check the session after sign-in to get the isFirstLogin flag
             // For now, redirect to root page which will handle the routing logic
             console.log('🎯 Redirecting to root for smart routing')
-            window.location.href = '/'
+            router.push('/')
         } catch (error) {
             console.error('Sign-in error:', error)
             setMessage(t('errors.unexpectedError'))

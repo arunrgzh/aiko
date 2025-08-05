@@ -64,13 +64,13 @@ app.include_router(enhanced_jobs.router)  # Enhanced dual recommendation system
 #     # TODO: Fix async session handling
 #     pass
 
-@app.on_event("startup")
-async def init_db():
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
+# @app.on_event("startup")
+# async def init_db():
+#     async with engine.begin() as conn:
+#         await conn.run_sync(Base.metadata.create_all)
     
-    # TODO: Fix async session for creating default assistants
-    # await create_default_assistants()
+#     # TODO: Fix async session for creating default assistants
+#     # await create_default_assistants()
 
 @app.get("/")
 async def root():
