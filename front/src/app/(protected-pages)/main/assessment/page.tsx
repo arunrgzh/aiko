@@ -8,6 +8,7 @@ import AssessmentQuestions from '@/components/shared/AssessmentQuestions'
 import AssessmentService from '@/services/AssessmentService'
 import { Spinner } from '@/components/ui/Spinner'
 import Container from '@/components/shared/Container'
+import Link from 'next/link'
 import type {
     AssessmentQuestion,
     AssessmentAnswer,
@@ -19,6 +20,7 @@ const AssessmentPage = () => {
     const router = useRouter()
     const { data: session, status, update: updateSession } = useSession()
     const t = useTranslations('assessment')
+    const vt = useTranslations('videos')
     const [questions, setQuestions] = useState<AssessmentQuestion[]>([])
     const [loading, setLoading] = useState(true)
     const [assessmentLoading, setAssessmentLoading] = useState(false)
@@ -271,6 +273,60 @@ const AssessmentPage = () => {
                                 </p>
                             </div>
                         )}
+
+                        {/* Video Course Suggestions */}
+                        <div className="mt-8 p-6 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <div className="flex items-center gap-2 mb-4">
+                                <span className="text-2xl">📈</span>
+                                <h4 className="text-lg font-semibold text-green-800 dark:text-green-200">
+                                    {vt('improveYourScore')}
+                                </h4>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div className="flex gap-3 p-3 bg-green-100 dark:bg-green-800/30 rounded-lg">
+                                    <img
+                                        src="https://img.youtube.com/vi/wuUtlAvXOow/mqdefault.jpg"
+                                        alt="Resume Course"
+                                        className="w-20 h-12 rounded object-cover"
+                                    />
+                                    <div>
+                                        <h5 className="font-medium text-sm text-green-800 dark:text-green-200">
+                                            {vt('courses.resume.title')}
+                                        </h5>
+                                        <p className="text-xs text-green-600 dark:text-green-300">
+                                            {vt(
+                                                'courses.careerDevelopment.description',
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-3 p-3 bg-green-100 dark:bg-green-800/30 rounded-lg">
+                                    <img
+                                        src="https://img.youtube.com/vi/i32vWk2L2BU/mqdefault.jpg"
+                                        alt="Interview Course"
+                                        className="w-20 h-12 rounded object-cover"
+                                    />
+                                    <div>
+                                        <h5 className="font-medium text-sm text-green-800 dark:text-green-200">
+                                            {vt('courses.interview.title')}
+                                        </h5>
+                                        <p className="text-xs text-green-600 dark:text-green-300">
+                                            {vt(
+                                                'courses.interview.description',
+                                            )}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <Link href="/main/videos">
+                                <button className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                                    {vt('viewAvailableCourses')}
+                                </button>
+                            </Link>
+                        </div>
                     </div>
 
                     <div className="flex justify-center space-x-4">

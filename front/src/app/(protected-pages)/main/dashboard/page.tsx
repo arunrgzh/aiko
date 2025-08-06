@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
+
 import {
     TbFileText,
     TbBriefcase,
@@ -86,6 +87,7 @@ const getGreeting = (
 
 export default function DashboardPage() {
     const t = useTranslations('dashboard')
+    const vt = useTranslations('videos')
     const [mounted, setMounted] = useState(false)
     const [greeting, setGreeting] = useState('')
     const [stats, setStats] = useState<DashboardStats | null>(null)
@@ -316,7 +318,98 @@ export default function DashboardPage() {
                     </motion.div>
                 </div>
             </motion.div>
+            {/* Video Learning Section */}
+            <motion.div
+                initial={{ y: 40, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.8, delay: 1.4 }}
+                className="mt-16"
+            >
+                <div className="max-w-4xl mx-auto">
+                    <Card className="bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 p-6">
+                        <div className="flex items-center gap-2 mb-4">
+                            <span className="text-2xl">📚</span>
+                            <h3 className="text-xl font-semibold">
+                                {vt('recommendedForYou')}
+                            </h3>
+                        </div>
 
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div className="flex gap-3 p-3 bg-white/70 dark:bg-gray-700/70 rounded-lg">
+                                <img
+                                    src="https://img.youtube.com/vi/wuUtlAvXOow/mqdefault.jpg"
+                                    alt="Resume Course"
+                                    className="w-20 h-12 rounded object-cover"
+                                />
+                                <div>
+                                    <h4 className="font-medium text-sm">
+                                        {vt('courses.resume.title')}
+                                    </h4>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                                        {vt('courses.resume.description')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 p-3 bg-white/70 dark:bg-gray-700/70 rounded-lg">
+                                <img
+                                    src="https://img.youtube.com/vi/sBPlq3Jksww/mqdefault.jpg"
+                                    alt="Motion Design"
+                                    className="w-20 h-12 rounded object-cover"
+                                />
+                                <div>
+                                    <h4 className="font-medium text-sm">
+                                        {vt('courses.motionDesign.title')}
+                                    </h4>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                                        {vt('courses.motionDesign.description')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 p-3 bg-white/70 dark:bg-gray-700/70 rounded-lg">
+                                <img
+                                    src="https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg"
+                                    alt="Interview Skills"
+                                    className="w-20 h-12 rounded object-cover"
+                                />
+                                <div>
+                                    <h4 className="font-medium text-sm">
+                                        {vt('courses.interview.title')}
+                                    </h4>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                                        {vt('courses.interview.description')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 p-3 bg-white/70 dark:bg-gray-700/70 rounded-lg">
+                                <img
+                                    src="https://img.youtube.com/vi/9bZkp7q19f0/mqdefault.jpg"
+                                    alt="Career Development"
+                                    className="w-20 h-12 rounded object-cover"
+                                />
+                                <div>
+                                    <h4 className="font-medium text-sm">
+                                        {vt('courses.careerDevelopment.title')}
+                                    </h4>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                                        {vt(
+                                            'courses.careerDevelopment.description',
+                                        )}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <Link href="/main/videos">
+                            <Button variant="solid" className="w-full">
+                                {vt('viewAllCourses')}
+                            </Button>
+                        </Link>
+                    </Card>
+                </div>
+            </motion.div>
             {/* Main Services */}
             <div className="max-w-7xl mx-auto px-6 lg:px-8 pb-12">
                 <motion.div
@@ -422,7 +515,7 @@ export default function DashboardPage() {
                 <motion.div
                     initial={{ y: 40, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 1.5 }}
+                    transition={{ duration: 0.8, delay: 1.6 }}
                     className="mt-16"
                 >
                     <div className="max-w-4xl mx-auto">
@@ -440,7 +533,7 @@ export default function DashboardPage() {
                                         animate={{ x: 0, opacity: 1 }}
                                         transition={{
                                             duration: 0.5,
-                                            delay: 1.6 + index * 0.1,
+                                            delay: 1.7 + index * 0.1,
                                         }}
                                         className="flex items-center gap-4 p-4 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 hover:bg-white/70 dark:hover:bg-gray-800/70 transition-all duration-300"
                                     >

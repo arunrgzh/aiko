@@ -7,7 +7,7 @@ load_dotenv()
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 
-from .api import auth, onboarding, assistants, notifications, hh_auth, assessment, jobs, enhanced_jobs
+from .api import auth, onboarding, assistants, notifications, hh_auth, assessment, jobs, enhanced_jobs, videos
 # TODO: Add hh_parser after fixing encoding issues
 from .api import settings as settings_api
 from .database import engine, Base, async_session
@@ -51,6 +51,7 @@ app.include_router(assistants.router)
 app.include_router(notifications.router)
 app.include_router(settings_api.router)
 app.include_router(jobs.router)  # Personalized job recommendations
+app.include_router(videos.router)  # Video management system
 
 # Include HeadHunter routers
 app.include_router(hh_auth.router)  # OAuth авторизация

@@ -78,6 +78,7 @@
             "home": "Главная",
             "vacancies": "Вакансии",
             "ai-chat": "Чат с ИИ",
+            "videos": "Курсы",
             "profile": "Профиль",
             "interviews": "Пробные собеседования"
         }
@@ -694,6 +695,36 @@
         "buttons": {
             "login": "Войти",
             "toggleTheme": "Переключить тему"
+        }
+    },
+
+    "videos": {
+        "recommendedForYou": "Рекомендовано для вас",
+        "viewAllCourses": "Посмотреть все курсы",
+        "noMatchesBoostSkills": "Нет подходящих вакансий? Повысьте свои навыки с помощью этих курсов",
+        "improveYourScore": "Улучшите свой результат:",
+        "viewAvailableCourses": "Посмотреть доступные курсы",
+        "courses": {
+            "resume": {
+                "title": "Как составить резюме",
+                "description": "Улучшите свои заявки"
+            },
+            "interview": {
+                "title": "Подготовка к собеседованию",
+                "description": "Успешно пройдите собеседования"
+            },
+            "motionDesign": {
+                "title": "Основы Motion Design",
+                "description": "Изучите новые навыки"
+            },
+            "jobSearch": {
+                "title": "Стратегии поиска работы",
+                "description": "Найдите лучшие возможности"
+            },
+            "careerDevelopment": {
+                "title": "Развитие карьеры",
+                "description": "Повысьте профессиональные навыки"
+            }
         }
     }
 }

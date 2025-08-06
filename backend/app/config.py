@@ -4,10 +4,10 @@ from typing import Optional
 
 class Settings(BaseSettings):
     # Database
-    database_url: str = ""  # Required via .env
+    database_url: str = "sqlite+aiosqlite:///./test_videos.db"  # Use local SQLite
 
     # Security
-    secret_key: str = ""  # Required via .env
+    secret_key: str = "your-secret-key-for-testing"  # Default for testing
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 30
     refresh_token_expire_days: int = 7
