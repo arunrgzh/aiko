@@ -52,12 +52,10 @@ services:
         depends_on:
             - backend
         restart: unless-stopped
-        volumes:
-            - ./front:/app
-            - /app/node_modules
+
         environment:
             - NODE_ENV=production
-        command: sh -c "npm ci && npm run build && npm run start"
+        command: npm run start
 
 volumes:
     postgres_data:
