@@ -16,10 +16,10 @@ export async function POST(
     console.log('route upload, body:', body)
     console.log(
         'url:',
-        `${process.env.BACKEND_URL || 'http://localhost:8000'}/api/main/assistants/${id}/chat`,
+        `${process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/main/assistants/${id}/chat`,
     )
     const res = await fetch(
-        `${process.env.BACKEND_URL || 'http://localhost:8000'}/api/main/assistants/${id}/chat`,
+        `${process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/main/assistants/${id}/chat`,
         {
             method: 'POST',
             headers: {
