@@ -11,7 +11,10 @@ type FastAPIAuthResponse = {
 type AccessPayload = { sub: string; exp: number }
 
 const API_URL =
-    process.env.NEXT_PUBLIC_API_URL || 'https://ai-komekshi.site/api'
+    process.env.NEXT_PUBLIC_API_URL ||
+    (typeof window !== 'undefined'
+        ? `${window.location.protocol}//${window.location.hostname}:8000/api`
+        : 'http://localhost:8000/api')
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
     const res = await fetch(`${API_URL}/api/auth/refresh`, {

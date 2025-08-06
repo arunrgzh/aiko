@@ -5,7 +5,7 @@ export async function GET(req: NextRequest) {
     const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET })
 
     const res = await fetch(
-        `${process.env.BACKEND_URL || 'http://localhost:8000'}/api/main/assistants/`,
+        `${process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/main/assistants/`,
         {
             method: 'GET',
             headers: {

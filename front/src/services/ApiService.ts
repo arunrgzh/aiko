@@ -31,7 +31,9 @@ const constructUrl = (url: string): string => {
     const baseUrl =
         process.env.NEXT_PUBLIC_API_URL ||
         process.env.NEXT_PUBLIC_API_BASE_URL ||
-        'http://localhost:8000/api'
+        (typeof window !== 'undefined'
+            ? `${window.location.protocol}//${window.location.hostname}:8000/api`
+            : 'http://localhost:8000/api')
 
     // Construct full URL
     const fullUrl = `${baseUrl}/${cleanUrl}`
