@@ -27,4 +27,7 @@ class User(Base):
     job_recommendations = relationship("JobRecommendation", back_populates="user", cascade="all, delete-orphan")
     saved_jobs = relationship("SavedJob", back_populates="user", cascade="all, delete-orphan")
     job_feedbacks = relationship("JobFeedback", back_populates="user", cascade="all, delete-orphan")
-    job_preferences = relationship("UserJobPreferences", back_populates="user", uselist=False, cascade="all, delete-orphan") 
+    job_preferences = relationship("UserJobPreferences", back_populates="user", uselist=False, cascade="all, delete-orphan")
+    
+    # Video-related relationships
+    video_history = relationship("UserVideoHistory", back_populates="user", cascade="all, delete-orphan") 

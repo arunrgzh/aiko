@@ -40,6 +40,16 @@ export const navigationConfig: NavigationTree[] = [
         subMenu: [],
     },
     {
+        key: 'main.videos',
+        path: `${MAIN_PREFIX}/videos`,
+        title: 'Курстар',
+        translateKey: 'nav.main.videos',
+        icon: 'play',
+        type: NAV_ITEM_TYPE_ITEM,
+        authority: [ADMIN, USER],
+        subMenu: [],
+    },
+    {
         key: 'main.profile',
         path: `${MAIN_PREFIX}/profile`,
         title: 'Профиль',

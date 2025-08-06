@@ -1,12 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import ChatHistory from './ChatHistory'
 import { useGenerativeChatStore } from '../_store/generativeChatStore'
-import useDebounce from '@/utils/hooks/useDebounce'
+import { useDebounce } from '@/utils/hooks/useDebounce'
 import classNames from '@/utils/classNames'
 import { TbSearch } from 'react-icons/tb'
 import type { ChangeEvent } from 'react'
@@ -23,14 +23,17 @@ const ChatSideNav = ({ className, bodyClass, onClick }: ChatSideNavProps) => {
     const { setSelectedConversation } = useGenerativeChatStore()
     const t = useTranslations('aiChat')
 
-    function handleDebounceFn(e: ChangeEvent<HTMLInputElement>) {
-        setQueryText?.(e.target.value)
+    const [searchInput, setSearchInput] = useState('')
+    const debouncedSearch = useDebounce(searchInput, 500)
+
+    function handleInputChange(e: ChangeEvent<HTMLInputElement>) {
+        setSearchInput(e.target.value)
     }
 
-    const debounceFn = useDebounce(handleDebounceFn, 500)
-    const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-        debounceFn(e)
-    }
+    // Update parent when debounced value changes
+    useEffect(() => {
+        setQueryText?.(debouncedSearch)
+    }, [debouncedSearch, setQueryText])
 
     const handleNewChat = () => {
         setSelectedConversation('')
