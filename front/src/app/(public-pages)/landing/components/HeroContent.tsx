@@ -10,7 +10,7 @@ import { useTranslations } from 'next-intl'
 const HeroContent = ({ mode }: { mode: Mode }) => {
     const router = useRouter()
 
-    const t = useTranslations('landing.hero')
+    const t = useTranslations('landing')
 
     const handleSignIn = () => {
         router.push('/sign-in')
@@ -46,7 +46,7 @@ const HeroContent = ({ mode }: { mode: Mode }) => {
                         className="flex items-center gap-4 justify-center mt-10 relative z-10"
                     >
                         <Button variant="solid" onClick={handleSignIn}>
-                            {t('cta')}
+                            {t('button.create')}
                         </Button>
                     </motion.div>
                 </div>
