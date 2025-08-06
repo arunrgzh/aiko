@@ -2,7 +2,7 @@
 
 import { apiForgotPassword } from '@/services/AuthService'
 import ForgotPassword from '@/components/auth/ForgotPassword'
-import { toast } from '@/components/ui/toast'
+import toast from '@/components/ui/toast'
 import Notification from '@/components/ui/Notification'
 import { useTranslations } from 'next-intl'
 import type { OnForgotPasswordSubmitPayload } from '@/components/auth/ForgotPassword'
