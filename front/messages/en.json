@@ -736,5 +736,35 @@
             "highlightLinks": "Highlight Links",
             "pageRead": "Page Read"
         }
+    },
+
+    "videos": {
+        "recommendedForYou": "Recommended for You",
+        "viewAllCourses": "View All Courses",
+        "noMatchesBoostSkills": "No matches? Boost your skills with these courses",
+        "improveYourScore": "Improve your score:",
+        "viewAvailableCourses": "View Available Courses",
+        "courses": {
+            "resume": {
+                "title": "How to Create a Resume",
+                "description": "Improve your applications"
+            },
+            "interview": {
+                "title": "Interview Preparation",
+                "description": "Ace your interviews"
+            },
+            "motionDesign": {
+                "title": "Motion Design Basics",
+                "description": "Learn new skills"
+            },
+            "jobSearch": {
+                "title": "Job Search Strategies",
+                "description": "Find better opportunities"
+            },
+            "careerDevelopment": {
+                "title": "Career Development",
+                "description": "Boost professional skills"
+            }
+        }
     }
 }

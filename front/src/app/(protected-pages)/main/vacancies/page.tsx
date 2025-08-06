@@ -13,11 +13,15 @@ import vacancyService from '@/services/VacancyService'
 import { JobRecommendation } from './types'
 import { Spinner } from '@/components/ui/Spinner'
 import Container from '@/components/shared/Container'
+import Card from '@/components/ui/Card'
+import Button from '@/components/ui/Button'
+import Link from 'next/link'
 
 export default function VacanciesPage() {
     const searchParams = useSearchParams()
     const { data: session, status } = useSession()
     const t = useTranslations('vacancies')
+    const vt = useTranslations('videos')
     const [isLoading, setIsLoading] = useState(true)
     const [showLoader, setShowLoader] = useState(true)
     const [personalRecommendations, setPersonalRecommendations] = useState<
@@ -344,6 +348,72 @@ export default function VacanciesPage() {
                 onDebugSkills={handleDebugSkills}
                 isLoading={isLoading}
             />
+
+            {/* Video Course Suggestions */}
+            {(personalRecommendations.length > 0 ||
+                assessmentRecommendations.length > 0) && (
+                <Container className="mt-8">
+                    <Card className="p-6">
+                        <h3 className="text-lg font-semibold mb-4">
+                            {vt('noMatchesBoostSkills')}
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="flex gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <img
+                                    src="https://img.youtube.com/vi/wuUtlAvXOow/mqdefault.jpg"
+                                    alt="Resume Course"
+                                    className="w-16 h-10 rounded object-cover"
+                                />
+                                <div>
+                                    <h4 className="font-medium text-sm">
+                                        {vt('courses.resume.title')}
+                                    </h4>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                                        {vt('courses.resume.description')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <img
+                                    src="https://img.youtube.com/vi/i32vWk2L2BU/mqdefault.jpg"
+                                    alt="Interview Course"
+                                    className="w-16 h-10 rounded object-cover"
+                                />
+                                <div>
+                                    <h4 className="font-medium text-sm">
+                                        {vt('courses.interview.title')}
+                                    </h4>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                                        {vt('courses.interview.description')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div className="flex gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                                <img
+                                    src="https://img.youtube.com/vi/sBPlq3Jksww/mqdefault.jpg"
+                                    alt="Skills Course"
+                                    className="w-16 h-10 rounded object-cover"
+                                />
+                                <div>
+                                    <h4 className="font-medium text-sm">
+                                        {vt('courses.motionDesign.title')}
+                                    </h4>
+                                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                                        {vt('courses.motionDesign.description')}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <Link href="/main/videos" className="mt-4 block">
+                            <Button variant="outline" className="w-full">
+                                {vt('viewAllCourses')}
+                            </Button>
+                        </Link>
+                    </Card>
+                </Container>
+            )}
 
             {/* Assistant Suggestion for post-onboarding assessment */}
             <AssistantSuggestion
