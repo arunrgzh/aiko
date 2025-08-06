@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Card from '@/components/ui/Card'
 import Button from '@/components/ui/Button'
 import Link from 'next/link'
+
 import {
     TbFileText,
     TbBriefcase,
@@ -418,11 +419,23 @@ export default function DashboardPage() {
                     })}
                 </div>
 
+                {/* Video Learning Section */}
+                <motion.div
+                    initial={{ y: 40, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.8, delay: 1.4 }}
+                    className="mt-16"
+                >
+                    <div className="max-w-4xl mx-auto">
+                        {/* VideoWidget removed - using simple video page instead */}
+                    </div>
+                </motion.div>
+
                 {/* Recent Activity */}
                 <motion.div
                     initial={{ y: 40, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    transition={{ duration: 0.8, delay: 1.5 }}
+                    transition={{ duration: 0.8, delay: 1.6 }}
                     className="mt-16"
                 >
                     <div className="max-w-4xl mx-auto">
@@ -440,7 +453,7 @@ export default function DashboardPage() {
                                         animate={{ x: 0, opacity: 1 }}
                                         transition={{
                                             duration: 0.5,
-                                            delay: 1.6 + index * 0.1,
+                                            delay: 1.7 + index * 0.1,
                                         }}
                                         className="flex items-center gap-4 p-4 rounded-2xl bg-white/50 dark:bg-gray-800/50 backdrop-blur-xl border border-white/20 dark:border-gray-700/20 hover:bg-white/70 dark:hover:bg-gray-800/70 transition-all duration-300"
                                     >

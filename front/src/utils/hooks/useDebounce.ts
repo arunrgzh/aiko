@@ -1,15 +1,17 @@
-'use client'
+import { useState, useEffect } from 'react'
 
-import debounce from 'lodash/debounce'
-import type { DebounceSettingsLeading } from 'lodash'
+export function useDebounce<T>(value: T, delay: number): T {
+    const [debouncedValue, setDebouncedValue] = useState<T>(value)
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function useDebounce<T extends (...args: any) => any>(
-    func: T,
-    wait: number | undefined,
-    options?: DebounceSettingsLeading,
-) {
-    return debounce(func, wait, options)
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedValue(value)
+        }, delay)
+
+        return () => {
+            clearTimeout(handler)
+        }
+    }, [value, delay])
+
+    return debouncedValue
 }
-
-export default useDebounce
