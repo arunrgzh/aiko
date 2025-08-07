@@ -13,11 +13,13 @@ type AccessPayload = { sub: string; exp: number }
 const API_URL =
     process.env.NEXT_PUBLIC_API_URL ||
     (typeof window !== 'undefined'
-        ? `${window.location.protocol}//${window.location.hostname}:8000/api`
+        ? window.location.hostname === 'ai-komekshi.site'
+            ? 'https://ai-komekshi.site/api'
+            : `${window.location.protocol}//${window.location.hostname}:8000/api`
         : 'http://localhost:8000/api')
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
-    const res = await fetch(`${API_URL}/api/auth/refresh`, {
+    const res = await fetch(`${API_URL}/auth/refresh`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ refresh_token: token.refreshToken }),
@@ -54,9 +56,9 @@ export const authOptions: NextAuthConfig = {
                 try {
                     console.log(
                         '🔐 Attempting login to:',
-                        `${API_URL}/api/auth/login`,
+                        `${API_URL}/auth/login`,
                     )
-                    const res = await fetch(`${API_URL}/api/auth/login`, {
+                    const res = await fetch(`${API_URL}/auth/login`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -216,7 +218,7 @@ export const authOptions: NextAuthConfig = {
         },
     },
 
-    secret: process.env.NEXTAUTH_SECRET,
+    secret: process.env.NEXTAUTH_SECRET || 'your-secret-key-here',
 }
 
 export default authOptions
