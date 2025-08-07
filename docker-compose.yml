@@ -29,8 +29,6 @@ services:
         container_name: ai_komekshi_backend
         env_file:
             - ./backend/.env.production
-        ports:
-            - '8000:8000'
         depends_on:
             - postgres
             - redis
@@ -47,17 +45,16 @@ services:
         container_name: ai_komekshi_frontend
         env_file:
             - ./front/.env.production
-        ports:
-            - '3000:3000'
         depends_on:
             - backend
         restart: unless-stopped
 
         environment:
             - NODE_ENV=production
-              - AUTH_TRUST_HOST=true
-              - NEXTAUTH_URL=https://ai-komekshi.site
-              - AUTH_URL=https://ai-komekshi.site
+            - NEXT_PUBLIC_API_URL=https://ai-komekshi.site/api
+            - NEXTAUTH_URL=https://ai-komekshi.site
+            - AUTH_URL=https://ai-komekshi.site
+            - AUTH_TRUST_HOST=true
         command: npm run start
 
 volumes:
