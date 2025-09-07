@@ -59,6 +59,7 @@ const SignInForm = (props: SignInFormProps) => {
     })
 
     const handleSignIn = async (values: SignInFormSchema) => {
+        console.log('Submitting sign-in with username:', values.username)
         try {
             setSubmitting(true)
             const result = await signIn('credentials', {
@@ -129,7 +130,7 @@ const SignInForm = (props: SignInFormProps) => {
                         rules={{ required: true }}
                         render={({ field }) => (
                             <PasswordInput
-                                type="text"
+                                type="password"
                                 placeholder={t('form.passwordPlaceholder')}
                                 autoComplete="off"
                                 disabled={isSubmitting}

@@ -10,13 +10,19 @@ type FastAPIAuthResponse = {
 }
 type AccessPayload = { sub: string; exp: number }
 
-const API_URL =
+// Normalize API base URL to ensure it always ends with "/api"
+const RAW_API_URL =
+    process.env.API_URL ||
     process.env.NEXT_PUBLIC_API_URL ||
     (typeof window !== 'undefined'
         ? window.location.hostname === 'ai-komekshi.site'
             ? 'https://ai-komekshi.site/api'
             : `${window.location.protocol}//${window.location.hostname}:8000/api`
         : 'http://localhost:8000/api')
+
+const API_URL = RAW_API_URL.endsWith('/api')
+    ? RAW_API_URL
+    : `${RAW_API_URL.replace(/\/+$/, '')}/api`
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
     const res = await fetch(`${API_URL}/auth/refresh`, {

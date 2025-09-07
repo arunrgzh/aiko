@@ -25,7 +25,7 @@ services:
     backend:
         build:
             context: ./backend
-            dockerfile: Dockerfile
+            dockerfile: dockerfile
         container_name: ai_komekshi_backend
         env_file:
             - ./backend/.env.production
@@ -52,12 +52,20 @@ services:
         depends_on:
             - backend
         restart: unless-stopped
-        volumes:
-            - ./front:/app
-            - /app/node_modules
+        # In production, do not override the built app with a bind mount
+        # volumes:
+        #     - ./front:/app
+        #     - /app/node_modules
         environment:
             - NODE_ENV=production
-        command: sh -c "npm ci && npm run build && npm run start"
+            - NEXTAUTH_URL=http://localhost:3000
+            - AUTH_TRUST_HOST=true
+            - NEXTAUTH_SECRET=dev-secret-change-me
+            - AUTH_SECRET=dev-secret-change-me
+            - NEXT_PUBLIC_API_URL=http://backend:8000/api
+            - API_URL=http://backend:8000/api
+        # Start Next.js on all interfaces
+        command: sh -c "npm run start -- -H 0.0.0.0 -p 3000"
 
 volumes:
     postgres_data:

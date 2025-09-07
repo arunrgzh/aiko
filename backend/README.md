@@ -25,11 +25,11 @@ ACCESS_TOKEN_EXPIRE_MINUTES=30
 REFRESH_TOKEN_EXPIRE_DAYS=7
 
 # Frontend
-FRONTEND_URL=http://REDACTED:3000
+FRONTEND_URL=http://localhost:3000
 
 # OpenAI API (получите ключ на https://platform.openai.com/api-keys)
 OPENAI_API_KEY=sk-your-openai-api-key-here
-OPENAI_MODEL=gpt-3.5-turbo
+OPENAI_MODEL=gpt-4.0-turbo
 OPENAI_MAX_TOKENS=1000
 OPENAI_TEMPERATURE=0.7
 
@@ -50,16 +50,19 @@ DEBUG=true
 ### 4. Запустите сервер:
 
 ```bash
-# Используя npm script (рекомендуется)
-npm run dev
+# Используя python (простой способ)
+python run.py
 
 # Или напрямую через uvicorn
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Или npm script (есть в backend/package.json)
+npm run dev
 ```
 
-Сервер будет доступен по адресу: https://ai-komekshi.site/api
+Сервер будет доступен по адресу: http://localhost:8000
 
-API документация (Swagger): https://ai-komekshi.site/api/docs
+API документация (Swagger): http://localhost:8000/docs
 
 ## Структура API
 

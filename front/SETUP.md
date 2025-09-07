@@ -1,33 +1,40 @@
-# XROX Application Setup Guide
+# AI-Komekshi Application Setup Guide
 
-This guide will help you set up the complete XROX application with a FastAPI backend and Next.js frontend, including the new onboarding system.
+This guide will help you set up the complete AI-Komekshi application with a FastAPI backend and Next.js frontend, including the onboarding system.
 
 ## 🚀 Quick Start with Docker
 
-The easiest way to get started is using Docker Compose:
+The easiest way to get started is using Docker Compose (frontend + backend + Postgres + Redis):
 
 ```bash
-# Clone the repository (if not already done)
+# Clone the repository
 git clone <your-repo-url>
-cd xrox-front-end
+cd AI-Komek
 
-# Start all services
-docker-compose -f docker-compose.full.yml up -d
+# (First time) Create minimal env files used by docker-compose
+# Backend env (production-like)
+printf "DATABASE_URL=postgresql+asyncpg://REDACTED:REDACTED@postgres:5432/ai_komek\nSECRET_KEY=change-me-in-prod\nFRONTEND_URL=http://localhost:3000\nENVIRONMENT=production\nDEBUG=False\n" > backend/.env.production
+
+# Frontend env (production-like)
+printf "NEXT_PUBLIC_API_URL=http://localhost:8000\nNEXTAUTH_SECRET=change-me\nNEXTAUTH_URL=http://localhost:3000\n" > front/.env.production
+
+# Build & start
+docker-compose up -d
 
 # The application will be available at:
-# Frontend: http://REDACTED:3000
-# Backend API: https://ai-komekshi.site/api
-# API Documentation: https://ai-komekshi.site/api/docs
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:8000
+# API Documentation: http://localhost:8000/docs
 ```
 
 ## 🛠️ Manual Setup
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.10+
 - Node.js 18+
-- PostgreSQL
-- Redis (optional)
+- PostgreSQL (optional for development; required for production)
+- Redis (optional for development; used for advanced features/production)
 
 ### Backend Setup
 
@@ -50,25 +57,51 @@ docker-compose -f docker-compose.full.yml up -d
     pip install -r requirements.txt
     ```
 
-4. **Set up environment variables:**
+4. **Create `.env` file:**
+
+    Choose one of the options below.
+
+    - SQLite (simplest local dev; no DB service needed):
+
+        ```env
+        DATABASE_URL=sqlite+aiosqlite:///./ai_komek.db
+        SECRET_KEY=your-secret-key-here-change-this
+        FRONTEND_URL=http://localhost:3000
+        ENVIRONMENT=development
+        DEBUG=True
+        ```
+
+    - PostgreSQL (local/production-like):
+
+        ```env
+        DATABASE_URL=postgresql+asyncpg://<user>:<password>@localhost:5432/<db>
+        SECRET_KEY=your-secret-key-here-change-this
+        FRONTEND_URL=http://localhost:3000
+        ENVIRONMENT=development
+        DEBUG=True
+        # Optional
+        REDIS_URL=redis://localhost:6379
+        ```
+
+5. **(If using PostgreSQL) Create database:**
 
     ```bash
-    cp env.example .env
-    # Edit .env with your configuration
-    ```
-
-5. **Set up database:**
-
-    ```bash
-    # Create PostgreSQL database
-    createdb xrox_db
-
-    # The tables will be created automatically when you run the app
+    createdb ai_komek
     ```
 
 6. **Run the backend:**
+
+    Any of the following works:
+
     ```bash
+    # Easiest
     python run.py
+
+    # Or with uvicorn
+    uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+    # Or via npm script (provided in backend/package.json)
+    npm run dev
     ```
 
 ### Frontend Setup
@@ -79,13 +112,15 @@ docker-compose -f docker-compose.full.yml up -d
     npm install
     ```
 
-2. **Set up environment variables:**
-   Create a `.env.local` file in the root directory:
+2. **Create `.env.local`:**
 
     ```env
-    API_URL=https://ai-komekshi.site/api
+    # Base URL for the backend API
+    NEXT_PUBLIC_API_URL=http://localhost:8000
+
+    # NextAuth
     NEXTAUTH_SECRET=your-nextauth-secret-here
-    NEXTAUTH_URL=http://REDACTED:3000
+    NEXTAUTH_URL=http://localhost:3000
     ```
 
 3. **Run the frontend:**
@@ -98,8 +133,12 @@ docker-compose -f docker-compose.full.yml up -d
 ### Backend (.env)
 
 ```env
-# Database
-DATABASE_URL=postgresql://user:password@REDACTED:5432/xrox_db
+# Database (choose one)
+# SQLite for local dev
+DATABASE_URL=sqlite+aiosqlite:///./ai_komek.db
+
+# Or PostgreSQL
+# DATABASE_URL=postgresql+asyncpg://REDACTED:REDACTED@localhost:5432/ai_komek
 
 # Security
 SECRET_KEY=your-secret-key-here-make-it-long-and-random
@@ -107,23 +146,29 @@ ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=30
 REFRESH_TOKEN_EXPIRE_DAYS=7
 
-# Redis
-REDIS_URL=redis://REDACTED:6379
+# Redis (optional)
+# REDIS_URL=redis://localhost:6379
 
 # Frontend URL for CORS
-FRONTEND_URL=http://REDACTED:3000
+FRONTEND_URL=http://localhost:3000
 
 # Environment
 ENVIRONMENT=development
 DEBUG=True
+
+# Optional Azure/OpenAI (only if you plan to use them)
+# AZURE_OPENAI_API_KEY=...
+# AZURE_OPENAI_BASE_URL=...
+# AZURE_OPENAI_API_VERSION=2024-06-01
+# OPENAI_API_KEY=...
 ```
 
 ### Frontend (.env.local)
 
 ```env
-API_URL=https://ai-komekshi.site/api
+NEXT_PUBLIC_API_URL=http://localhost:8000
 NEXTAUTH_SECRET=your-nextauth-secret-here
-NEXTAUTH_URL=http://REDACTED:3000
+NEXTAUTH_URL=http://localhost:3000
 ```
 
 ## 🔐 Authentication Flow
@@ -134,7 +179,7 @@ NEXTAUTH_URL=http://REDACTED:3000
 
 ## 🎯 Onboarding Flow
 
-The new onboarding system includes 5 steps:
+The onboarding system includes 5 steps:
 
 1. **Personal Information** - Name, phone, date of birth, gender
 2. **Professional Information** - Current position, experience, industry
@@ -149,26 +194,6 @@ The new onboarding system includes 5 steps:
 - `PUT /api/onboarding/profile` - Update onboarding profile
 - `POST /api/onboarding/complete` - Mark onboarding as completed
 - `GET /api/onboarding/progress` - Get onboarding progress
-
-## 🗄️ Database Schema
-
-### Users Table
-
-- `id` - Primary key
-- `username` - Unique username
-- `email` - Unique email
-- `hashed_password` - Bcrypt hashed password
-- `is_active` - Account status
-- `is_verified` - Email verification status
-- `is_first_login` - First login flag for onboarding
-
-### Onboarding Profiles Table
-
-- `user_id` - Foreign key to User
-- Personal information fields (first_name, last_name, phone, etc.)
-- Professional information fields (current_position, years_of_experience, etc.)
-- Skills and preferences (skills, preferred_job_types, etc.)
-- Progress tracking (onboarding_completed, current_step, total_steps)
 
 ## 🧪 Testing
 
@@ -189,8 +214,8 @@ npm test
 
 Once the backend is running, you can access:
 
-- **Swagger UI:** https://ai-komekshi.site/api/docs
-- **ReDoc:** https://ai-komekshi.site/api/redoc
+- **Swagger UI:** http://localhost:8000/docs
+- **ReDoc:** http://localhost:8000/redoc
 
 ## 🔧 Development
 
@@ -208,7 +233,7 @@ uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 npm run dev
 ```
 
-### Database Migrations
+### Database Migrations (if using PostgreSQL)
 
 ```bash
 cd backend
@@ -234,11 +259,13 @@ Make sure to update the following for production:
 ### Docker Production
 
 ```bash
+# Ensure backend/.env.production and front/.env.production are set appropriately
+
 # Build production images
-docker-compose -f docker-compose.prod.yml build
+docker-compose build
 
 # Run production stack
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose up -d
 ```
 
 ## 🐛 Troubleshooting
@@ -247,25 +274,25 @@ docker-compose -f docker-compose.prod.yml up -d
 
 1. **Database Connection Error**
 
-    - Ensure PostgreSQL is running
-    - Check DATABASE_URL in .env
+    - Ensure PostgreSQL is running (if using Postgres)
+    - Check `DATABASE_URL` in `.env`
     - Verify database exists
 
 2. **CORS Errors**
 
-    - Check FRONTEND_URL in backend .env
-    - Ensure frontend URL matches exactly
+    - Check `FRONTEND_URL` in backend `.env`
+    - Ensure frontend URL matches exactly (including scheme and port)
 
 3. **Authentication Issues**
 
-    - Verify NEXTAUTH_SECRET is set
-    - Check API_URL in frontend .env
-    - Ensure backend is running on correct port
+    - Verify `NEXTAUTH_SECRET` is set
+    - Check `NEXT_PUBLIC_API_URL` in frontend `.env`
+    - Ensure backend is running on the expected port
 
 4. **Onboarding Not Working**
     - Check if user has `is_first_login: true`
     - Verify onboarding API endpoints are accessible
-    - Check browser console for errors
+    - Check browser console and network tab for errors
 
 ## 📞 Support
 
@@ -274,7 +301,7 @@ If you encounter any issues:
 1. Check the logs: `docker-compose logs`
 2. Verify all environment variables are set correctly
 3. Ensure all services are running
-4. Check the API documentation at https://ai-komekshi.site/api/docs
+4. Check the API documentation at http://localhost:8000/docs
 
 ## 🎉 Next Steps
 
